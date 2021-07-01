@@ -27,7 +27,7 @@ Anim:Stop()
 ```lua
 HttpRequire("HttpLink") -- Need to start with 'https://' or 'http://'
 
-Animator:GetPlayer() -- Get Animator's Player (Player that play the game)
+Animator:GetPlayer() -- Get Animator's Assigned Player (Player that play the game)
 ```
 
 ## GUI Version, Work best with Nullware
