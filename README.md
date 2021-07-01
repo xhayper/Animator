@@ -5,9 +5,9 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 ## Features
 
 * Easy To Use
-* Can play Non-Trusted Animation / Raw Animation Data (Converter Provied)
+* Can play Non-Trusted Animation / Raw Animation Data (Use [Converter](https://github.com/xhayper/Animator/tree/main/Converter))
 * R6, R15, Custom Rig/Animation Support
-* Complatible with Nullware Reanimate (Used to  replicate Animation)
+* Complatible with Nullware Reanimate (Used to replicate Animation)
 
 ## Planned Feature
 
@@ -25,7 +25,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main
 ```lua
 -- Constructor --
 
-Animator.new(Player, AnimationData) -- Animation Data Should Be AnimationID as String/Number or KeyfraneSequnce or Raw Animation Data (Converter will be provied in next update)
+Animator.new(Player, AnimationData) -- Animation Data Should Be AnimationID as String/Number or KeyfraneSequnce or Raw Animation Data
 
 -- Functions --
 
