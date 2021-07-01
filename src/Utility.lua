@@ -1,7 +1,6 @@
 local Utility = {}
-Utility.__index = Utility
 
-local sub,len,format = string.sub, string.len, string.format
+local sub,len = string.sub, string.len
 
 function Utility:convertEnum(enum)
 	local stringEnum = tostring(enum)
