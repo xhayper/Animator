@@ -59,6 +59,8 @@ Anim:Stop()
 
 ## Animator with UI
 
+* Note: Only support Animation ID
+
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 
