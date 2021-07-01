@@ -36,8 +36,8 @@ function Animator:Start()
 			spawn(function()
 				local originalHipHeight
 				if chr:FindFirstChild("Humanoid") then
-					if chr.Humanoid:FindFirstChild("Animator") and chr.Humanoid.Animator:IsA("Animator")
-						chr.Humanoid.Animator:Destroy() then
+					if chr.Humanoid:FindFirstChild("Animator") and chr.Humanoid.Animator:IsA("Animator") then
+						chr.Humanoid.Animator:Destroy()
 					end
 					originalHipHeight = chr.Humanoid.HipHeight
 					chr.Humanoid.HipHeight = self.AnimationData.AuthoredHipHeight
