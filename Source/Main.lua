@@ -1,4 +1,3 @@
---[[
 local pathToGithub = "https://raw.githubusercontent.com/xhayper/Animator/main/Source/"
 
 getgenv().HttpRequire = function(path)
@@ -18,5 +17,3 @@ getgenv().Animator = animatorRequire("Animator.lua")
 local Utility = animatorRequire("Utility.lua")
 
 Utility:sendNotif("API Loaded", nil, 5)
-]]--
-return print("Scrapped, Due to now having enough Knowledge")
