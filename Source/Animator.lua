@@ -23,6 +23,7 @@ function Animator.new(plr, Animation)
 	else
 		c.AnimationData = Parser:parseAnimationData(game:GetObjects("rbxassetid://"..tostring(Animation))[1])
 	end
+	c.Looped = c.AnimationData.Looped
 	return c
 end
 
