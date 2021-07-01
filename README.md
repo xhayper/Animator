@@ -29,7 +29,7 @@ Animator.isPlaying -- Is the animation playing?
 -- Globals --
 
 HttpRequire("HttpLink") -- Require the module using GET Request, Must start with 'http://' or 'https://'
-myRequire("Path") -- Used by Animator to require the modules
+animatorRequire("Path") -- Used by Animator, Same as HttpRequire but with this repo link
 ```
 
 ## Usage
@@ -48,7 +48,9 @@ wait(5)
 Anim:Stop()
 ```
 
-## GUI Version, Work best with Nullware
+## GUI Version
+
+* Work best with Nullware
 
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/src/Main.lua"))()
