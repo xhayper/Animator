@@ -1,4 +1,5 @@
 local Utility = {}
+Utility.__index = Utility
 
 local sub,len,format = string.sub, string.len, string.format
 
