@@ -13,3 +13,7 @@ getgenv().animatorRequire = function(path)
 end
 
 getgenv().Animator = animatorRequire("Animator.lua")
+
+local Utility = animatorRequire("Utility.lua")
+
+Utility:sendNotif("API Loaded", nil, 5)
