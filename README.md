@@ -7,6 +7,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 * Easy To Use
 * Can play Non-Trusted Animation
 * R6, R15, Custom Rig/Animation Support
+* Complatible with Nullware Reanimate (Used to replicating)
 
 ## Planned Feature
 
@@ -56,8 +57,6 @@ Anim:Stop()
 ```
 
 ## Animator with UI
-
-* Work best with Nullware
 
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/src/Main.lua"))()
