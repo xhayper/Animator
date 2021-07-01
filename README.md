@@ -55,7 +55,7 @@ wait(5)
 Anim:Stop()
 ```
 
-## GUI Version
+## Animator with UI
 
 * Work best with Nullware
 
