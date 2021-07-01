@@ -1,6 +1,6 @@
 local Utility = myRequire("Utility.lua")
 
-local sub,len,format = string.sub, string.len, string.format
+local sub,format = string.sub, string.format
 
 local Parser = {}
 
@@ -26,6 +26,7 @@ function Parser:parseAnimationData(KeyframeSequence)
 				if FrameData.Poses[PartName] then
 					return error("Animation have duplicated Pose with same name")
 				else
+					print(Parser:parsePoseData(I))
 					FrameData.Poses[PartName] = Parser:parsePoseData(I)
 				end
 			end
