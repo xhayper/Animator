@@ -25,6 +25,7 @@ function Utility:getRigData(plr)
 	end
 
 	for _,I in pairs(chr:GetDescendants()) do
+		print(I.Name, I.ClassName)
 		if I:IsA("Motor6D") and (chrClone == nil or chrClone ~= nil and I:IsDescendantOf(chrClone) ~= true) then
 			local Part1Name = I.Part1.Name
 			if RigMotor[Part1Name] then

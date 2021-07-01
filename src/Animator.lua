@@ -40,13 +40,9 @@ function Animator:Start()
 					chr.Animate.Disabled = true
 				end
 				local RigMotor = Utility:getRigData(self.Player)
-				print("Woo?")
-				print(self.AnimationData)
-				print(self.AnimationData.Frames)
 				local lastTick = tick()
 				local lastFrameTime = 0
 				for frameNumber,Frame in pairs(self.AnimationData.Frames) do
-					print(frameNumber,Frame)
 					if Frame.Time ~= 0 then
 						if tick() - lastTick < Frame.Time then
 							repeat RunService.Heartbeat:Wait() until tick() - lastTick >= Frame.Time
