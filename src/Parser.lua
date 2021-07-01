@@ -26,7 +26,6 @@ function Parser:parseAnimationData(KeyframeSequence)
 				if FrameData.Poses[PartName] then
 					return error("Animation have duplicated Pose with same name")
 				else
-					print(Parser:parsePoseData(I))
 					FrameData.Poses[PartName] = Parser:parsePoseData(I)
 				end
 			end
