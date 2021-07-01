@@ -1,3 +1,5 @@
+# SCRAPPED UNTIL I HAVE MORE KNOWLEDGE ABOUT NETWORK OWNERSHIP
+
 # Animator
 
 Alternative Roblox animation player to fit your "Animating/Whatever" need
