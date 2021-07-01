@@ -19,4 +19,4 @@ local Utility = animatorRequire("Utility.lua")
 
 Utility:sendNotif("API Loaded", nil, 5)
 ]]--
-print("Scrapped, Due to now having enough Knowledge")
+return print("Scrapped, Due to now having enough Knowledge")
