@@ -33,12 +33,13 @@ function Animator:Start()
 		local chr = self.Player.Character
 		if chr then
 			spawn(function()
-				if chr:FindFirstChild("Humanoid") and chr.Humanoid:FindFirstChild("Animator") then
+				if chr:FindFirstChild("Humanoid") and chr.Humanoid:FindFirstChild("Animator") and chr.Humanoid.Animator:IsA("Animator") then
 					chr.Humanoid.Animator:Destroy()
 				end
-				if chr:FindFirstChild("Animate") then
+				if chr:FindFirstChild("Animate") and chr.Animate:IsA("LocalScript") then
 					chr.Animate.Disabled = true
 				end
+				print("Woo?")
 				local RigMotor = Utility:getRigData(self.Player)
 				local lastTick = tick()
 				local lastFrameTime = 0
