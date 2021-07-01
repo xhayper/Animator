@@ -4,7 +4,7 @@ local TweenService = game:GetService("TweenService")
 local Parser = animatorRequire("Parser.lua")
 local Utility = animatorRequire("Utility.lua")
 
-local Animator = {isPlaying = false, isStopped = false, Looped = true}
+local Animator = {isPlaying = false, isStopped = false, Loop = false}
 Animator.__index = Animator
 
 function Animator.new(plr, Animation)
@@ -23,7 +23,7 @@ function Animator.new(plr, Animation)
 	else
 		c.AnimationData = Parser:parseAnimationData(game:GetObjects("rbxassetid://"..tostring(Animation))[1])
 	end
-	c.Looped = c.AnimationData.Looped
+	c.Loop = c.AnimationData.Loop
 	return c
 end
 
@@ -68,7 +68,7 @@ function Animator:Start()
 					lastFrameTime = Frame.Time
 				end
 				self.isPlaying = false
-				if self.Looped == true and self.isStopped ~= true then
+				if self.Loop == true and self.isStopped ~= true then
 					return self:Start()
 				else
 					wait()
