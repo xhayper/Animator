@@ -1,6 +1,6 @@
 # Animator
 
-Basiclly
+Installation
 
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/src/Main.lua"))()
@@ -20,4 +20,10 @@ Anim.Looped = false -- True by default
 Anim:Start()
 wait(5)
 Anim:Stop()
+```
+
+Also
+
+```lua
+HttpRequire("HTTP LINK") -- Need to start with 'https://' or 'http://'
 ```
