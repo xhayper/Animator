@@ -48,7 +48,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main
 
 local Player = game:GetService("Players").LocalPlayer
 
-local AnimationData = 5806573931 -- Can also be KeyframeSequnce Instance, Table of data or ID as string
+local AnimationData = 123456789 -- Can also be KeyframeSequnce Instance, Table of data or ID as string
 
 local Anim = Animator.new(Player, AnimationData)
 Anim.Loop = true
