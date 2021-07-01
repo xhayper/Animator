@@ -16,7 +16,7 @@ function Parser:parseAnimationData(KeyframeSequence)
 		return warn(format("invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)", KeyframeSequence.ClassName))
 	end
 
-	local AnimationData = {Priority = KeyframeSequence.Priority, Frames = {}}
+	local AnimationData = {Loop = KeyframeSequence.Loop, Priority = KeyframeSequence.Priority, AuthoredHipHeight = KeyframeSequence.AuthoredHipHeight, Frames = {}}
 
 	for i,Frame in pairs(KeyframeSequence:GetChildren()) do
 		if Frame:IsA("Keyframe") then
