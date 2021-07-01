@@ -1,6 +1,6 @@
 # Animator
 
-Roblox Alternative Animation Player
+Alternative Roblox animation player to fit your "Exploting" need
 
 ## Features
 
@@ -151,3 +151,7 @@ Nullware.Button({
 	end
 })
 ```
+
+## Note
+* I did this for fun, if you get banned for this, it's your fault
+* I am bored so i make this
