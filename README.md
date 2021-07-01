@@ -29,7 +29,7 @@ Animator.isPlaying -- Is the animation playing?
 -- Globals --
 
 HttpRequire("HttpLink") -- Require the module using GET Request, Must start with 'http://' or 'https://'
-animatorRequire("Path") -- Used by Animator, Same as HttpRequire but with this repo link
+animatorRequire("Path") -- Used by Animator, Same as HttpRequire but with this repo link as the prefix
 ```
 
 ## Example
