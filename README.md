@@ -1,5 +1,7 @@
 # Animator
 
+Roblox Alternative Animation Player
+
 ## Features
 
 * Easy To Use
