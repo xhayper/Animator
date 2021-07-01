@@ -5,7 +5,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 ## Features
 
 * Easy To Use
-* Can play Non-Trusted Animation
+* Can play Non-Trusted Animation / Raw Animation Data (Converter Provied)
 * R6, R15, Custom Rig/Animation Support
 * Complatible with Nullware Reanimate (Used to  replicate Animation)
 
