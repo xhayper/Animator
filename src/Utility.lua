@@ -25,7 +25,7 @@ function Utility:getRigData(plr)
 	end
 
 	for _,I in pairs(chr:GetDescendants()) do
-		if I:IsA("Motor6D") and (chrClone == nil or chrClone and I:IsDescendantOf(chrClone) ~= true) then
+		if I:IsA("Motor6D") and (chrClone == nil or chrClone ~= nil and I:IsDescendantOf(chrClone) ~= true) then
 			local Part1Name = I.Part1.Name
 			if RigMotor[Part1Name] then
 				return error("Rig Error! Found 2 Motor6D with same Part1!")
