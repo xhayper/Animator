@@ -42,7 +42,6 @@ function Animator:Start()
 				local RigMotor = Utility:getRigData(self.Player)
 				local lastTick = tick()
 				local lastFrameTime = 0
-				print("A")
 				for frameNumber,Frame in pairs(self.AnimationData.Frames) do
 					if Frame.Time ~= 0 then
 						if tick() - lastTick < Frame.Time then
