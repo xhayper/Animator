@@ -6,7 +6,7 @@ Alternative Roblox animation player to fit your "Exploting" need
 
 * Easy To Use
 * Can play Non-Trusted Animation
-* R6, R15, Custom Rig Support
+* R6, R15, Custom Rig/Animation Support
 
 ## Planned Feature
 
