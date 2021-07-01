@@ -88,7 +88,7 @@ local Nullware = UI.New({
 	Title = "Nullware"
 })
 
--- PLAYER --
+-- MAIN --
 
 local Animation = Main.TextField({
 	Text = "Animation"
