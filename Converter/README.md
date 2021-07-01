@@ -16,7 +16,7 @@
 	AuthoredHipHeight = Number, -- Hip Height
 	Frames = {
 		{
-			["Part Name"] = { -- Name of the part, For example, "HumanoidRootPart"
+			["Part Name"] = { -- Name of the part, For example, "HumanoidRootPart", "Left Arm", "Right Arm", "Lower Torso"
 				CFrame = CFrame -- CFrame of the Animation
 				EasingDirection = Enum.EasingDirection, -- Tween Easing Direction
 				EasingStyle = Enum.EasingStyle, -- Tween Easing Style
