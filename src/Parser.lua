@@ -1,4 +1,4 @@
-local Utility = myRequire("Utility.lua")
+local Utility = animatorRequire("Utility.lua")
 
 local sub,format = string.sub, string.format
 

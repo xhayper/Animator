@@ -8,8 +8,8 @@ getgenv().HttpRequire = function(path)
 	end
 end
 
-getgenv().myRequire = function(path)
+getgenv().animatorRequire = function(path)
 	return HttpRequire(pathToGithub..path)
 end
 
-getgenv().Animator = myRequire("Animator.lua")
+getgenv().Animator = animatorRequire("Animator.lua")
