@@ -24,6 +24,8 @@ function Animator.new(plr, Animation)
 	else
 		c.AnimationData = Parser:parseAnimationData(game:GetObjects("rbxassetid://"..tostring(Animation))[1])
 	end
+	
+	print(c.AnimationData)
 
 	return c
 end
