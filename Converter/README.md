@@ -22,7 +22,7 @@
 				EasingStyle = Enum.EasingStyle, -- Tween Easing Style
 				Weight = Number -- Animation Weight
 			},
-			Time = Number -- Timestamp of the animation
+			Time = Number -- Timestamp of the Frame
 		}
 	}
 }
