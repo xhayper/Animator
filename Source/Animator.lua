@@ -103,7 +103,7 @@ function Animator:Stop()
 end
 
 function Animator:GetPlayer()
-	return self.Player	
+	return self.Player
 end
 
 return Animator
