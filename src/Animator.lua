@@ -13,7 +13,7 @@ function Animator.new(plr, Animation)
 	if not plr:IsA("Player") then
 		return error(format("invalid argument 1 to 'new' (Player expected, got %s)", plr.ClassName))
 	else
-		c.Player = Player
+		c.Player = plr
 	end
 
 	if typeof(Animation) == "table" then
