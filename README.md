@@ -6,6 +6,11 @@
 * Can play Non-Trusted Animation
 * R6, R15, Custom Rig Support
 
+## Planned Feature
+
+* Priority Support (Idk how)
+* Weight System (Idk how)
+
 ## Installation
 
 ```lua
