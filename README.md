@@ -32,7 +32,7 @@ HttpRequire("HttpLink") -- Require the module using GET Request, Must start with
 animatorRequire("Path") -- Used by Animator, Same as HttpRequire but with this repo link
 ```
 
-## Usage
+## Example
 
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/src/Main.lua"))()
