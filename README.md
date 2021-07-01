@@ -1,9 +1,35 @@
 # Animator
 
+## Features
+
+* Easy To Use
+* Can play Non-Trusted Animation
+* R6, R15, Custom Rig Support
+
 ## Installation
 
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/src/Main.lua"))()
+```
+
+## Documentation
+
+```lua
+-- Constructor --
+
+Animator.new(Player, AnimationData) -- Animation Data Should Be AnimationID as String/Number or KeyfraneSequnce or Raw Animation Data (Converter will be provied in next update)
+
+-- Functions --
+
+Animator:Play() -- Play the Animation
+Animator:Stop() -- Stop the Animation
+Animator:GetPlayer() -- Get assigned Player
+Animator.isPlaying -- Is the animation playing?
+
+-- Globals --
+
+HttpRequire("HttpLink") -- Require the module using GET Request, Must start with 'http://' or 'https://'
+myRequire("Path") -- Used by Animator to require the modules
 ```
 
 ## Usage
@@ -20,14 +46,6 @@ Anim.Looped = false -- True by default
 Anim:Start()
 wait(5)
 Anim:Stop()
-```
-
-## Also
-
-```lua
-HttpRequire("HttpLink") -- Need to start with 'https://' or 'http://'
-
-Animator:GetPlayer() -- Get Animator's Assigned Player (Player that play the game)
 ```
 
 ## GUI Version, Work best with Nullware
