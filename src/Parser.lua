@@ -19,18 +19,20 @@ function Parser:parseAnimationData(KeyframeSequence)
 	local AnimationData = {Priority = KeyframeSequence.Priority, Frames = {}}
 
 	for i,Frame in pairs(KeyframeSequence:GetChildren()) do
-		local FrameData = {Time = Frame.Time, Poses = {}}
-		for _,I in pairs(Frame:GetDescendants()) do
-			if I:IsA("Pose") then
-				local PartName = I.Name
-				if FrameData.Poses[PartName] then
-					warn("Animation have duplicated Pose with same name")
-				else
-					FrameData.Poses[PartName] = Parser:parsePoseData(I)
+		if Frame:IsA("Frame") then
+			local FrameData = {Time = Frame.Time, Poses = {}}
+			for _,I in pairs(Frame:GetDescendants()) do
+				if I:IsA("Pose") then
+					local PartName = I.Name
+					if FrameData.Poses[PartName] then
+						warn("Animation have duplicated Pose with same name")
+					else
+						FrameData.Poses[PartName] = Parser:parsePoseData(I)
+					end
 				end
 			end
+			table.insert(AnimationData.Frames, FrameData)
 		end
-		table.insert(AnimationData.Frames, FrameData)
 	end
 
 	table.sort(AnimationData.Frames, function(l, r)
