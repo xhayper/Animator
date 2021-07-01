@@ -2,6 +2,7 @@ local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
 local Parser = myRequire("Parser.lua")
+local Utility = myRequire("Utility.lua")
 
 local Animator = {}
 
@@ -24,9 +25,6 @@ function Animator.new(plr, Animation)
 	else
 		c.AnimationData = Parser:parseAnimationData(game:GetObjects("rbxassetid://"..tostring(Animation))[1])
 	end
-	
-	print(c.AnimationData)
-
 	return c
 end
 
@@ -43,7 +41,7 @@ function Animator:Start()
 				if chr:FindFirstChild("Animate") then
 					chr.Animate.Disabled = true
 				end
-				local RigMotor = getRigData(self.plr)
+				local RigMotor = Utility:getRigData(self.plr)
 				local lastTick = tick()
 				local lastFrameTime = 0
 				for frameNumber,Frame in pairs(self.AnimationData.Frames) do
