@@ -107,7 +107,7 @@ local Play = Main.Button({
 			wait()
 		end
 		currentAnim = Animator.new(plr, Animation:GetText())
-		currentAnim.Looped = Loop:GetState()
+		currentAnim.Loop = Loop:GetState()
 		currentAnim:Start()
 	end
 })
