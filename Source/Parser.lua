@@ -1,6 +1,6 @@
 local Utility = animatorRequire("Utility.lua")
 
-local sub,format = string.sub, string.format
+local format = string.format
 
 local Parser = {}
 
@@ -24,11 +24,8 @@ function Parser:parseAnimationData(KeyframeSequence)
 			for _,I in pairs(Frame:GetDescendants()) do
 				if I:IsA("Pose") then
 					local PartName = I.Name
-					if FrameData.Poses[PartName] then
-						warn("Animation have duplicated Pose with same name")
-					else
-						FrameData.Poses[PartName] = Parser:parsePoseData(I)
-					end
+					if FrameData.Poses[PartName] then return warn("Animation have duplicated Pose with same name") end
+					FrameData.Poses[PartName] = Parser:parsePoseData(I)
 				end
 			end
 			table.insert(AnimationData.Frames, FrameData)

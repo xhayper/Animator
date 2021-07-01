@@ -1,6 +1,6 @@
 local Utility = {}
 
-local sub,len = string.sub, string.len
+local sub= string.sub
 
 function Utility:sendNotif(Text, Icon, Duration, Button1, Button2, Callback)
 	game:GetService("StarterGui"):SetCore("SendNotification", {
@@ -40,11 +40,8 @@ function Utility:getRigData(plr)
 		if I:IsA("Motor6D") and (chrClone == nil or chrClone ~= nil and I:IsDescendantOf(chrClone) ~= true) then
 			if I.Part0 ~= nil and I.Part1 ~= nil then
 				local Part1Name = I.Part1.Name
-				if RigMotor[Part1Name] then
-					warn("Rig Error! Found 2 Motor6D with same Part1!")
-				else
-					RigMotor[Part1Name] = I
-				end
+				if RigMotor[Part1Name] then return warn("Rig Error! Found 2 Motor6D with same Part1!") end
+				RigMotor[Part1Name] = I
 			end
 		end
 	end
