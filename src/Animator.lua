@@ -10,7 +10,7 @@ Animator.__index = Animator
 function Animator.new(plr, Animation)
 	local c = setmetatable({}, Animator)
 
-	if not plr:IsA("Player") then
+	if plr:IsA("Player") ~= true then
 		return error(format("invalid argument 1 to 'new' (Player expected, got %s)", plr.ClassName))
 	else
 		c.Player = plr
