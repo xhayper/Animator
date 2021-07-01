@@ -17,7 +17,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 ## Installation
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/src/Main.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 ```
 
 ## Documentation
@@ -43,7 +43,7 @@ animatorRequire("Path") -- Used by Animator, Same as HttpRequire but with this r
 ## Example
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/src/Main.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 
 local Player = game:GetService("Players").LocalPlayer
 
@@ -59,7 +59,7 @@ Anim:Stop()
 ## Animator with UI
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/src/Main.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 
 -- Main --
 
