@@ -41,6 +41,8 @@ function Animator:Start()
 				end
 				local RigMotor = Utility:getRigData(self.Player)
 				print("Woo?")
+				print(self.AnimationData)
+				print(self.AnimationData.Frames)
 				local lastTick = tick()
 				local lastFrameTime = 0
 				for frameNumber,Frame in pairs(self.AnimationData.Frames) do
