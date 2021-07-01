@@ -13,7 +13,7 @@ function Animator.new(plr, Animation)
 	if not plr:IsA("Player") then
 		return error(format("invalid argument 1 to 'new' (Player expected, got %s)", plr.ClassName))
 	else
-		c.plr = plr
+		c.Player = Player
 	end
 
 	if typeof(Animation) == "table" then
@@ -30,7 +30,7 @@ function Animator:Start()
 	if self.isPlaying == false then
 		self.isPlaying = true
 		self.isStopped = false
-		local chr = self.plr.Character
+		local chr = self.Player.Character
 		if chr then
 			spawn(function()
 				if chr:FindFirstChild("Humanoid") and chr.Humanoid:FindFirstChild("Animator") then
@@ -92,6 +92,10 @@ function Animator:Stop()
 		self.isPlaying = false
 		self.isStopped = true
 	end
+end
+
+function Animator:GetPlayer()
+	return self.Player	
 end
 
 return Animator
