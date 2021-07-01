@@ -2,6 +2,7 @@ local Utility = myRequire("Utility.lua")
 local sub,len,format = string.sub, string.len, string.format
 
 local Parser = {}
+Parser.__index = Parser
 
 function Parser:parsePoseData(Pose)
 	if not Pose:IsA("Pose") then
