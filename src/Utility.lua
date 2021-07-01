@@ -31,6 +31,7 @@ function Utility:getRigData(plr)
 				return error("Rig Error! Found 2 Motor6D with same Part1!")
 			end
 			RigMotor[Part1Name] = I
+			print(Part1Name)
 		end
 	end
 	return RigMotor
