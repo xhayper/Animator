@@ -82,15 +82,11 @@ local UI = Material.Load({
 	Theme = "Dark"
 })
 
+-- MAIN --
+
 local Main = UI.New({
 	Title = "Animator"
 })
-
-local Nullware = UI.New({
-	Title = "Nullware"
-})
-
--- MAIN --
 
 local Animation = Main.TextField({
 	Text = "Animation"
@@ -124,6 +120,10 @@ local Stop = Main.Button({
 })
 
 -- REANIMATE --
+
+local Nullware = UI.New({
+	Title = "Nullware"
+})
 
 local NullwareLink = Nullware.TextField({
 	Text = "Nullware Reanimate Link",
