@@ -39,7 +39,7 @@ function Animator:Start()
 				if chr:FindFirstChild("Animate") then
 					chr.Animate.Disabled = true
 				end
-				local RigMotor = Utility:getRigData(self.plr)
+				local RigMotor = Utility:getRigData(self.Player)
 				local lastTick = tick()
 				local lastFrameTime = 0
 				for frameNumber,Frame in pairs(self.AnimationData.Frames) do
