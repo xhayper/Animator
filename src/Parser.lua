@@ -19,7 +19,7 @@ function Parser:parseAnimationData(KeyframeSequence)
 	local AnimationData = {Priority = KeyframeSequence.Priority, Frames = {}}
 
 	for i,Frame in pairs(KeyframeSequence:GetChildren()) do
-		if Frame:IsA("Frame") then
+		if Frame:IsA("Keyframe") then
 			local FrameData = {Time = Frame.Time, Poses = {}}
 			for _,I in pairs(Frame:GetDescendants()) do
 				if I:IsA("Pose") then
