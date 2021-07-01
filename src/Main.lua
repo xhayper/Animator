@@ -1,4 +1,4 @@
-local pathToGithub = "https://raw.githack.com/xhayper/Animator/main/src/"
+local pathToGithub = "https://raw.githubusercontent.com/xhayper/Animator/main/src/"
 
 getgenv().HttpRequire = function(path)
 	if string.sub(path, 1, 8) == "https://" or string.sub(path, 1, 7) == "http://" then
