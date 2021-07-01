@@ -2,6 +2,18 @@ local Utility = {}
 
 local sub,len = string.sub, string.len
 
+function Utility:sendNotif(Text, Icon, Duration, Button1, Button2, Callback)
+	game:GetService("StarterGui"):SetCore("SendNotification", {
+		Title = "Animator";
+		Text = Text or nil;
+		Icon = Icon or nil;
+		Duration = Duration or nil;
+		Button1 = Button1 or nil;
+		Button2 = Button2 or nil;
+		Callback = Callback or nil;
+	})
+end
+
 function Utility:convertEnum(enum)
 	local stringEnum = tostring(enum)
 	local enumValue = stringEnum:split(".")[3]
