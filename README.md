@@ -1,6 +1,6 @@
 # Animator
 
-Alternative Roblox animation player to fit your "Exploting" need
+Alternative Roblox animation player to fit your "Animating/Whatever" need
 
 ## Features
 
