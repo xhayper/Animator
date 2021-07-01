@@ -32,6 +32,7 @@ Animator.new(Player, AnimationData) -- Animation Data Should Be AnimationID as S
 Animator:Play() -- Play the Animation
 Animator:Stop() -- Stop the Animation
 Animator:GetPlayer() -- Get assigned Player
+Animator.Loop -- Do you want the animation to Loop?
 Animator.isPlaying -- Is the animation playing?
 
 -- Globals --
@@ -50,7 +51,7 @@ local Player = game:GetService("Players").LocalPlayer
 local AnimationData = 5806573931 -- Can also be KeyframeSequnce Instance, Table of data or ID as string
 
 local Anim = Animator.new(Player, AnimationData)
-Anim.Looped = false -- True by default
+Anim.Loop = true
 Anim:Start()
 wait(5)
 Anim:Stop()
