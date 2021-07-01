@@ -4,8 +4,6 @@ local TweenService = game:GetService("TweenService")
 local Parser = myRequire("Parser.lua")
 local Utility = myRequire("Utility.lua")
 
-local Animator = {}
-
 local Animator = {isPlaying = false, isStopped = false, Looped = true}
 Animator.__index = Animator
 
