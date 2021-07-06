@@ -63,10 +63,10 @@ function Animator:Play()
 			local RigMotor = Utility:getRigData(self.Player)
 			local lastFrameTime = 0
 			spawn(function()
+				local firstTick = tick()
 				while self.IsPlaying == true and self.Length > self.TimePosition do
-					local lastTick = tick()
 					RunService.Heartbeat:Wait()
-					self.TimePosition += tick() - lastTick
+					self.TimePosition += tick() - firstTick
 				end
 			end)
 			local lastTick = tick()
