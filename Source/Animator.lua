@@ -6,7 +6,7 @@ local Utility = animatorRequire("Utility.lua")
 
 local Signal = animatorRequire("Nevermore/Signal.lua")
 
-local Animator = {IsPlaying = false, Looped = false}
+local Animator = {IsPlaying = false, Looped = false, Speed = 1}
 Animator.__index = Animator
 
 local format = string.format
@@ -69,8 +69,9 @@ function Animator:Play()
 			local lastFrameTime = 0
 			local startTick = tick()
 			for _,Frame in pairs(self.AnimationData.Frames) do
-				if Frame.Time ~= 0 and tick() - startTick < Frame.Time then
-					repeat RunService.Heartbeat:Wait() until tick() - startTick >= Frame.Time
+				local FrameTime = Frame.Time/self.Speed 
+				if FrameTime ~= 0 and tick() - startTick < FrameTime then
+					repeat RunService.Heartbeat:Wait() until tick() - startTick >= FrameTime
 				end
 				if self.IsPlaying == false then break end
 				if Frame.Name ~= "Keyframe" then
@@ -79,7 +80,7 @@ function Animator:Play()
 					end)
 				end
 				for PartName,Pose in pairs(Frame.Poses) do
-					local Tweeninfo = TweenInfo.new(Frame.Time - lastFrameTime, Pose.EasingStyle, Pose.EasingDirection)
+					local Tweeninfo = TweenInfo.new(FrameTime - lastFrameTime, Pose.EasingStyle, Pose.EasingDirection)
 					if PartName == "HumanoidRootPart" then
 						chr.HumanoidRootPart.CFrame *= Pose.CFrame
 					else
@@ -91,7 +92,7 @@ function Animator:Play()
 						end
 					end
 				end
-				lastFrameTime = Frame.Time
+				lastFrameTime = FrameTime
 			end
 			if self.Looped == true and self.IsPlaying == true then
 				self.DidLooped:Fire()
@@ -115,6 +116,10 @@ function Animator:Play()
 			self.Stopped:Fire()
 		end)
 	end
+end
+
+function Animator:AdjustSpeed(speed)
+	self.Speed = speed
 end
 
 function Animator:Stop()
