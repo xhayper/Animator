@@ -64,11 +64,10 @@ function Animator:Play()
 			local lastFrameTime = 0
 			spawn(function()
 				self._stopCounter = false
-				local lastTick = tick()
+				local firstTick = tick()
 				while self.IsPlaying == true and self.Length > self.TimePosition and self._stopCounter == false do
-					self.TimePosition += tick() - lastTick
+					self.TimePosition += tick() - firstTick
 					RunService.Heartbeat:Wait()
-					lastTick = tick()
 				end
 			end)
 			for _,Frame in pairs(self.AnimationData.Frames) do
