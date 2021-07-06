@@ -71,8 +71,8 @@ function Animator:Play()
 			end)
 			local lastTick = tick()
 			for _,Frame in pairs(self.AnimationData.Frames) do
-				if Frame.Time ~= 0 and tick() - lastTick < Frame.Time then
-					repeat RunService.Heartbeat:Wait() until tick() - lastTick >= Frame.Time
+				if Frame.Time ~= 0 and tick() - lastTick < Frame.Time - lastFrameTime then
+					repeat RunService.Heartbeat:Wait() until tick() - lastTick >= Frame.Time - lastFrameTime
 				end
 				if self.IsPlaying == false then break end
 				if Frame.Name ~= "Keyframe" then
