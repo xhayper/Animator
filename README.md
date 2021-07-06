@@ -36,16 +36,19 @@ Animator:Play() -- Play the Animation
 Animator:Stop() -- Stop the Animation
 Animator:GetPlayer() -- Get assigned Player
 Animator:Destroy() -- Stop current animation and destroy the instance
+Animator:GetTimeOfKeyframe(keyframeName) -- Get time position of the given frame name(first one)
 
--- Propertys --
+-- Properties --
 
 Animator.Looped -- Do you want the animation to Loop?
 Animator.IsPlaying -- Is the animation playing?
+Animator.Length -- Animation Length
 
 -- Signals --
 
 Animator.Stopped -- Run when the animation ended
 Animator.DidLooped -- Run when the animation loop
+Animator.KeyframeReached -- On keyframe reached
 
 -- Globals --
 
