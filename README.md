@@ -36,7 +36,7 @@ Animator:Play() -- Play the Animation
 Animator:Stop() -- Stop the Animation
 Animator:GetPlayer() -- Get assigned Player
 Animator:Destroy() -- Stop current animation and destroy the instance
-Animator:GetTimeOfKeyframe(keyframeName) -- Get time position of the given frame name(first one)
+Animator:GetTimeOfKeyframe(keyframeName) -- Get time position of the given frame name (first one)
 
 -- Properties --
 
