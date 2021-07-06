@@ -71,7 +71,7 @@ local AnimationData = 123456789 -- Can also be KeyframeSequnce Instance, Table o
 
 local Anim = Animator.new(Player, AnimationData)
 Anim:Play()
-Anim.Ended:Wait()
+Anim.Stopped:Wait()
 print("Done!")
 ```
 
