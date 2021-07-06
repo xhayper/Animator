@@ -109,7 +109,9 @@ function Animator:GetPlayer()
 end
 
 function Animator:Destroy()
-
+	self:Stop()
+	self.Stopped:Wait()
+	self = nil
 end
 
 return Animator
