@@ -5,7 +5,7 @@ local sub= string.sub
 function Utility:sendNotif(Text, Icon, Duration, Button1, Button2, Callback)
 	game:GetService("StarterGui"):SetCore("SendNotification", {
 		Title = "Animator";
-		Text = Text .. "\nBy hayper#0001" or nil;
+		Text = (Text .. "\nBy hayper#0001") or nil;
 		Icon = Icon or nil;
 		Duration = Duration or nil;
 		Button1 = Button1 or nil;
