@@ -6,7 +6,7 @@ local Utility = animatorRequire("Utility.lua")
 
 local Signal = animatorRequire("Nevermore/Signal.lua")
 
-local Animator = {IsPlaying = false, Looped = false, Stopped = Signal.new(), DidLooped = Signal.new(), KeyframeReached = Signal.new(), TimePosition = 0, _stopCounter = false}
+local Animator = {IsPlaying = false, Looped = false, Stopped = Signal.new(), DidLooped = Signal.new(), KeyframeReached = Signal.new(), TimePosition = 0}
 Animator.__index = Animator
 
 local format = string.format
@@ -44,7 +44,7 @@ function Animator:GetTimeOfKeyframe(keyframeName)
 end
 
 function Animator:Play()
-	if self.IsPlaying == false or self._stopCounter == true then
+	if self.IsPlaying == false then
 		self.IsPlaying = true
 		local chr = self.Player.Character
 		if not chr then return end
@@ -63,15 +63,14 @@ function Animator:Play()
 			local RigMotor = Utility:getRigData(self.Player)
 			local lastFrameTime = 0
 			spawn(function()
-				self._stopCounter = false
-				while self.IsPlaying == true and self.Length > self.TimePosition and self._stopCounter == false do
+				while self.IsPlaying == true and self.Length > self.TimePosition do
 					local lastTick = tick()
 					RunService.Heartbeat:Wait()
 					self.TimePosition += tick() - lastTick
 				end
 			end)
 			for _,Frame in pairs(self.AnimationData.Frames) do
-				if Frame.Time >= self.TimePosition or Frame.Time == 0 then
+				if Frame.Time >= self.TimePosition then
 					if Frame.Time ~= 0 and self.TimePosition < Frame.Time then
 						repeat RunService.Heartbeat:Wait() until self.TimePosition >= Frame.Time
 					end
@@ -91,13 +90,10 @@ function Animator:Play()
 								}):Play()
 							end
 						end
-					end
 					lastFrameTime = Frame.Time
-				else
-					self._stopCounter = true
-					return self:Play()
 				end
 			end
+		end
 			if self.Looped == true and self.IsPlaying == true then
 				self.DidLooped:Fire()
 				return self:Play()
