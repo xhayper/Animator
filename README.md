@@ -8,6 +8,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 * Can play Non-Trusted Animation / Raw Animation Data (Use [Converter](https://github.com/xhayper/Animator/tree/main/Converter))
 * R6, R15, Custom Rig/Animation Support
 * Compatible with Nullware Reanimate (Used to replicate Animation)
+* Replicate AnimationTrack's API
 
 ## Planned Feature
 
@@ -34,8 +35,13 @@ Animator.new(Player, AnimationData) -- Animation Data Should Be AnimationID as S
 Animator:Play() -- Play the Animation
 Animator:Stop() -- Stop the Animation
 Animator:GetPlayer() -- Get assigned Player
-Animator.Loop -- Do you want the animation to Loop?
-Animator.isPlaying -- Is the animation playing?
+Animator.Looped -- Do you want the animation to Loop?
+Animator.IsPlaying -- Is the animation playing?
+
+-- Signals --
+
+Animator.Stopped -- Run when the animation ended
+Animator.DidLooped -- Run when the animation loop
 
 -- Globals --
 
@@ -55,10 +61,9 @@ local Player = game:GetService("Players").LocalPlayer
 local AnimationData = 123456789 -- Can also be KeyframeSequnce Instance, Table of data or ID as string
 
 local Anim = Animator.new(Player, AnimationData)
-Anim.Loop = true
-Anim:Start()
-wait(5)
-Anim:Stop()
+Anim:Play()
+Anim.Ended:Wait()
+print("Done!")
 ```
 
 ## Animator with UI
@@ -111,15 +116,15 @@ local Play = Main.Button({
 			wait()
 		end
 		currentAnim = Animator.new(plr, Animation:GetText())
-		currentAnim.Loop = Loop:GetState()
-		currentAnim:Start()
+		currentAnim.Looped = Loop:GetState()
+		currentAnim:Play()
 	end
 })
 
 local Stop = Main.Button({
 	Text = "Stop",
 	Callback = function()
-		if currentAnim.isPlaying == true then
+		if currentAnim.IsPlaying == true then
 			currentAnim:Stop()
 		end
 	end
