@@ -90,7 +90,9 @@ function Animator:Play()
 				lastFrameTime = FrameTime
 			end
 			if self.Looped == true and self.IsPlaying == true then
-				self.DidLooped:Fire()
+				spawn(function()
+					self.DidLooped:Fire()
+				end)
 				return self:Play()
 			end
 			self.IsPlaying = false
