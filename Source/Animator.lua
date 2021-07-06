@@ -71,32 +71,28 @@ function Animator:Play()
 			end)
 			local lastTick = tick()
 			for _,Frame in pairs(self.AnimationData.Frames) do
-				if Frame.Time >= self.TimePosition then
-					if Frame.Time ~= 0 and tick() - lastTick < Frame.Time then
-						repeat RunService.Heartbeat:Wait() until tick() - lastTick >= Frame.Time
-					end
-					if self.IsPlaying == false then break end
-					if Frame.Name ~= "Keyframe" then
-						self.KeyframeReached:Fire(Frame.Name)
-					end
-					for PartName,Pose in pairs(Frame.Poses) do
-						local Tweeninfo = TweenInfo.new(Frame.Time - lastFrameTime, Pose.EasingStyle, Pose.EasingDirection)
-						if PartName == "HumanoidRootPart" then
-							chr.HumanoidRootPart.CFrame *= Pose.CFrame
-						else
-							local Motor = RigMotor[PartName]
-							if Motor then
-								TweenService:Create(Motor, Tweeninfo, {
-									Transform = Pose.CFrame
-								}):Play()
-							end
+				if Frame.Time ~= 0 and tick() - lastTick < Frame.Time then
+					repeat RunService.Heartbeat:Wait() until tick() - lastTick >= Frame.Time
+				end
+				if self.IsPlaying == false then break end
+				if Frame.Name ~= "Keyframe" then
+					self.KeyframeReached:Fire(Frame.Name)
+				end
+				for PartName,Pose in pairs(Frame.Poses) do
+					local Tweeninfo = TweenInfo.new(Frame.Time - lastFrameTime, Pose.EasingStyle, Pose.EasingDirection)
+					if PartName == "HumanoidRootPart" then
+						chr.HumanoidRootPart.CFrame *= Pose.CFrame
+					else
+						local Motor = RigMotor[PartName]
+						if Motor then
+							TweenService:Create(Motor, Tweeninfo, {
+								Transform = Pose.CFrame
+							}):Play()
 						end
 					end
-					lastTick = tick()
-					lastFrameTime = Frame.Time
-				else
-					lastTick -= (self.Length-self.TimePosition)*1000
 				end
+				lastTick = tick()
+				lastFrameTime = Frame.Time
 			end
 			if self.Looped == true and self.IsPlaying == true then
 				self.DidLooped:Fire()
