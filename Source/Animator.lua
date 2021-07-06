@@ -6,7 +6,7 @@ local Utility = animatorRequire("Utility.lua")
 
 local Signal = animatorRequire("Nevermore/Signal.lua")
 
-local Animator = {IsPlaying = false, Looped = false, Stopped = Signal.new(), DidLooped = Signal.new(), KeyframeReached = Signal.new(), TimePosition = 0}
+local Animator = {IsPlaying = false, Looped = false, TimePosition = 0}
 Animator.__index = Animator
 
 local format = string.format
@@ -32,6 +32,11 @@ function Animator.new(plr, Animation)
 	end)
 	c.Length = c.AnimationData.Frames[#c.AnimationData.Frames].Time
 	c.Looped = c.AnimationData.Looped
+
+	-- SIGNALS --
+	c.Stopped = Signal.new()
+	c.DidLooped = Signal.new()
+	c.KeyframeReached = Signal.new()
 	return c
 end
 
@@ -76,7 +81,9 @@ function Animator:Play()
 				end
 				if self.IsPlaying == false then break end
 				if Frame.Name ~= "Keyframe" then
-					self.KeyframeReached:Fire(Frame.Name)
+					spawn(function ()
+						self.KeyframeReached:Fire(Frame.Name)
+					end)
 				end
 				for PartName,Pose in pairs(Frame.Poses) do
 					local Tweeninfo = TweenInfo.new(Frame.Time - lastFrameTime, Pose.EasingStyle, Pose.EasingDirection)
