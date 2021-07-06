@@ -35,6 +35,7 @@ Animator.new(Player, AnimationData) -- Animation Data Should Be AnimationID as S
 Animator:Play() -- Play the Animation
 Animator:Stop() -- Stop the Animation
 Animator:GetPlayer() -- Get assigned Player
+Animator:Destroy() -- Stop current animation and destroy the instance
 
 -- Propertys --
 
