@@ -67,13 +67,6 @@ function Animator:Play()
 			end
 			local RigMotor = Utility:getRigData(self.Player)
 			local lastFrameTime = 0
-			spawn(function()
-				local startTick = tick()
-				while self.IsPlaying == true and self.Length > self.TimePosition do
-					RunService.Heartbeat:Wait()
-					self.TimePosition += tick() - startTick
-				end
-			end)
 			local startTick = tick()
 			for _,Frame in pairs(self.AnimationData.Frames) do
 				if Frame.Time ~= 0 and tick() - startTick < Frame.Time then
