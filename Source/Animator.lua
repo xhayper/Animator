@@ -6,7 +6,7 @@ local Utility = animatorRequire("Utility.lua")
 
 local Signal = animatorRequire("Nevermore/Signal.lua")
 
-local Animator = {IsPlaying = false, Looped = false, Stopped = Signal.new(), DidLooped = Signal.new(), KeyframeReached = Signal.new()}
+local Animator = {IsPlaying = false, Looped = false, Stopped = Signal.new(), DidLooped = Signal.new(), KeyframeReached = Signal.new(), TimePosition = 0, _stopCounter = false}
 
 local format = string.format
 
@@ -43,7 +43,7 @@ function Animator:GetTimeOfKeyframe(keyframeName)
 end
 
 function Animator:Play()
-	if self.IsPlaying == false then
+	if self.IsPlaying == false or self._stopCounter == true then
 		self.IsPlaying = true
 		local chr = self.Player.Character
 		if not chr then return end
@@ -60,32 +60,43 @@ function Animator:Play()
 				chr.Animate.Disabled = true
 			end
 			local RigMotor = Utility:getRigData(self.Player)
-			local lastTick = tick()
 			local lastFrameTime = 0
+			spawn(function()
+				self._stopCounter = false
+				local lastTick = tick()
+				while self.IsPlaying == true and self.Length > self.TimePosition and self._stopCounter == false do
+					self.TimePosition += tick() - lastTick
+					RunService.Heartbeat:Wait()
+					lastTick = tick()
+				end
+			end)
 			for _,Frame in pairs(self.AnimationData.Frames) do
-				if Frame.Time ~= 0 then
-					if tick() - lastTick < Frame.Time then
-						repeat RunService.Heartbeat:Wait() until tick() - lastTick >= Frame.Time
+				if Frame.Time >= self.TimePosition then
+					if Frame.Time ~= 0 and tick() - self.TimePosition < Frame.Time then
+						repeat RunService.Heartbeat:Wait() until tick() - self.TimePosition >= Frame.Time
 					end
-				end
-				if self.IsPlaying == false then break end
-				if Frame.Name ~= "Keyframe" then
-					self.KeyframeReached:Fire(Frame.Name)
-				end
-				for PartName,Pose in pairs(Frame.Poses) do
-					local Tweeninfo = TweenInfo.new(Frame.Time - lastFrameTime, Pose.EasingStyle, Pose.EasingDirection)
-					if PartName == "HumanoidRootPart" then
-						chr.HumanoidRootPart.CFrame *= Pose.CFrame
-					else
-						local Motor = RigMotor[PartName]
-						if Motor then
-							TweenService:Create(Motor, Tweeninfo, {
-								Transform = Pose.CFrame
-							}):Play()
+					if self.IsPlaying == false then break end
+					if Frame.Name ~= "Keyframe" then
+						self.KeyframeReached:Fire(Frame.Name)
+					end
+					for PartName,Pose in pairs(Frame.Poses) do
+						local Tweeninfo = TweenInfo.new(Frame.Time - lastFrameTime, Pose.EasingStyle, Pose.EasingDirection)
+						if PartName == "HumanoidRootPart" then
+							chr.HumanoidRootPart.CFrame *= Pose.CFrame
+						else
+							local Motor = RigMotor[PartName]
+							if Motor then
+								TweenService:Create(Motor, Tweeninfo, {
+									Transform = Pose.CFrame
+								}):Play()
+							end
 						end
 					end
+					lastFrameTime = Frame.Time
+				else
+					self._stopCounter = true
+					return self:Play()
 				end
-				lastFrameTime = Frame.Time
 			end
 			if self.Looped == true and self.IsPlaying == true then
 				self.DidLooped:Fire()
@@ -106,6 +117,7 @@ function Animator:Play()
 			if chr:FindFirstChild("Animate") then
 				chr.Animate.Disabled = false
 			end
+			self.TimePosition = 0
 			self.Stopped:Fire()
 		end)
 	end
