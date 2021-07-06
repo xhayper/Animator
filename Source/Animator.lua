@@ -72,8 +72,8 @@ function Animator:Play()
 			end)
 			for _,Frame in pairs(self.AnimationData.Frames) do
 				if Frame.Time >= self.TimePosition then
-					if Frame.Time ~= 0 and self.TimePosition - lastFrameTime < Frame.Time then
-						repeat RunService.Heartbeat:Wait() until self.TimePosition - lastFrameTime >= Frame.Time
+					if Frame.Time ~= 0 and self.TimePosition < Frame.Time then
+						repeat RunService.Heartbeat:Wait() until self.TimePosition >= Frame.Time
 					end
 					if self.IsPlaying == false then break end
 					if Frame.Name ~= "Keyframe" then
