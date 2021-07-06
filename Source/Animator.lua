@@ -55,12 +55,8 @@ function Animator:Play()
 		if not chr then return end
 		spawn(function()
 			local originalHipHeight
-			if chr:FindFirstChild("Humanoid") then
-				if chr.Humanoid:FindFirstChild("Animator") and chr.Humanoid.Animator:IsA("Animator") then
-					chr.Humanoid.Animator:Destroy()
-				end
-				originalHipHeight = chr.Humanoid.HipHeight
-				chr.Humanoid.HipHeight = self.AnimationData.AuthoredHipHeight
+			if chr:FindFirstChild("Humanoid") and chr.Humanoid:FindFirstChild("Animator") and chr.Humanoid.Animator:IsA("Animator") then
+				chr.Humanoid.Animator:Destroy()
 			end
 			if chr:FindFirstChild("Animate") and chr.Animate:IsA("LocalScript") then
 				chr.Animate.Disabled = true
@@ -105,9 +101,6 @@ function Animator:Play()
 				Motor.Transform = defaultCF
 			end
 			if chr:FindFirstChild("Humanoid") then
-				if originalHipHeight ~= nil then
-					chr.Humanoid.HipHeight = originalHipHeight
-				end
 				Instance.new("Animator", chr.Humanoid)
 			end
 			if chr:FindFirstChild("Animate") then
