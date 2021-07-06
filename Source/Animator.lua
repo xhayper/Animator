@@ -6,7 +6,7 @@ local Utility = animatorRequire("Utility.lua")
 
 local Signal = animatorRequire("Nevermore/Signal.lua")
 
-local Animator = {IsPlaying = false, Looped = false, TimePosition = 0}
+local Animator = {IsPlaying = false, Looped = false}
 Animator.__index = Animator
 
 local format = string.format
@@ -112,7 +112,6 @@ function Animator:Play()
 			if chr:FindFirstChild("Animate") then
 				chr.Animate.Disabled = false
 			end
-			self.TimePosition = 0
 			self.Stopped:Fire()
 		end)
 	end
