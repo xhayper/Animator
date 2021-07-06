@@ -63,16 +63,16 @@ function Animator:Play()
 			local RigMotor = Utility:getRigData(self.Player)
 			local lastFrameTime = 0
 			spawn(function()
-				local firstTick = tick()
+				local startTick = tick()
 				while self.IsPlaying == true and self.Length > self.TimePosition do
 					RunService.Heartbeat:Wait()
-					self.TimePosition += tick() - firstTick
+					self.TimePosition += tick() - startTick
 				end
 			end)
-			local lastTick = tick()
+			local startTick = tick()
 			for _,Frame in pairs(self.AnimationData.Frames) do
-				if Frame.Time ~= 0 and tick() - lastTick < Frame.Time - lastFrameTime then
-					repeat RunService.Heartbeat:Wait() until tick() - lastTick >= Frame.Time - lastFrameTime
+				if Frame.Time ~= 0 and tick() - startTick < Frame.Time then
+					repeat RunService.Heartbeat:Wait() until tick() - startTick >= Frame.Time
 				end
 				if self.IsPlaying == false then break end
 				if Frame.Name ~= "Keyframe" then
@@ -91,7 +91,6 @@ function Animator:Play()
 						end
 					end
 				end
-				lastTick = tick()
 				lastFrameTime = Frame.Time
 			end
 			if self.Looped == true and self.IsPlaying == true then
