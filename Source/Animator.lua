@@ -31,7 +31,7 @@ function Animator.new(plr, Animation)
 		return l.Time < r.Time
 	end)
 	c.Length = c.AnimationData.Frames[#c.AnimationData.Frames].Time
-	c.Looped = c.AnimationData.Looped
+	c.Looped = c.AnimationData.Loop
 
 	-- SIGNALS --
 	c.Stopped = Signal.new()
@@ -54,7 +54,6 @@ function Animator:Play()
 		local chr = self.Player.Character
 		if not chr then return end
 		spawn(function()
-			local originalHipHeight
 			if chr:FindFirstChild("Humanoid") and chr.Humanoid:FindFirstChild("Animator") and chr.Humanoid.Animator:IsA("Animator") then
 				chr.Humanoid.Animator:Destroy()
 			end
