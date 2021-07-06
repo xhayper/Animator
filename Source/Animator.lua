@@ -71,7 +71,7 @@ function Animator:Play()
 				end
 			end)
 			for _,Frame in pairs(self.AnimationData.Frames) do
-				if Frame.Time >= self.TimePosition then
+				if Frame.Time >= self.TimePosition or Frame.Time == 0 then
 					if Frame.Time ~= 0 and self.TimePosition < Frame.Time then
 						repeat RunService.Heartbeat:Wait() until self.TimePosition >= Frame.Time
 					end
