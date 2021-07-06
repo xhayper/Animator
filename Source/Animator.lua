@@ -7,6 +7,7 @@ local Utility = animatorRequire("Utility.lua")
 local Signal = animatorRequire("Nevermore/Signal.lua")
 
 local Animator = {IsPlaying = false, Looped = false, Stopped = Signal.new(), DidLooped = Signal.new(), KeyframeReached = Signal.new(), TimePosition = 0, _stopCounter = false}
+Animator.__index = Animator
 
 local format = string.format
 
