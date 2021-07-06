@@ -71,7 +71,7 @@ function Animator:Play()
 				end
 				if self.IsPlaying == false then break end
 				if Frame.Name ~= "Keyframe" then
-					spawn(function ()
+					spawn(function()
 						self.KeyframeReached:Fire(Frame.Name)
 					end)
 				end
