@@ -69,10 +69,11 @@ function Animator:Play()
 					self.TimePosition += tick() - lastTick
 				end
 			end)
+			local lastTick = tick()
 			for _,Frame in pairs(self.AnimationData.Frames) do
 				if Frame.Time >= self.TimePosition then
-					if Frame.Time ~= 0 and self.TimePosition < Frame.Time then
-						repeat RunService.Heartbeat:Wait() until self.TimePosition >= Frame.Time
+					if Frame.Time ~= 0 and tick() - lastTick < Frame.Time then
+						repeat RunService.Heartbeat:Wait() until tick() - lastTick >= Frame.Time
 					end
 					if self.IsPlaying == false then break end
 					if Frame.Name ~= "Keyframe" then
@@ -90,10 +91,13 @@ function Animator:Play()
 								}):Play()
 							end
 						end
+					end
+					lastTick = tick()
 					lastFrameTime = Frame.Time
+				else
+					lastTick -= (self.Length-self.TimePosition)*1000
 				end
 			end
-		end
 			if self.Looped == true and self.IsPlaying == true then
 				self.DidLooped:Fire()
 				return self:Play()
