@@ -6,7 +6,7 @@ local Utility = animatorRequire("Utility.lua")
 
 local Signal = animatorRequire("Nevermore/Signal.lua")
 
-local Animator = {IsPlaying = false, Looped = false, Stopped = Signal.new(), DidLooped = Signal.new()}
+local Animator = {IsPlaying = false, Looped = false, Stopped = Signal.new(), DidLooped = Signal.new(), KeyframeReached = Signal.new()}
 
 local format = string.format
 
@@ -32,6 +32,14 @@ function Animator.new(plr, Animation)
 	c.Length = c.AnimationData.Frames[#c.AnimationData.Frames].Time
 	c.Looped = c.AnimationData.Looped
 	return c
+end
+
+function Animator:GetTimeOfKeyframe(keyframeName)
+	for _,i in pairs(self.AnimationData.Frames) do
+		if i.Name == keyframeName then
+			return i.Time
+		end
+	end
 end
 
 function Animator:Play()
@@ -61,6 +69,9 @@ function Animator:Play()
 					end
 				end
 				if self.IsPlaying == false then break end
+				if Frame.Name ~= "Keyframe" then
+					self.KeyframeReached:Fire(Frame.Name)
+				end
 				for PartName,Pose in pairs(Frame.Poses) do
 					local Tweeninfo = TweenInfo.new(Frame.Time - lastFrameTime, Pose.EasingStyle, Pose.EasingDirection)
 					if PartName == "HumanoidRootPart" then
