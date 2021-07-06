@@ -5,7 +5,6 @@ local Parser = animatorRequire("Parser.lua")
 local Utility = animatorRequire("Utility.lua")
 
 local Animator = {isPlaying = false, isStopped = false, Loop = false}
-Animator.__index = Animator
 
 local format = string.format
 
