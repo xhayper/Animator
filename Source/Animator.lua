@@ -6,7 +6,7 @@ local Utility = animatorRequire("Utility.lua")
 
 local Signal = animatorRequire("Nevermore/Signal.lua")
 
-local Animator = {isPlaying = false, Looped = false, Stopped = Signal.new(), DidLooped = Signal.new()}
+local Animator = {IsPlaying = false, Looped = false, Stopped = Signal.new(), DidLooped = Signal.new()}
 
 local format = string.format
 
@@ -34,9 +34,9 @@ function Animator.new(plr, Animation)
 	return c
 end
 
-function Animator:Start()
-	if self.isPlaying == false then
-		self.isPlaying = true
+function Animator:Play()
+	if self.IsPlaying == false then
+		self.IsPlaying = true
 		local chr = self.Player.Character
 		if not chr then return end
 		spawn(function()
@@ -60,7 +60,7 @@ function Animator:Start()
 						repeat RunService.Heartbeat:Wait() until tick() - lastTick >= Frame.Time
 					end
 				end
-				if self.isPlaying == false then break end
+				if self.IsPlaying == false then break end
 				for PartName,Pose in pairs(Frame.Poses) do
 					local Tweeninfo = TweenInfo.new(Frame.Time - lastFrameTime, Pose.EasingStyle, Pose.EasingDirection)
 					if PartName == "HumanoidRootPart" then
@@ -76,11 +76,11 @@ function Animator:Start()
 				end
 				lastFrameTime = Frame.Time
 			end
-			if self.Looped == true and self.isPlaying == true then
+			if self.Looped == true and self.IsPlaying == true then
 				self.DidLooped:Fire()
-				return self:Start()
+				return self:Play()
 			end
-			self.isPlaying = false
+			self.IsPlaying = false
 			wait()
 			local defaultCF = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
 			for _,Motor in pairs(RigMotor) do
@@ -101,7 +101,7 @@ function Animator:Start()
 end
 
 function Animator:Stop()
-	self.isPlaying = false
+	self.IsPlaying = false
 end
 
 function Animator:GetPlayer()
