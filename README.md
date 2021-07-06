@@ -35,6 +35,9 @@ Animator.new(Player, AnimationData) -- Animation Data Should Be AnimationID as S
 Animator:Play() -- Play the Animation
 Animator:Stop() -- Stop the Animation
 Animator:GetPlayer() -- Get assigned Player
+
+-- Propertys --
+
 Animator.Looped -- Do you want the animation to Loop?
 Animator.IsPlaying -- Is the animation playing?
 
