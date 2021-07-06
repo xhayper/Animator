@@ -6,7 +6,7 @@ local Utility = animatorRequire("Utility.lua")
 
 local Signal = animatorRequire("Nevermore/Signal.lua")
 
-local Animator = {IsPlaying = false, Looped = false, Speed = 1}
+local Animator = {IsPlaying = false, Looped = false, Speed = 1, _Looping = false}
 Animator.__index = Animator
 
 local format = string.format
@@ -49,8 +49,9 @@ function Animator:GetTimeOfKeyframe(keyframeName)
 end
 
 function Animator:Play()
-	if self.IsPlaying == false then
+	if self.IsPlaying == false or self._Looping == true then
 		self.IsPlaying = true
+		self._Looping = false
 		local chr = self.Player.Character
 		if not chr then return end
 		spawn(function()
@@ -90,9 +91,8 @@ function Animator:Play()
 				lastFrameTime = FrameTime
 			end
 			if self.Looped == true and self.IsPlaying == true then
-				spawn(function()
-					self.DidLooped:Fire()
-				end)
+				self.DidLooped:Fire()
+				self._Looping = true
 				return self:Play()
 			end
 			self.IsPlaying = false
