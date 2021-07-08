@@ -50,7 +50,7 @@ Animator.Speed -- Playback Speed
 
 Animator.Stopped:Connect() -- Run when the animation ended
 Animator.DidLooped:Connect() -- Run when the animation loop
-Animator.KeyframeReached:Connect(keyframeName) -- On keyframe reached
+Animator.KeyframeReached:Connect(keyframeName) -- On keyframe reached (Only trigger if the keyframe name isn't Keyframe
 
 -- Globals --
 
