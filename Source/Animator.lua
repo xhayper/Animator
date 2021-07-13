@@ -77,6 +77,10 @@ function Animator:Play()
 				end
 				for PartName,Pose in pairs(Frame.Poses) do
 					local Tweeninfo = TweenInfo.new(FrameTime - lastFrameTime, Pose.EasingStyle, Pose.EasingDirection)
+					print(PartName)
+					for i,v in pairs(RigMotor) do
+						print(i, v)		
+					end
 					if PartName == "HumanoidRootPart" then
 						--chr.HumanoidRootPart.CFrame *= Pose.CFrame
 					else
