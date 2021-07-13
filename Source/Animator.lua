@@ -27,7 +27,6 @@ function Animator.new(plr, Animation)
 	else
 		c.AnimationData = Parser:parseAnimationData(game:GetObjects("rbxassetid://"..tostring(Animation))[1])
 	end
-	print(Utility:TableToString(c.AnimationData))
 	table.sort(c.AnimationData.Frames, function(l, r)
 		return l.Time < r.Time
 	end)
@@ -76,12 +75,11 @@ function Animator:Play()
 						self.KeyframeReached:Fire(Frame.Name)
 					end)
 				end
+				for i,v in pairs(Frame.Poses) do
+					print(i, v)		
+				end
 				for PartName,Pose in pairs(Frame.Poses) do
 					local Tweeninfo = TweenInfo.new(FrameTime - lastFrameTime, Pose.EasingStyle, Pose.EasingDirection)
-					print(PartName)
-					for i,v in pairs(RigMotor) do
-						print(i, v)		
-					end
 					if PartName == "HumanoidRootPart" then
 						--chr.HumanoidRootPart.CFrame *= Pose.CFrame
 					else
