@@ -53,7 +53,7 @@ function Utility:getRigData(plr)
 	return RigMotor
 end
 
-local gsub, match, rep, sub,format, len = string.gsub, string.match, string.rep, string.sub, string.format, string.len
+local gsub, match, rep,format, len = string.gsub, string.match, string.rep, string.format, string.len
 
 local SpecialCharacters = {['\a'] = '\\a', ['\b'] = '\\b', ['\f'] = '\\f', ['\n'] = '\\n', ['\r'] = '\\r', ['\t'] = '\\t', ['\v'] = '\\v', ['\0'] = '\\0'}
 local Keywords = { ['and'] = true, ['break'] = true, ['do'] = true, ['else'] = true, ['elseif'] = true, ['end'] = true, ['false'] = true, ['for'] = true, ['function'] = true, ['if'] = true, ['in'] = true, ['local'] = true, ['nil'] = true, ['not'] = true, ['or'] = true, ['repeat'] = true, ['return'] = true, ['then'] = true, ['true'] = true, ['until'] = true, ['while'] = true, ['continue'] = true}
