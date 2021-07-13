@@ -27,6 +27,7 @@ function Animator.new(plr, Animation)
 	else
 		c.AnimationData = Parser:parseAnimationData(game:GetObjects("rbxassetid://"..tostring(Animation))[1])
 	end
+	print(Utility:TableToString(c))
 	table.sort(c.AnimationData.Frames, function(l, r)
 		return l.Time < r.Time
 	end)
