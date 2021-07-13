@@ -26,8 +26,6 @@ function Parser:parseAnimationData(KeyframeSequence)
 					local PartName = I.Name
 					if FrameData.Poses[PartName] then return warn("Animation have duplicated Pose with same name") end
 					FrameData.Poses[PartName] = Parser:parsePoseData(I)
-					print(PartName)
-					print(I.Name)
 				end
 			end
 			table.insert(AnimationData.Frames, FrameData)
