@@ -34,9 +34,8 @@ Animator.new(Player, AnimationData) -- Animation Data Should Be AnimationID as S
 
 Animator:Play() -- Play the Animation
 Animator:Stop() -- Stop the Animation
-Animator:GetPlayer() -- Get assigned Player
-Animator:Destroy() -- Stop current animation and destroy the instance
-Animator:GetTimeOfKeyframe(keyframeName) -- Get time position of the given frame name (first one)
+~~Animator:Destroy() -- Stop current animation and destroy the instance~~ -- Will be added later
+~~Animator:GetTimeOfKeyframe(keyframeName) -- Get time position of the given frame name (first one)~~ -- Will be added later
 Animator:AdjustSpeed(speed) -- Set playback Speed
 
 -- Properties --
@@ -45,12 +44,13 @@ Animator.Looped -- Do you want the animation to Loop?
 Animator.IsPlaying -- Is the animation playing?
 Animator.Length -- Animation Length
 Animator.Speed -- Playback Speed
+Animator.Player -- The player that the animator is assigned to
 
 -- Signals --
 
 Animator.Stopped:Connect() -- Run when the animation ended
 Animator.DidLooped:Connect() -- Run when the animation loop
-Animator.KeyframeReached:Connect(keyframeName) -- On keyframe reached (Only trigger if the keyframe name isn't Keyframe
+~~Animator.KeyframeReached:Connect(keyframeName) -- On keyframe reached (Only trigger if the keyframe name isn't Keyframe~~ -- Will be added later
 
 -- Globals --
 
