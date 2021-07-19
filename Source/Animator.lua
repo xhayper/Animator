@@ -45,6 +45,7 @@ function Animator.new(plr, Animation)
 	c._maid.Stopped = c.Stopped
 	c._maid.DidLooped = c.DidLooped
 	c._maid.KeyframeReached = c.KeyframeReached
+	c._maid.Animator = c
 	return c
 end
 
