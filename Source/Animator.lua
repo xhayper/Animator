@@ -25,7 +25,7 @@ function Animator.new(Player, AnimationResolvable)
 		if not animationInstance then error("invalid argument 1 to 'new' (AnimationID expected)") end
 		c.AnimationData = Parser:parseAnimationData(animationInstance)
 	elseif typeof(AnimationResolvable) == "table" then -- Assuming that Resolvable is animation data table
-		c.AnimationData = {}
+		c.AnimationData = AnimationResolvable
 	elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("KeyframeSequence") then -- Assuming that Resolvable is KeyframeSequence
 		c.AnimationData = Parser:parseAnimationData(AnimationResolvable)
 	else
@@ -58,7 +58,7 @@ function Animator:_playPose(pose, parent, fade)
 end
 
 function Animator:Play(force)
-	if self._playing == false then
+	if self._playing == false or force and force == true then
 		self._playing = true
 		self.IsPlaying = true
 		local Character = self.Player.Character
