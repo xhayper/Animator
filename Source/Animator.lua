@@ -102,7 +102,7 @@ function Animator:Play()
 				self:Play()
 			end
 			for _,r in next, Utility:getMotors(self.Player) do
-				TweenService:Create(r, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Transform = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)}):Play()
+				r.Transform = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
 			end
 			if not Character.Humanoid:FindFirstChild("Animator") then
 				Instance.new("Animator", Character.Humanoid)
