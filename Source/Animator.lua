@@ -72,9 +72,6 @@ function Animator:Play()
 		if Character.Humanoid:FindFirstChild("Animator") and Character.Humanoid.Animator:IsA("Animator") then
 			Character.Humanoid.Animator:Destroy()
 		end
-		if Character:FindFirstChild("Animate") and Character.Animate:IsA("LocalScript") then
-			Character.Animate.Disabled = true
-		end
 		local start = os.clock()
 		coroutine.wrap(function()
 			for i,f in next, self.AnimationData.Frames do
@@ -98,13 +95,10 @@ function Animator:Play()
 			if self.Looped then
 				self.DidLoop:Fire()
 				self._isLooping = true
-				self:Play(true)
+				self:Play()
 			end
-			if not Character.Humanoid:FindFirstChild("Animator") or Character.Humanoid:FindFirstChild("Animator") and not Character.Humanoid.Animator:IsA("Animator") then
+			if not Character.Humanoid:FindFirstChild("Animator") then
 				Instance.new("Animator", Character.Humanoid)
-			end
-			if Character:FindFirstChild("Animate") and Character.Animate:IsA("LocalScript") and Character.Animate.Disabled == true then
-				Character.Animate.Disabled = false
 			end
 			self.Stopped:Fire()
 		end)()
