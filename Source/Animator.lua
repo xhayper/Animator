@@ -77,6 +77,7 @@ function Animator:Play()
 			Character.Humanoid.Animator:Destroy()
 		end
 		local start = os.clock()
+		local diffTime = 0
 		coroutine.wrap(function()
 			for i,f in next, self.AnimationData.Frames do
 				f.Time /= self.Speed
@@ -91,6 +92,7 @@ function Animator:Play()
 						local fadeTime = f.Time
 						if i ~= 1 then
 							fadeTime = (f.Time*self.Speed-self.AnimationData.Frames[i-1].Time)/self.Speed
+							diffTime = fadeTime
 						end
 						self:_playPose(p, nil, fadeTime)
 					end
@@ -100,6 +102,16 @@ function Animator:Play()
 				self.DidLoop:Fire()
 				self._isLooping = true
 				self:Play()
+			end
+			for _,r in next, Utility:getMotors(self.Player) do
+				if diffTime > 0 then
+					local TI = TweenInfo.new(diffTime, "Quad", "In")
+					if self._stopped ~= true then
+						TweenService:Create(r, TI, {Transform = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)}):Play()
+					end
+				else
+					r.Transform = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+				end
 			end
 			if not Character.Humanoid:FindFirstChild("Animator") then
 				Instance.new("Animator", Character.Humanoid)
