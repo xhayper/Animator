@@ -42,6 +42,7 @@ end
 
 function Animator:_playPose(pose, parent, fade)
 	local RigList = Utility:getMotors(self.Player)
+	print(RigList)
 	if pose.SubPose then
 		for _,sp in next, pose.SubPose do
 			self:_playPose(sp, pose, fade)
@@ -78,6 +79,7 @@ function Animator:Play(force)
 			if self._stopped == true then
 				break;
 			end
+			print(f.Pose)
 			if f.Pose then
 				local fadeTime = f.Time
 				if i ~= 1 then
