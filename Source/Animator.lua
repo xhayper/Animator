@@ -100,7 +100,7 @@ function Animator:Play()
 				self._isLooping = true
 				self:Play(true)
 			end
-			if not Character.Humanoid:FindFirstChild("Animator") or not Character.Humanoid.Animator:IsA("Animator") then
+			if not Character.Humanoid:FindFirstChild("Animator") or Character.Humanoid:FindFirstChild("Animator") and not Character.Humanoid.Animator:IsA("Animator") then
 				Instance.new("Animator", Character.Humanoid)
 			end
 			if Character:FindFirstChild("Animate") and Character.Animate:IsA("LocalScript") and Character.Animate.Disabled == true then
