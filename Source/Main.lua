@@ -17,5 +17,3 @@ getgenv().Animator = animatorRequire("Animator.lua")
 local Utility = animatorRequire("Utility.lua")
 
 Utility:sendNotif("API Loaded", nil, 5)
-
--- Hi! Whited! Love your Nullware Stuff!

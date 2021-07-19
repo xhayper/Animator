@@ -1,6 +1,6 @@
 local Utility = {}
 
-local sub= string.sub
+local format = string.format
 
 function Utility:sendNotif(Text, Icon, Duration, Button1, Button2, Callback)
 	game:GetService("StarterGui"):SetCore("SendNotification", {
@@ -15,42 +15,38 @@ function Utility:sendNotif(Text, Icon, Duration, Button1, Button2, Callback)
 end
 
 function Utility:convertEnum(enum)
-	local stringEnum = tostring(enum)
-	local enumValue = stringEnum:split(".")[3]
-	if (sub(stringEnum, 1, 24) == "Enum.PoseEasingDirection") then
-		return Enum.EasingDirection[enumValue]
-	elseif (sub(stringEnum, 1, 20) == "Enum.PoseEasingStyle") then
-		return Enum.EasingStyle[enumValue]
+	local a = tostring(enum):split(".")
+	if a[1] == "Enum" then
+		local p = a[2]
+		local v = a[3]
+		local EnumTable = {
+			["PoseEasingDirection"] = "EasingDirection",
+			["PoseEasingStyle"] = "EasingStyle"
+		}
+		if EnumTable[p] then
+			return Enum[EnumTable[p]][v]
+		else
+			return enum
+		end
 	else
 		return enum
 	end
 end
 
-function Utility:getRigData(plr)
-	local RigMotor = {}
-
-	local chr = plr.Character
-	local chrClone
-
-	if chr:FindFirstChild(plr.Name) then
-		chrClone = chr[plr.Name]
+function Utility:getMotors(Player)
+	if not Player:IsA("Player") then
+		error(format("invalid argument 1 to 'getMotors' (Player expected, got %s)", Player.ClassName))
 	end
 
-	for _,I in pairs(chr:GetDescendants()) do
-		if I:IsA("Motor6D") and (chrClone == nil or chrClone ~= nil and I:IsDescendantOf(chrClone) ~= true) then
-			if I.Part0 ~= nil and I.Part1 ~= nil then
-				local Part0Name = I.Part0.Name
-				local Part1Name = I.Part1.Name
-				if RigMotor[Part0Name] and RigMotor[Part1Name] then return warn("Rig Error! Found 2 Motor6D with same Part0 and Part1!") end
-				if RigMotor[Part0Name] then
-					RigMotor[Part1Name] = I
-				else
-					RigMotor[Part0Name] = I
-				end
-			end
+	local MotorList = {}
+
+	for _,i in next, Player.Character:GetDescendants() do
+		if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
+			MotorList:insert(i)
 		end
 	end
-	return RigMotor
+
+	return MotorList
 end
 
 return Utility
