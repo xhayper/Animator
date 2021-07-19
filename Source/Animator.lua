@@ -5,6 +5,7 @@ local Parser = animatorRequire("Parser.lua")
 local Utility = animatorRequire("Utility.lua")
 
 local Signal = animatorRequire("Nevermore/Signal.lua")
+local Maid = animatorRequire("Nevermore/Maid.lua")
 
 local Animator = {IsPlaying = false, Looped = false, Speed = 1, _Looping = false}
 Animator.__index = Animator
@@ -37,6 +38,13 @@ function Animator.new(plr, Animation)
 	c.Stopped = Signal.new()
 	c.DidLooped = Signal.new()
 	c.KeyframeReached = Signal.new()
+	
+	-- M-m-maid?! u-uwu! --
+	c._maid = Maid.new()
+	c._maid.AnimationData = c.AnimationData
+	c._maid.Stopped = c.Stopped
+	c._maid.DidLooped = c.DidLooped
+	c._maid.KeyframeReached = c.KeyframeReached
 	return c
 end
 
@@ -130,6 +138,7 @@ end
 function Animator:Destroy()
 	self:Stop()
 	self.Stopped:Wait()
+	self._maid:Destroy()
 	self = nil
 end
 
