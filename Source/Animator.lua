@@ -76,8 +76,8 @@ function Animator:Play(force)
 			elseif 1 > self.Speed then
 				f.Time /= self.Speed
 			end
-			if i ~= 1 and f.Time * self.Speed and self.Speed >= 1 or f.Time / self.Speed then
-				repeat print(f.Time, os.clock()-start); RunService.RenderStepped:Wait() until os.clock()-start > f.Time * self.Speed and self.Speed >= 1 or f.Time / self.Speed
+			if i ~= 1 and f.Time > os.clock()-start then
+				repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time
 			end
 			if self._stopped == true then
 				break;
