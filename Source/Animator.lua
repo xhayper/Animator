@@ -21,8 +21,8 @@ function Animator.new(Player, AnimationResolvable)
 	c.Player = Player
 
 	if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then -- Assuming that Resolvable is animation id
-		local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable))[1]:IsA("KeyframeSequence")
-		if not animationInstance then error("invalid argument 1 to 'new' (AnimationID expected)") end
+		local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable))[1]
+		if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID expected)") end
 		c.AnimationData = Parser:parseAnimationData(animationInstance)
 	elseif typeof(AnimationResolvable) == "table" then -- Assuming that Resolvable is animation data table
 		c.AnimationData = AnimationResolvable
