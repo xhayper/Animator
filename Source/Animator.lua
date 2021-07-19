@@ -105,10 +105,7 @@ function Animator:Play()
 			end
 			for _,r in next, Utility:getMotors(self.Player) do
 				if diffTime > 0 then
-					local TI = TweenInfo.new(diffTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-					if self._stopped ~= true then
-						TweenService:Create(r, TI, {Transform = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)}):Play()
-					end
+						TweenService:Create(r, TweenInfo.new(diffTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Transform = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)}):Play()
 				else
 					r.Transform = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
 				end
