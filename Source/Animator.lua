@@ -69,7 +69,7 @@ function Animator:Play(force)
 			Character.Animate.Disabled = true
 		end
 		local start = os.clock()
-		for i,f in pairs(self.AnimationData.Frames) do
+		for i,f in next, self.AnimationData.Frames do
 			print(f.Time * self.Speed and self.Speed >= 1 or f.Time / self.Speed)
 			if i ~= 1 and f.Time * self.Speed and self.Speed >= 1 or f.Time / self.Speed then
 				repeat print(f.Time, os.clock()-start); RunService.RenderStepped:Wait() until os.clock()-start > f.Time * self.Speed and self.Speed >= 1 or f.Time / self.Speed
@@ -80,7 +80,7 @@ function Animator:Play(force)
 			if f.Pose then
 				local fadeTime = f.Time
 				if i ~= 1 then
-					fadeTime = f.Time-self.AnimationData.Frames[i-1]
+					fadeTime = f.Time-self.AnimationData.Frames[i-1].Time
 				end
 				self:_playPose(f.Pose, nil, fadeTime)
 			end
