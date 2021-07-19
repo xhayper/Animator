@@ -81,11 +81,13 @@ function Animator:Play(force)
 			end
 			print(f.Pose)
 			if f.Pose then
-				local fadeTime = f.Time
-				if i ~= 1 then
-					fadeTime = f.Time-self.AnimationData.Frames[i-1].Time/self.Speed
+				for _,p in next, f.Pose do
+					local fadeTime = f.Time
+					if i ~= 1 then
+						fadeTime = f.Time-self.AnimationData.Frames[i-1].Time/self.Speed
+					end
+					self:_playPose(p, nil, fadeTime)
 				end
-				self:_playPose(f.Pose, nil, fadeTime)
 			end
 		end
 		if self.Looped then
