@@ -8,7 +8,7 @@ function Parser:parsePoseData(pose)
 	if not pose:IsA("Pose") then
 		error(format("invalid argument 1 to '_parsePoseData' (Pose expected, got %s)", pose.ClassName))
 	end
-	local poseData = {CFrame = pose.CFrame, EasingDirection = Utility:convertEnum(pose.EasingDirection), EasingStyle = Utility:convertEnum(pose.EasingStyle), Weight = pose.Weight}
+	local poseData = {Name = pose.Name, CFrame = pose.CFrame, EasingDirection = Utility:convertEnum(pose.EasingDirection), EasingStyle = Utility:convertEnum(pose.EasingStyle), Weight = pose.Weight}
 	if #pose:GetChildren() > 0 then
 		poseData.Subpose = {}
 		for _,p in next, pose:GetChildren() do
@@ -47,7 +47,7 @@ function Parser:parseAnimationData(keyframeSequence)
 	table.sort(animationData.Frames, function(l, r)
 		return l.Time < r.Time
 	end)
-	
+
 	return animationData
 end
 
