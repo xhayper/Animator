@@ -69,7 +69,7 @@ function Animator:Play()
 		self._isLooping = false
 		self.IsPlaying = true
 		local Character = self.Player.Character
-		if Character.Humanoid:FindFirstChild("Animator") and Character.Humanoid.Animator:IsA("Animator") then
+		if Character.Humanoid:FindFirstChild("Animator") then
 			Character.Humanoid.Animator:Destroy()
 		end
 		local start = os.clock()
