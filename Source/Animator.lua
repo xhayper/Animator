@@ -9,7 +9,7 @@ local Maid = animatorRequire("Nevermore/Maid.lua")
 
 local format = string.format
 
-local Animator = {AnimationData = {}, Player = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _playing = false, _stopped = false}
+local Animator = {AnimationData = {}, Player = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _playing = false, _stopped = false, _isLooping = false}
 Animator.__index = Animator
 
 function Animator.new(Player, AnimationResolvable)
@@ -63,9 +63,10 @@ function Animator:_playPose(pose, parent, fade)
 	end
 end
 
-function Animator:Play(force)
-	if self._playing == false or force and force == true then
+function Animator:Play()
+	if self._playing == false or self._isLooping == true then
 		self._playing = true
+		self._isLooping = false
 		self.IsPlaying = true
 		local Character = self.Player.Character
 		if Character.Humanoid:FindFirstChild("Animator") and Character.Humanoid.Animator:IsA("Animator") then
@@ -96,6 +97,7 @@ function Animator:Play(force)
 			end
 			if self.Looped then
 				self.DidLoop:Fire()
+				self._isLooping = true
 				self:Play(true)
 			end
 			if not Character.Humanoid:FindFirstChild("Animator") or not Character.Humanoid.Animator:IsA("Animator") then
