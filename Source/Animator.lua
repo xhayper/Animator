@@ -75,35 +75,37 @@ function Animator:Play(force)
 			Character.Animate.Disabled = true
 		end
 		local start = os.clock()
-		for i,f in next, self.AnimationData.Frames do
-			f.Time /= self.Speed
-			if i ~= 1 and f.Time > os.clock()-start then
-				repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time
-			end
-			if self._stopped == true then
-				break;
-			end
-			if f.Pose then
-				for _,p in next, f.Pose do
-					local fadeTime = f.Time
-					if i ~= 1 then
-						fadeTime = f.Time-self.AnimationData.Frames[i-1].Time/self.Speed
+		coroutine.wrap(function()
+			for i,f in next, self.AnimationData.Frames do
+				f.Time /= self.Speed
+				if i ~= 1 and f.Time > os.clock()-start then
+					repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time
+				end
+				if self._stopped == true then
+					break;
+				end
+				if f.Pose then
+					for _,p in next, f.Pose do
+						local fadeTime = f.Time
+						if i ~= 1 then
+							fadeTime = f.Time-self.AnimationData.Frames[i-1].Time/self.Speed
+						end
+						self:_playPose(p, nil, fadeTime)
 					end
-					self:_playPose(p, nil, fadeTime)
 				end
 			end
-		end
-		if self.Looped then
-			self.DidLoop:Fire()
-			self:Play(true)
-		end
-		if not Character.Humanoid:FindFirstChild("Animator") or not Character.Humanoid.Animator:IsA("Animator") then
-			Instance.new("Animator", Character.Humanoid)
-		end
-		if Character:FindFirstChild("Animate") and Character.Animate:IsA("LocalScript") and Character.Animate.Disabled == true then
-			Character.Animate.Disabled = false
-		end
-		self.Stopped:Fire()
+			if self.Looped then
+				self.DidLoop:Fire()
+				self:Play(true)
+			end
+			if not Character.Humanoid:FindFirstChild("Animator") or not Character.Humanoid.Animator:IsA("Animator") then
+				Instance.new("Animator", Character.Humanoid)
+			end
+			if Character:FindFirstChild("Animate") and Character.Animate:IsA("LocalScript") and Character.Animate.Disabled == true then
+				Character.Animate.Disabled = false
+			end
+			self.Stopped:Fire()
+		end)()
 	end
 end
 
