@@ -9,6 +9,7 @@ function Parser:parsePoseData(pose)
 		error(format("invalid argument 1 to '_parsePoseData' (Pose expected, got %s)", pose.ClassName))
 	end
 	local poseData = {Name = pose.Name, CFrame = pose.CFrame, EasingDirection = Utility:convertEnum(pose.EasingDirection), EasingStyle = Utility:convertEnum(pose.EasingStyle), Weight = pose.Weight}
+	print(#pose:GetChildren())
 	if #pose:GetChildren() > 0 then
 		poseData.Subpose = {}
 		for _,p in next, pose:GetChildren() do
