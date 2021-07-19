@@ -35,7 +35,7 @@ end
 
 function Utility:getMotors(Player)
 	if not Player:IsA("Player") then
-		return print(format("invalid argument 1 to 'getMotors' (Player expected, got %s)", Player.ClassName))
+		error(format("invalid argument 1 to 'getMotors' (Player expected, got %s)", Player.ClassName))
 	end
 
 	local MotorList = {}

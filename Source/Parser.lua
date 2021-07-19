@@ -6,7 +6,7 @@ local Parser = {}
 
 function Parser:parsePoseData(pose)
 	if not pose:IsA("Pose") then
-		return print(format("invalid argument 1 to '_parsePoseData' (Pose expected, got %s)", pose.ClassName))
+		error(format("invalid argument 1 to '_parsePoseData' (Pose expected, got %s)", pose.ClassName))
 	end
 	local poseData = {Name = pose.Name, CFrame = pose.CFrame, EasingDirection = Utility:convertEnum(pose.EasingDirection), EasingStyle = Utility:convertEnum(pose.EasingStyle), Weight = pose.Weight}
 	if #pose:GetChildren() > 0 then
@@ -22,7 +22,7 @@ end
 
 function Parser:parseKeyframeData(keyframe)
 	if not keyframe:IsA("Keyframe") then
-		return print(format("invalid argument 1 to '_parseKeyframeData' (Keyframe expected, got %s)", keyframe.ClassName))
+		error(format("invalid argument 1 to '_parseKeyframeData' (Keyframe expected, got %s)", keyframe.ClassName))
 	end
 	local keyframeData = {Name = keyframe.Name, Time = keyframe.Time, Pose = {}}
 	for _,p in next, keyframe:GetChildren() do
@@ -35,7 +35,7 @@ end
 
 function Parser:parseAnimationData(keyframeSequence)
 	if not keyframeSequence:IsA("KeyframeSequence") then
-		return print(format("invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)", keyframeSequence.ClassName))
+		error(format("invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)", keyframeSequence.ClassName))
 	end
 	local animationData = {Loop = keyframeSequence.Loop, Priority = keyframeSequence.Priority, Frames = {}}
 	for _,f in next, keyframeSequence:GetChildren() do
