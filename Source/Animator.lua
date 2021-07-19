@@ -140,7 +140,7 @@ function Animator:Destroy()
 	self:Stop()
 	self.Stopped:Wait()
 	self._maid:Destroy()
-	self = nil
+	-- self = nil -- Do we even need this?
 end
 
 return Animator
