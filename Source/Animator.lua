@@ -51,13 +51,13 @@ function Animator:_playPose(pose, parent, fade)
 		for _,motor in next, RigList do
 			if motor.Part0.Name == parent.Name and motor.Part1.Name == pose.Name then
 				if fade > 0 then
-				local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
-				if self._stopped ~= true then
-					TweenService:Create(motor, TI, {Transform = pose.CFrame}):Play()
+					local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
+					if self._stopped ~= true then
+						TweenService:Create(motor, TI, {Transform = pose.CFrame}):Play()
+					end
+				else
+					motor.Transform = pose.CFrame
 				end
-			else
-				motor.Transform = pose.CFrame
-			end
 			end
 		end
 	else
