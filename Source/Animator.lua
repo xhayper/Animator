@@ -7,120 +7,94 @@ local Utility = animatorRequire("Utility.lua")
 local Signal = animatorRequire("Nevermore/Signal.lua")
 local Maid = animatorRequire("Nevermore/Maid.lua")
 
-local Animator = {IsPlaying = false, Looped = false, Speed = 1, _Looping = false}
-Animator.__index = Animator
-
 local format = string.format
 
-function Animator.new(plr, Animation)
+local Animator = {AnimationData = {}, Player = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _playing = false, _stopped = false}
+Animator.__index = Animator
+
+function Animator.new(Player, AnimationResolvable)
+	if not Player:IsA("Player") then
+		error(format("invalid argument 1 to 'new' (Player expected, got %s)", Player.ClassName))
+	end
+
 	local c = setmetatable({}, Animator)
+	c.Player = Player
 
-	if plr:IsA("Player") ~= true then
-		return error(format("invalid argument 1 to 'new' (Player expected, got %s)", plr.ClassName))
+	if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then -- Assuming that Resolvable is animation id
+		local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable))[1]:FindFirstChildWhichIsA("KeyframeSequence")
+		if not animationInstance then error("invalid argument 1 to 'new' (AnimationID expected)") end
+		c.AnimationData = Parser:parseAnimationData(animationInstance)
+	elseif typeof(AnimationResolvable) == "table" then -- Assuming that Resolvable is animation data table
+		c.AnimationData = {}
+	elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("KeyframeSequence") then -- Assuming that Resolvable is KeyframeSequence
+		c.AnimationData = Parser:parseAnimationData(AnimationResolvable)
 	else
-		c.Player = plr
+		error(format("invalid argument 2 to 'new' (number,string,KeyframeSequence expected, got %s)", Player.ClassName))
 	end
 
-	if typeof(Animation) == "table" then
-		c.AnimationData = Animation
-	elseif typeof(Animation) ~= "number" and typeof(Animation) ~= "string" and Animation:IsA("KeyframeSequence") then
-		c.AnimationData = Parser:parseAnimationData(Animation)
-	else
-		c.AnimationData = Parser:parseAnimationData(game:GetObjects("rbxassetid://"..tostring(Animation))[1])
-	end
-	table.sort(c.AnimationData.Frames, function(l, r)
-		return l.Time < r.Time
-	end)
+	c.Looped = c.AnimationData.Looped
 	c.Length = c.AnimationData.Frames[#c.AnimationData.Frames].Time
-	c.Looped = c.AnimationData.Loop
 
-	-- SIGNALS --
+	c.DidLoop = Signal.new()
 	c.Stopped = Signal.new()
-	c.DidLooped = Signal.new()
-	c.KeyframeReached = Signal.new()
-	
-	-- M-m-maid?! u-uwu! --
-	c._maid = Maid.new()
-	c._maid.AnimationData = c.AnimationData
-	c._maid.Stopped = c.Stopped
-	c._maid.DidLooped = c.DidLooped
-	c._maid.KeyframeReached = c.KeyframeReached
-	c._maid.Animator = c
 	return c
 end
 
-function Animator:GetTimeOfKeyframe(keyframeName)
-	for _,i in pairs(self.AnimationData.Frames) do
-		if i.Name == keyframeName then
-			return i.Time
+function Animator:_playPose(pose, parent, fade)
+	local RigList = Utility:getMotors(self.Player)
+	if pose.SubPose then
+		for _,sp in next, pose.SubPose do
+			self:_playPose(sp, pose, fade)
+		end
+	end
+	if parent then
+		for _,motor in next, RigList do
+			if motor.Part0.Name == parent.Name and motor.Part1 == pose.Name then
+				local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
+				TweenService:Create(motor, TI, {Transform = pose.CFrame}):Play()
+			end
 		end
 	end
 end
 
-function Animator:Play()
-	if self.IsPlaying == false or self._Looping == true then
+function Animator:Play(force)
+	if self._playing == false then
+		self._playing = true
 		self.IsPlaying = true
-		self._Looping = false
-		local chr = self.Player.Character
-		if not chr then return end
-		spawn(function()
-			if chr:FindFirstChild("Humanoid") and chr.Humanoid:FindFirstChild("Animator") and chr.Humanoid.Animator:IsA("Animator") then
-				chr.Humanoid.Animator:Destroy()
+		local Character = self.Player.Character
+		if Character.Humanoid:FindFirstChild("Animator") and Character.Humanoid.Animator:IsA("Animator") then
+			Character.Humanoid.Animator:Destroy()
+		end
+		if Character:FindFirstChild("Animate") and Character.Animate:IsA("LocalScript") then
+			Character.Animate.Disabled = true
+		end
+		local start = os.clock()
+		for i,f in next, self.AnimationData.Frames do
+			if i ~= 1 and f.Time > os.clock()-start then
+				repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time * self.Speed and self.Speed >= 1 or f.Time / self.Speed
 			end
-			if chr:FindFirstChild("Animate") and chr.Animate:IsA("LocalScript") then
-				chr.Animate.Disabled = true
+			if self._stopped == true then
+				break;
 			end
-			local RigMotor = Utility:getRigData(self.Player)
-			local lastFrameTime = 0
-			local startTick = tick()
-			for _,Frame in pairs(self.AnimationData.Frames) do
-				local FrameTime = Frame.Time/self.Speed 
-				if FrameTime ~= 0 and tick() - startTick < FrameTime then
-					repeat RunService.Heartbeat:Wait() until tick() - startTick >= FrameTime
+			if f.Pose then
+				local fadeTime = f.Time
+				if i ~= 1 then
+					fadeTime = f.Time-self.AnimationData.Frames[i-1]
 				end
-				if self.IsPlaying == false then break end
-				if Frame.Name ~= "Keyframe" then
-					spawn(function()
-						self.KeyframeReached:Fire(Frame.Name)
-					end)
-				end
-				for i,v in pairs(Frame.Poses) do
-					print(i, v)		
-				end
-				for PartName,Pose in pairs(Frame.Poses) do
-					local Tweeninfo = TweenInfo.new(FrameTime - lastFrameTime, Pose.EasingStyle, Pose.EasingDirection)
-					if PartName == "HumanoidRootPart" then
-						--chr.HumanoidRootPart.CFrame *= Pose.CFrame
-					else
-						local Motor = RigMotor[PartName]
-						if Motor then
-							TweenService:Create(Motor, Tweeninfo, {
-								Transform = Pose.CFrame
-							}):Play()
-						end
-					end
-				end
-				lastFrameTime = FrameTime
+				self:_playPose(f.Pose, nil, fadeTime)
 			end
-			if self.Looped == true and self.IsPlaying == true then
-				self.DidLooped:Fire()
-				self._Looping = true
-				return self:Play()
-			end
-			self.IsPlaying = false
-			wait()
-			local defaultCF = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-			for _,Motor in pairs(RigMotor) do
-				Motor.Transform = defaultCF
-			end
-			if chr:FindFirstChild("Humanoid") then
-				Instance.new("Animator", chr.Humanoid)
-			end
-			if chr:FindFirstChild("Animate") then
-				chr.Animate.Disabled = false
-			end
-			self.Stopped:Fire()
-		end)
+		end
+		if self.Looped then
+			self.DidLoop:Fire()
+			self:Play(true)
+		end
+		if not Character.Humanoid:FindFirstChild("Animator") or not Character.Humanoid.Animator:IsA("Animator") then
+			Instance.new("Animator", Character.Humanoid)
+		end
+		if Character:FindFirstChild("Animate") and Character.Animate:IsA("LocalScript") and Character.Animate.Disabled == true then
+			Character.Animate.Disabled = false
+		end
+		self.Stopped:Fire()
 	end
 end
 
@@ -129,18 +103,7 @@ function Animator:AdjustSpeed(speed)
 end
 
 function Animator:Stop()
-	self.IsPlaying = false
-end
-
-function Animator:GetPlayer()
-	return self.Player
-end
-
-function Animator:Destroy()
-	self:Stop()
-	self.Stopped:Wait()
-	self._maid:Destroy()
-	-- self = nil -- Do we even need this?
+	self._stopped = true
 end
 
 return Animator
