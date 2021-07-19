@@ -72,9 +72,9 @@ function Animator:Play(force)
 		local start = os.clock()
 		for i,f in next, self.AnimationData.Frames do
 			if self.Speed > 1 then
-				f.Time *= self.Speed
-			elseif 1 > self.Speed then
 				f.Time /= self.Speed
+			elseif 1 > self.Speed then
+				f.Time *= self.Speed
 			end
 			if i ~= 1 and f.Time > os.clock()-start then
 				repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time
@@ -85,7 +85,13 @@ function Animator:Play(force)
 			if f.Pose then
 				local fadeTime = f.Time
 				if i ~= 1 then
-					fadeTime = f.Time-self.AnimationData.Frames[i-1].Time
+					local lastFrameTime = self.AnimationData.Frames[i-1].Time
+					if self.Speed > 1 then
+						lastFrameTime.Time /= self.Speed
+					elseif 1 > self.Speed then
+						lastFrameTime.Time *= self.Speed
+					end
+					fadeTime = f.Time-lastFrameTime
 				end
 				self:_playPose(f.Pose, nil, fadeTime)
 			end
