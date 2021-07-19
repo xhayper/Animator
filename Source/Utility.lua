@@ -42,7 +42,7 @@ function Utility:getMotors(Player)
 
 	for _,i in next, Player.Character:GetDescendants() do
 		if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
-			MotorList:insert(i)
+			table.insert(MotorList, i)
 		end
 	end
 
