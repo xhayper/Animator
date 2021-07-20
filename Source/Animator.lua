@@ -126,10 +126,12 @@ function Animator:Play(fadeTime, weight, speed)
 			for _,r in next, Utility:getMotors(self.Player) do
 				if self._stopFadeTime > 0 then
 					TweenService:Create(r, TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-						Transform = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+						Transform = CFrame.new(),
+						CurrentAngle = 0
 					}):Play()
 				else
-					r.Transform = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+					r.CurrentAngle = 0
+					r.Transform = CFrame.new()
 				end
 			end
 			if not Character.Humanoid:FindFirstChild("Animator") then
