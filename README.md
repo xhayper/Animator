@@ -49,6 +49,8 @@ Animator:Destroy() -- Stop current animation and destroy the instance
 Animator:GetMarkerReachedSignal(name) -- Return a signal that will fire when an marker with same name has been reached, (Args - Value)
 Animator:GetTimeOfKeyframe(keyframeName) -- Get time position of the given frame name (first one)
 Animator:AdjustSpeed(speed) -- Set playback Speed
+Animator:IgnoreMotorIn(tableOfInstance) -- Ignore motor in the table (must be table of Instance)
+Animator:GetMotorIgnoreList() -- Return Table of Instance that the animator will use as Ignore list
 
 -- Properties --
 
