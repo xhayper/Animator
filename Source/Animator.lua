@@ -78,8 +78,10 @@ function Animator:Play(fadeTime, weight, speed)
 		self._isLooping = false
 		self.IsPlaying = true
 		local Character = self.Player.Character
-		if Character.Humanoid:FindFirstChild("Animator") then
-			Character.Humanoid.Animator:Destroy()
+		if Character:FindFirstChild("Humanoid") then
+			if Character.Humanoid:FindFirstChild("Animator") then
+				Character.Humanoid.Animator:Destroy()
+			end
 		end
 		local start = os.clock()
 		coroutine.wrap(function()
@@ -128,8 +130,10 @@ function Animator:Play(fadeTime, weight, speed)
 					r.Transform = CFrame.new()
 				end
 			end
-			if not Character.Humanoid:FindFirstChild("Animator") then
-				Instance.new("Animator", Character.Humanoid)
+			if Character:FindFirstChild("Humanoid") then
+				if not Character.Humanoid:FindFirstChild("Animator") then
+					Instance.new("Animator", Character.Humanoid)
+				end
 			end
 			self._stopped = false
 			self._playing = false
