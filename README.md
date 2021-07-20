@@ -36,7 +36,7 @@ Animator.new(Player, AnimationData) -- Animation Data Should Be AnimationID as S
 Animator:Play(fadeTime, weight, speed) -- Play the Animation with spefic fadeTime and speed, (Deault - fadeTime = 0.100000001, weight = 1, speed = 1)
 Animator:Stop(fadeTime) -- Stop the Animation with spefic fadeTime, (Default - fadeTime = 0.100000001)
 Animator:Destroy() -- Stop current animation and destroy the instance
-Animator:GetMarkerReachedSignal(name) -- When it hit the marker, this will be fired, (Args - Value)
+Animator:GetMarkerReachedSignal(name) -- Return a signal that will fire when an marker with same name hitted, (Args - Value)
 Animator:GetTimeOfKeyframe(keyframeName) -- Get time position of the given frame name (first one)
 Animator:AdjustSpeed(speed) -- Set playback Speed
 
