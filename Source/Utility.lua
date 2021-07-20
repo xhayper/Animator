@@ -33,15 +33,27 @@ function Utility:convertEnum(enum)
 	end
 end
 
-function Utility:getMotors(Player)
+function Utility:getMotors(Player, IgnoreList)
+	IgnoreList = IgnoreList or {}
 	if not Player:IsA("Player") then
 		error(format("invalid argument 1 to 'getMotors' (Player expected, got %s)", Player.ClassName))
+	end
+
+	if typeof(IgnoreList) ~= "table" then
+		error(format("invalid argument 1 to 'getMotors' (Table expected, got %s)", typeof(IgnoreList)))
 	end
 
 	local MotorList = {}
 
 	for _,i in next, Player.Character:GetDescendants() do
 		if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
+			for _,i2 in next, IgnoreList do
+				if typeof(i2) == "Instance" then
+					if i:IsDescendantOf(i2) then
+						continue
+					end
+				end
+			end
 			table.insert(MotorList, i)
 		end
 	end
