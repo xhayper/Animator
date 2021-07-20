@@ -150,7 +150,9 @@ local Play = Main.Button({
 	Text = "Play",
 	Callback = function()
 		if currentAnim ~= nil and currentAnim.IsPlaying == true then
-			currentAnim:Destroy()
+			currentAnim:Stop(0)
+			currentAnim.Stopped:Wait()
+			RunService.RenderStepped:Wait()
 		end
 		currentAnim = Animator.new(Player, Animation:GetText())
 		currentAnim.Looped = Loop:GetState()
