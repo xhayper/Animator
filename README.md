@@ -16,6 +16,9 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 * Weight System (Idk how)
 * Seeking froward, Backward (Idl how)
 
+## Credits
+* Whited - Metatable Hook
+
 ## Installation
 
 ```lua
@@ -58,6 +61,7 @@ Animator.KeyframeReached:Connect(keyframeName) -- On keyframe reached (Only trig
 
 HttpRequire("HttpLink") -- Require the module using GET Request, Must start with 'http://' or 'https://'
 animatorRequire("Path") -- Used by Animator, Same as HttpRequire but with this repo link as the prefix
+hookAnimatorFunction() -- Hook animator to Humanoid:LoadAnimation()
 ```
 
 ## Example
@@ -72,6 +76,23 @@ local Player = game:GetService("Players").LocalPlayer
 local AnimationData = 123456789 -- Can also be KeyframeSequnce Instance, Table of data or ID as string
 
 local Anim = Animator.new(Player, AnimationData)
+Anim:Play()
+Anim.Stopped:Wait()
+print("Done!")
+```
+
+```lua
+if getgenv()["Animator"] == nil then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
+end
+
+hookAnimatorFunction() -- Hook animator to Humanoid:LoadAnimation()
+
+local Player = game:GetService("Players").LocalPlayer
+
+local AnimationData = 123456789 -- Can also be KeyframeSequnce Instance, Table of data or ID as string
+
+local Anim = Player.Character.Humanoid:LoadAnimation(AnimationData)
 Anim:Play()
 Anim.Stopped:Wait()
 print("Done!")

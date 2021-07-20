@@ -29,7 +29,7 @@ function Animator.new(Player, AnimationResolvable)
 	elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("KeyframeSequence") then -- Assuming that Resolvable is KeyframeSequence
 		c.AnimationData = Parser:parseAnimationData(AnimationResolvable)
 	elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("Animation") then -- Assuming that Resolvable is Animation
-		local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable.AnimationId))[1]
+		local animationInstance = game:GetObjects(AnimationResolvable.AnimationId)[1]
 		if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
 		c.AnimationData = Parser:parseAnimationData(animationInstance)
 	else

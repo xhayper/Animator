@@ -1,3 +1,9 @@
+local RunService = game:GetService("RunService")
+
+local Players = game:GetService("Players")
+
+local Player = Players.LocalPlayer
+
 local pathToGithub = "https://raw.githubusercontent.com/xhayper/Animator/main/Source/"
 
 getgenv().HttpRequire = function(path)
@@ -15,6 +21,20 @@ end
 getgenv().Animator = animatorRequire("Animator.lua")
 
 local Utility = animatorRequire("Utility.lua")
+
+getgenv().hookAnimatorFunction = function()
+	local OldFunc
+	OldFunc = hookmetamethod(game, "__namecall", function(Object, ...)
+		local NamecallMethod = getnamecallmethod()
+		if Object.ClassName == "Humanoid" and Object.Parent == Player.Character and NamecallMethod == "LoadAnimation" then
+			if checkcaller() then
+				return Animator.new(Player, ...)
+			end
+		end
+		return OldFunc(Object, ...)
+	end)
+	Utility:sendNotif("Hook by Whited", nil, 5)
+end
 
 Utility:sendNotif("API Loaded", nil, 5)
 
