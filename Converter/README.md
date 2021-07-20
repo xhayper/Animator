@@ -1,4 +1,6 @@
-# Converter
+# Animator/Converter
+
+* This folder contain code nessecary for converting `KeyframeSequence` to AnimationData that Animator can read
 
 ## Usage
 
