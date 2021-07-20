@@ -110,60 +110,71 @@ local function TableToString(Table, IgnoredTables, DepthData, Path)
 end
 
 -- Below is my Code --
-
 function convertEnum(enum)
-	local stringEnum = tostring(enum)
-	local enumValue = stringEnum:split(".")[3]
-	if (sub(stringEnum, 1, 24) == "Enum.PoseEasingDirection") then
-		return Enum.EasingDirection[enumValue]
-	elseif (sub(stringEnum, 1, 20) == "Enum.PoseEasingStyle") then
-		return Enum.EasingStyle[enumValue]
+	local a = tostring(enum):split(".")
+	if a[1] == "Enum" then
+		local p = a[2]
+		local v = a[3]
+		local EnumTable = {
+			["PoseEasingDirection"] = "EasingDirection",
+			["PoseEasingStyle"] = "EasingStyle"
+		}
+		if EnumTable[p] then
+			return Enum[EnumTable[p]][v]
+		else
+			return enum
+		end
 	else
 		return enum
 	end
 end
 
-function parsePoseData(Pose)
-	if not Pose:IsA("Pose") then
-		return warn(format("invalid argument 1 to 'parsePoseData' (Pose expected, got %s)", Pose.ClassName))
+function parsePoseData(pose)
+	if not pose:IsA("Pose") then
+		error(format("invalid argument 1 to '_parsePoseData' (Pose expected, got %s)", pose.ClassName))
 	end
-	return {Weight = Pose.Weight, CFrame = Pose.CFrame, EasingDirection = convertEnum(Pose.EasingDirection);  EasingStyle = convertEnum(Pose.EasingStyle)}
+	local poseData = {Name = pose.Name, CFrame = pose.CFrame, EasingDirection = convertEnum(pose.EasingDirection), EasingStyle = convertEnum(pose.EasingStyle), Weight = pose.Weight}
+	if #pose:GetChildren() > 0 then
+		poseData.Subpose = {}
+		for _,p in next, pose:GetChildren() do
+			if p:IsA("Pose") then
+				table.insert(poseData.Subpose, parsePoseData(p))
+			end
+		end
+	end
+	return poseData
 end
 
-function parseAnimationData(KeyframeSequence)
-	if not KeyframeSequence:IsA("KeyframeSequence") then
-		return warn(format("invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)", KeyframeSequence.ClassName))
+function parseKeyframeData(keyframe)
+	if not keyframe:IsA("Keyframe") then
+		error(format("invalid argument 1 to '_parseKeyframeData' (Keyframe expected, got %s)", keyframe.ClassName))
 	end
+	local keyframeData = {Name = keyframe.Name, Time = keyframe.Time, Pose = {}}
+	for _,p in next, keyframe:GetChildren() do
+		if p:IsA("Pose") then
+			table.insert(keyframeData.Pose, parsePoseData(p))
+		end
+	end
+	return keyframeData
+end
 
-	local AnimationData = {Loop = KeyframeSequence.Loop, Priority = KeyframeSequence.Priority, Frames = {}}
-
-	for i,Frame in pairs(KeyframeSequence:GetChildren()) do
-		if Frame:IsA("Keyframe") then
-			local FrameData = {Time = Frame.Time, Poses = {}, Name = Frame.Name}
-			for _,I in pairs(Frame:GetDescendants()) do
-				if I:IsA("Pose") then
-					local PartName = I.Name
-					if FrameData.Poses[PartName] then
-						warn("Animation have duplicated Pose with same name")
-					else
-						FrameData.Poses[PartName] = parsePoseData(I)
-					end
-				end
-			end
-			table.insert(AnimationData.Frames, FrameData)
+function parseAnimationData(keyframeSequence)
+	if not keyframeSequence:IsA("KeyframeSequence") then
+		error(format("invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)", keyframeSequence.ClassName))
+	end
+	local animationData = {Loop = keyframeSequence.Loop, Priority = keyframeSequence.Priority, Frames = {}}
+	for _,f in next, keyframeSequence:GetChildren() do
+		if f:IsA("Keyframe") then
+			table.insert(animationData.Frames, parseKeyframeData(f))
 		end
 	end
 
-	table.sort(AnimationData.Frames, function(l, r)
+	table.sort(animationData.Frames, function(l, r)
 		return l.Time < r.Time
 	end)
 
-	return AnimationData
+	return animationData
 end
-
---[[
-  Run in CommandBar
-]]--
 
 local KeyframeSequnce = path.to.KeyframeSequnce
 local AnimationData = TableToString(parseAnimationData(KeyframeSequnce))
