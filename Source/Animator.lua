@@ -97,68 +97,70 @@ function Animator:Play(fadeTime, weight, speed)
 		local con
 		con = Character:GetPropertyChangedSignal("Parent"):Connect(function()
 			if Character.Parent == nil then
-				self:Destroy()
+				self = nil
 				con:Disconnect()
 			end
 		end)
-		local start = os.clock()
-		coroutine.wrap(function()
-			for i,f in next, self.AnimationData.Frames do
-				f.Time /= self.Speed
-				if i ~= 1 and f.Time > os.clock()-start then
-					repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true
-				end
-				if self._stopped == true then
-					break;
-				end
-				if f.Name ~= "Keyframe" then
-					self.KeyframeReached:Fire(f.Name)
-				end
-				if f["Marker"] then
-					for k,v in next, f["Marker"] do
-						if self._markerSignal[k] then
-							self._markerSignal[k]:Fire(v)
+		if self ~= nil then
+			local start = os.clock()
+			coroutine.wrap(function()
+				for i,f in next, self.AnimationData.Frames do
+					f.Time /= self.Speed
+					if i ~= 1 and f.Time > os.clock()-start then
+						repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true
+					end
+					if self._stopped == true then
+						break;
+					end
+					if f.Name ~= "Keyframe" then
+						self.KeyframeReached:Fire(f.Name)
+					end
+					if f["Marker"] then
+						for k,v in next, f["Marker"] do
+							if self._markerSignal[k] then
+								self._markerSignal[k]:Fire(v)
+							end
+						end
+					end
+					if f.Pose then
+						for _,p in next, f.Pose do
+							fadeTime += f.Time
+							if i ~= 1 then
+								fadeTime = (f.Time*self.Speed-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
+							end
+							self:_playPose(p, nil, fadeTime)
 						end
 					end
 				end
-				if f.Pose then
-					for _,p in next, f.Pose do
-						fadeTime += f.Time
-						if i ~= 1 then
-							fadeTime = (f.Time*self.Speed-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
-						end
-						self:_playPose(p, nil, fadeTime)
+				if self.Looped == true and self._stopped ~= true then
+					self.DidLoop:Fire()
+					self._isLooping = true
+					return self:Play(fadeTime, weight, speed)
+				end
+				RunService.RenderStepped:Wait()
+				for _,r in next, Utility:getMotors(self.Player, self._motorIgnoreList) do
+					if self._stopFadeTime > 0 then
+						TweenService:Create(r, TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+							Transform = CFrame.new(),
+							CurrentAngle = 0
+						}):Play()
+					else
+						r.CurrentAngle = 0
+						r.Transform = CFrame.new()
 					end
 				end
-			end
-			if self.Looped == true and self._stopped ~= true then
-				self.DidLoop:Fire()
-				self._isLooping = true
-				return self:Play(fadeTime, weight, speed)
-			end
-			RunService.RenderStepped:Wait()
-			for _,r in next, Utility:getMotors(self.Player, self._motorIgnoreList) do
-				if self._stopFadeTime > 0 then
-					TweenService:Create(r, TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-						Transform = CFrame.new(),
-						CurrentAngle = 0
-					}):Play()
+				if Character:FindFirstChildOfClass("Humanoid") and not Character.Humanoid:FindFirstChildOfClass("Animator") then
+					Instance.new("Animator", Character.Humanoid)
 				else
-					r.CurrentAngle = 0
-					r.Transform = CFrame.new()
+					self:Destroy()
 				end
-			end
-			if Character:FindFirstChildOfClass("Humanoid") and not Character.Humanoid:FindFirstChildOfClass("Animator") then
-				Instance.new("Animator", Character.Humanoid)
-			else
-				self:Destroy()
-			end
-			con:Disconnect()
-			self._stopped = false
-			self._playing = false
-			self.IsPlaying = false
-			self.Stopped:Fire()
-		end)()
+				con:Disconnect()
+				self._stopped = false
+				self._playing = false
+				self.IsPlaying = false
+				self.Stopped:Fire()
+			end)()
+		end
 	end
 end
 
