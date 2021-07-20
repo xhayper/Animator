@@ -35,7 +35,7 @@ function Animator.new(Player, AnimationResolvable)
 		error(format("invalid argument 2 to 'new' (number,string,KeyframeSequence expected, got %s)", Player.ClassName))
 	end
 
-	c.Looped = c.AnimationData.Looped
+	c.Looped = c.AnimationData.Loop
 	c.Length = c.AnimationData.Frames[#c.AnimationData.Frames].Time
 
 	c.DidLoop = Signal.new()
@@ -96,7 +96,7 @@ function Animator:Play(fadeTime, weight, speed)
 		end
 		local con
 		con = Character:GetPropertyChangedSignal("Parent"):Connect(function()
-			if Character.Parent == nil then 
+			if Character.Parent == nil then
 				self:Destroy()
 			end
 			con:Disconnect()
@@ -148,17 +148,15 @@ function Animator:Play(fadeTime, weight, speed)
 					r.Transform = CFrame.new()
 				end
 			end
-			if Character:FindFirstChildOfClass("Humanoid") then
-				if not Character.Humanoid:FindFirstChildOfClass("Animator") then
-					Instance.new("Animator", Character.Humanoid)
-				end
+			if Character:FindFirstChildOfClass("Humanoid") and not Character.Humanoid:FindFirstChildOfClass("Animator") then
+				Instance.new("Animator", Character.Humanoid)
 			else
 				self:Destroy()
 			end
+			con:Disconnect()
 			self._stopped = false
 			self._playing = false
 			self.IsPlaying = false
-			con:Disconnect()
 			self.Stopped:Fire()
 		end)()
 	end
