@@ -137,8 +137,8 @@ function Animator:Play(fadeTime, weight, speed)
 end
 
 function Animator:GetTimeOfKeyframe(keyframeName)
-	for i,f in next, self.AnimationData.Frames do
-		if i.Name == keyframeName then
+	for _,f in next, self.AnimationData.Frames do
+		if f.Name == keyframeName then
 			return f.Time
 		end
 	end
