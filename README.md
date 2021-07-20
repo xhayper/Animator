@@ -84,11 +84,11 @@ print("Done!")
 ```lua
 if getgenv()["Animator"] == nil then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
+	hookAnimatorFunction() -- Hook animator to Humanoid:LoadAnimation()
 end
 
-hookAnimatorFunction() -- Hook animator to Humanoid:LoadAnimation()
-
-local Player = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
 
 local AnimationData = 123456789 -- Can also be KeyframeSequnce Instance, Table of data or ID as string
 
