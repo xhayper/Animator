@@ -22,6 +22,11 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 ## Credits
 * Whited - Metatable Hook
 
+## Resources
+
+* Minified - [Here](https://github.com/xhayper/Animator/blob/main/Other/Minified.lua)
+* AIO - [Here](https://github.com/xhayper/Animator/blob/main/Other/AIO.lua)
+
 ## Installation
 
 ```lua
