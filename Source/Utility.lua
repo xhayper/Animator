@@ -47,14 +47,18 @@ function Utility:getMotors(Player, IgnoreList)
 
 	for _,i in next, Player.Character:GetDescendants() do
 		if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
+			local IsTained = false
 			for _,i2 in next, IgnoreList do
 				if typeof(i2) == "Instance" then
 					if i:IsDescendantOf(i2) then
-						continue
+						IsTained = true
+						break
 					end
 				end
 			end
-			table.insert(MotorList, i)
+			if IsTained ~= true then
+				table.insert(MotorList, i)
+			end
 		end
 	end
 
