@@ -250,7 +250,7 @@ if getgenv()["Animator"] == nil then
     local RunService = game:GetService("RunService")
     local TweenService = game:GetService("TweenService")
 
-    local Animator = {AnimationData = {}, _motorIgnoreList = {}, Stoplayer = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
+    local Animator = {__mode = "kv", AnimationData = {}, _motorIgnoreList = {}, Stoplayer = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
     Animator.__index = Animator
     
     function Animator.new(Player, AnimationResolvable)
@@ -339,16 +339,16 @@ if getgenv()["Animator"] == nil then
             local con
             con = Character:GetPropertyChangedSignal("Parent"):Connect(function()
                 if Character.Parent == nil then
+                    con:Disconnect()
                     self:Destroy()
                 end
-                con:Disconnect()
-            end) 
+            end)
             local start = os.clock()
             coroutine.wrap(function()
                 for i,f in next, self.AnimationData.Frames do
                     f.Time = f.Time / self.Speed
                     if i ~= 1 and f.Time > os.clock()-start then
-                        repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true or self.Player.Character == nil
+                        repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true
                     end
                     if self._stopped == true then
                         break;
@@ -437,10 +437,7 @@ if getgenv()["Animator"] == nil then
         self.DidLoop:Destroy()
         self.Stopped:Destroy()
         self.KeyframeReached:Destroy()
-        for _,s in next, self._markerSignal do
-            s:Destroy()
-        end
-        setmetatable(self, nil)
+        self = nil
     end
 
 	------------------------------------------------------------------
