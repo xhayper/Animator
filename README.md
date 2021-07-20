@@ -14,7 +14,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 
 * Priority Support (Idk how)
 * Weight System (Idk how)
-* Seeking froward, Backward (Idl how)
+* Seeking froward, Backward (Idk how)
 
 ## Credits
 * Whited - Metatable Hook
