@@ -5,7 +5,6 @@ local Parser = animatorRequire("Parser.lua")
 local Utility = animatorRequire("Utility.lua")
 
 local Signal = animatorRequire("Nevermore/Signal.lua")
-local Maid = animatorRequire("Nevermore/Maid.lua")
 
 local format = string.format
 
@@ -42,11 +41,6 @@ function Animator.new(Player, AnimationResolvable)
 	c.DidLoop = Signal.new()
 	c.Stopped = Signal.new()
 	c.KeyframeReached = Signal.new()
-
-	c._maid = Maid.new()
-	c._maid:GiveTask(c.DidLoop)
-	c._maid:GiveTask(c.Stopped)
-	c._maid:GiveTask(c.KeyframeReached)
 	return c
 end
 
@@ -157,7 +151,6 @@ end
 function Animator:GetMarkerReachedSignal(name)
 	if not self._markerSignal[name] then
 		self._markerSignal[name] = Signal.new()
-		self._maid:GiveTask(self._markerSignal[name])
 	end
 	return self._markerSignal[name]
 end
@@ -174,7 +167,6 @@ end
 function Animator:Destroy()
 	self:Stop(0)
 	self.Stopped:Wait()
-	self._maid:Destroy()
 	self = nil
 end
 
