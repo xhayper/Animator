@@ -8,7 +8,7 @@ local Signal = animatorRequire("Nevermore/Signal.lua")
 
 local format = string.format
 
-local Animator = {AnimationData = {}, Player = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
+local Animator = {AnimationData = {}, _motorIgnoreList = {}, Stoplayer = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
 Animator.__index = Animator
 
 function Animator.new(Player, AnimationResolvable)
@@ -45,7 +45,7 @@ function Animator.new(Player, AnimationResolvable)
 end
 
 function Animator:_playPose(pose, parent, fade)
-	local RigList = Utility:getMotors(self.Player)
+	local RigList = Utility:getMotors(self.Player, self._motorIgnoreList)
 	if pose.Subpose then
 		for _,sp in next, pose.Subpose do
 			self:_playPose(sp, pose, fade)
@@ -69,6 +69,17 @@ function Animator:_playPose(pose, parent, fade)
 			self.Player.Character[pose.Name].CFrame *= pose.CFrame
 		end
 	end
+end
+
+function Animator:IgnoreMotorIn(ignoreList)
+	if typeof(ignoreList) ~= "table" then
+		error(format("invalid argument 1 to 'IgnoreMotorIn' (Table expected, got %s)", typeof(ignoreList)))
+	end
+	self._motorIgnoreList = ignoreList
+end
+
+function Animator:GetMotorIgnoreList()
+	return self._motorIgnoreList
 end
 
 function Animator:Play(fadeTime, weight, speed)
@@ -119,7 +130,7 @@ function Animator:Play(fadeTime, weight, speed)
 				return self:Play(fadeTime, weight, speed)
 			end
 			RunService.RenderStepped:Wait()
-			for _,r in next, Utility:getMotors(self.Player) do
+			for _,r in next, Utility:getMotors(self.Player, self._motorIgnoreList) do
 				if self._stopFadeTime > 0 then
 					TweenService:Create(r, TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
 						Transform = CFrame.new(),

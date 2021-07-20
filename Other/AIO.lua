@@ -152,18 +152,31 @@ if getgenv()["Animator"] == nil then
 		end
 	end
 
-	function Utility:getMotors(Player)
+	function Utility:getMotors(Player, IgnoreList)
+        IgnoreList = IgnoreList or {}
+
 		if not Player:IsA("Player") then
 			error(format("invalid argument 1 to 'getMotors' (Player expected, got %s)", Player.ClassName))
 		end
 
+        if typeof(IgnoreList) ~= "table" then
+            error(format("invalid argument 1 to 'getMotors' (Table expected, got %s)", typeof(IgnoreList)))
+        end
+    
 		local MotorList = {}
 
-		for _,i in next, Player.Character:GetDescendants() do
-			if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
-				table.insert(MotorList, i)
-			end
-		end
+        for _,i in next, Player.Character:GetDescendants() do
+            if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
+                for _,i2 in next, IgnoreList do
+                    if typeof(i2) == "Instance" then
+                        if i:IsDescendantOf(i2) then
+                            continue
+                        end
+                    end
+                end
+                table.insert(MotorList, i)
+            end
+        end
 
 		return MotorList
 	end
@@ -234,7 +247,7 @@ if getgenv()["Animator"] == nil then
 	local TweenService = game:GetService("TweenService")
 	local RunService = game:GetService("RunService")
 
-	local Animator = {AnimationData = {}, Player = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
+	local Animator = {AnimationData = {}, _motorIgnoreList = {}, Player = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
 	Animator.__index = Animator
 
 	function Animator.new(Player, AnimationResolvable)
@@ -370,6 +383,17 @@ if getgenv()["Animator"] == nil then
 			end)()
 		end
 	end
+
+    function Animator:IgnoreMotorIn(ignoreList)
+        if typeof(ignoreList) ~= "table" then
+            error(format("invalid argument 1 to 'IgnoreMotorIn' (Table expected, got %s)", typeof(ignoreList)))
+        end
+        self._motorIgnoreList = ignoreList
+    end
+    
+    function Animator:GetMotorIgnoreList()
+        return self._motorIgnoreList
+    end
 
 	function Animator:GetTimeOfKeyframe(keyframeName)
 		for _,f in next, self.AnimationData.Frames do
