@@ -117,7 +117,7 @@ function Animator:Play(fadeTime, weight, speed)
 			for _,r in next, Utility:getMotors(self.Player) do
 				TweenService:Create(r, TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
 					Transform = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-				})
+				}):Play()
 			end
 			if not Character.Humanoid:FindFirstChild("Animator") then
 				Instance.new("Animator", Character.Humanoid)
