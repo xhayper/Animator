@@ -100,7 +100,7 @@ print("Done!")
 
 ## Animator with UI
 
-* Note: Only support Animation ID
+* Note: UI Only support Animation ID
 
 ```lua
 if getgenv()["Animator"] == nil then
