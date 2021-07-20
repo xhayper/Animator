@@ -155,7 +155,7 @@ local Play = Main.Button({
 	Text = "Play",
 	Callback = function()
 		if currentAnim ~= nil and currentAnim.IsPlaying == true then
-			currentAnim:Stop(0)
+			currentAnim:Stop(0) -- Honestly, :Destroy() might work better, but i can't seem to get it to work
 			currentAnim.Stopped:Wait()
 			RunService.RenderStepped:Wait()
 		end
