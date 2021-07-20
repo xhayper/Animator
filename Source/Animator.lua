@@ -94,12 +94,19 @@ function Animator:Play(fadeTime, weight, speed)
 				Character.Humanoid.Animator:Destroy()
 			end
 		end
+		local con
+		con = Character:GetPropertyChangedSignal("Parent"):Connect(function()
+			if Character.Parent == nil then 
+				self:Destroy()
+			end
+			con:Disconnect()
+		end) 
 		local start = os.clock()
 		coroutine.wrap(function()
 			for i,f in next, self.AnimationData.Frames do
 				f.Time /= self.Speed
 				if i ~= 1 and f.Time > os.clock()-start then
-					repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true
+					repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true or self.Player.Character == nil
 				end
 				if self._stopped == true then
 					break;
@@ -151,6 +158,7 @@ function Animator:Play(fadeTime, weight, speed)
 			self._stopped = false
 			self._playing = false
 			self.IsPlaying = false
+			con:Disconnect()
 			self.Stopped:Fire()
 		end)()
 	end

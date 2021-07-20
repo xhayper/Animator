@@ -152,37 +152,37 @@ if getgenv()["Animator"] == nil then
 		end
 	end
 
-    function Utility:getMotors(Player, IgnoreList)
-        IgnoreList = IgnoreList or {}
-        if not Player:IsA("Player") then
-            error(format("invalid argument 1 to 'getMotors' (Player expected, got %s)", Player.ClassName))
-        end
-    
-        if typeof(IgnoreList) ~= "table" then
-            error(format("invalid argument 1 to 'getMotors' (Table expected, got %s)", typeof(IgnoreList)))
-        end
-    
-        local MotorList = {}
-    
-        for _,i in next, Player.Character:GetDescendants() do
-            if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
-                local IsTained = false
-                for _,i2 in next, IgnoreList do
-                    if typeof(i2) == "Instance" then
-                        if i:IsDescendantOf(i2) then
-                            IsTained = true
-                            break
-                        end
-                    end
-                end
-                if IsTained ~= true then
-                    table.insert(MotorList, i)
-                end
-            end
-        end
-    
-        return MotorList
-    end
+	function Utility:getMotors(Player, IgnoreList)
+		IgnoreList = IgnoreList or {}
+		if not Player:IsA("Player") then
+			error(format("invalid argument 1 to 'getMotors' (Player expected, got %s)", Player.ClassName))
+		end
+
+		if typeof(IgnoreList) ~= "table" then
+			error(format("invalid argument 1 to 'getMotors' (Table expected, got %s)", typeof(IgnoreList)))
+		end
+
+		local MotorList = {}
+
+		for _,i in next, Player.Character:GetDescendants() do
+			if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
+				local IsTained = false
+				for _,i2 in next, IgnoreList do
+					if typeof(i2) == "Instance" then
+						if i:IsDescendantOf(i2) then
+							IsTained = true
+							break
+						end
+					end
+				end
+				if IsTained ~= true then
+					table.insert(MotorList, i)
+				end
+			end
+		end
+
+		return MotorList
+	end
 
 	-----------------------------------------------------------------
 
@@ -320,11 +320,18 @@ if getgenv()["Animator"] == nil then
 			self._isLooping = false
 			self.IsPlaying = true
 			local Character = self.Player.Character
-            if Character:FindFirstChildOfClass("Humanoid") then
-                if Character.Humanoid:FindFirstChildOfClass("Animator") then
-                    Character.Humanoid.Animator:Destroy()
-                end
-            end
+			if Character:FindFirstChildOfClass("Humanoid") then
+				if Character.Humanoid:FindFirstChildOfClass("Animator") then
+					Character.Humanoid.Animator:Destroy()
+				end
+			end
+			local con
+			con = Character:GetPropertyChangedSignal("Parent"):Connect(function()
+				if Character.Parent == nil then 
+					self:Destroy()
+				end
+				con:Disconnect()
+			end) 
 			local start = os.clock()
 			coroutine.wrap(function()
 				for i,f in next, self.AnimationData.Frames do
@@ -372,31 +379,31 @@ if getgenv()["Animator"] == nil then
 						r.Transform = CFrame.new()
 					end
 				end
-                if Character:FindFirstChildOfClass("Humanoid") then
-                    if not Character.Humanoid:FindFirstChildOfClass("Animator") then
-                        Instance.new("Animator", Character.Humanoid)
-                    end
-                else
-                    self:Destroy()
-                end
-                self._stopped = false
-                self._playing = false
+				if Character:FindFirstChildOfClass("Humanoid") then
+					if not Character.Humanoid:FindFirstChildOfClass("Animator") then
+						Instance.new("Animator", Character.Humanoid)
+					end
+				else
+					self:Destroy()
+				end
+				self._stopped = false
+				self._playing = false
 				self.IsPlaying = false
 				self.Stopped:Fire()
 			end)()
 		end
 	end
 
-    function Animator:IgnoreMotorIn(ignoreList)
-        if typeof(ignoreList) ~= "table" then
-            error(format("invalid argument 1 to 'IgnoreMotorIn' (Table expected, got %s)", typeof(ignoreList)))
-        end
-        self._motorIgnoreList = ignoreList
-    end
-    
-    function Animator:GetMotorIgnoreList()
-        return self._motorIgnoreList
-    end
+	function Animator:IgnoreMotorIn(ignoreList)
+		if typeof(ignoreList) ~= "table" then
+			error(format("invalid argument 1 to 'IgnoreMotorIn' (Table expected, got %s)", typeof(ignoreList)))
+		end
+		self._motorIgnoreList = ignoreList
+	end
+
+	function Animator:GetMotorIgnoreList()
+		return self._motorIgnoreList
+	end
 
 	function Animator:GetTimeOfKeyframe(keyframeName)
 		for _,f in next, self.AnimationData.Frames do
@@ -427,14 +434,14 @@ if getgenv()["Animator"] == nil then
 		self:Stop(0)
 		self.Stopped:Wait()
 
-	    -- Maid won't work properly so.
-	    self.DidLoop:Destroy()
-	    self.Stopped:Destroy()
-	    self.KeyframeReached:Destroy()
-        for _,s in next, self._markerSignal do
-            s:Destroy()
-        end
-	    setmetatable(self, nil)
+		-- Maid won't work properly so.
+		self.DidLoop:Destroy()
+		self.Stopped:Destroy()
+		self.KeyframeReached:Destroy()
+		for _,s in next, self._markerSignal do
+			s:Destroy()
+		end
+		setmetatable(self, nil)
 	end
 
 	------------------------------------------------------------------
@@ -452,7 +459,7 @@ if getgenv()["Animator"] == nil then
 		OldFunc = hookmetamethod(game, "__namecall", function(Object, ...)
 			local NamecallMethod = getnamecallmethod()
 			if Object.ClassName == "Humanoid" and Object.Parent == Player.Character and NamecallMethod == "LoadAnimation" and checkcaller() then
-			    return Animator.new(Player, ...)
+				return Animator.new(Player, ...)
 			end
 			return OldFunc(Object, ...)
 		end)
