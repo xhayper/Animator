@@ -167,6 +167,11 @@ end
 function Animator:Destroy()
 	self:Stop(0)
 	self.Stopped:Wait()
+
+	-- Maid won't work properly so.
+	self.DidLoop:Destroy()
+	self.Stopped:Destroy()
+	self.KeyframeReached:Destroy()
 	setmetatable(self, nil)
 end
 
