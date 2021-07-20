@@ -158,8 +158,8 @@ function Animator:AdjustSpeed(speed)
 end
 
 function Animator:Stop(fadeTime)
-	self._stopped = true
 	self._stopFadeTime = fadeTime or 0.100000001
+	self._stopped = true
 end
 
 function Animator:Destroy()
