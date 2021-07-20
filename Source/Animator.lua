@@ -172,6 +172,9 @@ function Animator:Destroy()
 	self.DidLoop:Destroy()
 	self.Stopped:Destroy()
 	self.KeyframeReached:Destroy()
+	for _,s in next, self._markerSignal do
+		s:Destroy()
+	end
 	setmetatable(self, nil)
 end
 
