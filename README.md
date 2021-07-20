@@ -29,7 +29,7 @@ end
 ```lua
 -- Constructor --
 
-Animator.new(Player, AnimationData) -- Animation Data Should Be AnimationID as String/Number or KeyfraneSequnce or Raw Animation Data
+Animator.new(Player, AnimationData) -- Animation Data Should Be AnimationID as String/Number or KeyframeSequnce or Raw Animation Data or Animation Instance
 
 -- Functions --
 
