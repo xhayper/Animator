@@ -9,7 +9,7 @@ local Maid = animatorRequire("Nevermore/Maid.lua")
 
 local format = string.format
 
-local Animator = {AnimationData = {}, Player = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
+local Animator = {AnimationData = {}, IsPlaying = false, Player = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
 Animator.__index = Animator
 
 function Animator.new(Player, AnimationResolvable)
@@ -80,6 +80,7 @@ end
 function Animator:Play(fadeTime, weight, speed)
 	fadeTime = fadeTime or 0.100000001
 	if self._playing == false or self._isLooping == true then
+		self.IsPlaying = true
 		self._playing = true
 		self._isLooping = false
 		self.IsPlaying = true
@@ -131,6 +132,7 @@ function Animator:Play(fadeTime, weight, speed)
 			if not Character.Humanoid:FindFirstChild("Animator") then
 				Instance.new("Animator", Character.Humanoid)
 			end
+			self.IsPlaying = false
 			self.Stopped:Fire()
 		end)()
 	end
