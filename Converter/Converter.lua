@@ -153,6 +153,11 @@ function parseKeyframeData(keyframe)
 	for _,p in next, keyframe:GetChildren() do
 		if p:IsA("Pose") then
 			table.insert(keyframeData.Pose, parsePoseData(p))
+		elseif p:IsA("KeyframeMarker") then
+			if not keyframeData["Marker"] then
+				keyframeData.Marker = {}
+			end
+			table.insert(keyframeData.Marker, p.Name)
 		end
 	end
 	return keyframeData
