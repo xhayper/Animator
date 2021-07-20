@@ -164,7 +164,7 @@ function Animator:Stop(fadeTime)
 end
 
 function Animator:Destroy()
-	self:Stop()
+	self:Stop(0)
 	self.Stopped:Wait()
 	self._maid:Destroy()
 	self = nil

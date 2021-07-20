@@ -87,8 +87,11 @@ if getgenv()["Animator"] == nil then
 end
 
 -- Main --
+local RunService = game:GetService("RunService")
 
-local plr = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
 
 local currentAnim
 
@@ -124,8 +127,9 @@ local Play = Main.Button({
 	Callback = function()
 		if currentAnim ~= nil and currentAnim.IsPlaying == true then
 			currentAnim:Stop(0)
+			RunService.RenderStepped:Wait()
 		end
-		currentAnim = Animator.new(plr, Animation:GetText())
+		currentAnim = Animator.new(Player, Animation:GetText())
 		currentAnim.Looped = Loop:GetState()
 		currentAnim:Play()
 		spawn(function()
