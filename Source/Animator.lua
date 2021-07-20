@@ -120,7 +120,7 @@ function Animator:Play(fadeTime, weight, speed)
 			if self.Looped then
 				self.DidLoop:Fire()
 				self._isLooping = true
-				self:Play(fadeTime, weight, speed)
+				return self:Play(fadeTime, weight, speed)
 			end
 			RunService.RenderStepped:Wait()
 			for _,r in next, Utility:getMotors(self.Player) do
