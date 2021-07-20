@@ -10,20 +10,4 @@
 ## Data Structure
 
 ```lua
-{
-	Priority = Enum.AnimationPriority, -- Animation Priority
-	Loop = Boolean, -- Does the animation loop?
-	AuthoredHipHeight = Number, -- Hip Height
-	Frames = {
-		{
-			["Part Name"] = { -- Name of the part, For example, "HumanoidRootPart", "Left Arm", "Right Arm", "Lower Torso"
-				CFrame = CFrame -- CFrame of the Animation
-				EasingDirection = Enum.EasingDirection, -- Tween Easing Direction
-				EasingStyle = Enum.EasingStyle, -- Tween Easing Style
-				Weight = Number -- Animation Weight
-			},
-			Time = Number -- Timestamp of the Frame
-		}
-	}
-}
 ```

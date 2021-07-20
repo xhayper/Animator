@@ -14,6 +14,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 
 * Priority Support (Idk how)
 * Weight System (Idk how)
+* Seeking froward, Backward (Idl how)
 
 ## Installation
 
@@ -32,10 +33,11 @@ Animator.new(Player, AnimationData) -- Animation Data Should Be AnimationID as S
 
 -- Functions --
 
-Animator:Play() -- Play the Animation
-Animator:Stop() -- Stop the Animation
-~~Animator:Destroy() -- Stop current animation and destroy the instance~~ -- Will be added later
-~~Animator:GetTimeOfKeyframe(keyframeName) -- Get time position of the given frame name (first one)~~ -- Will be added later
+Animator:Play(fadeTime, weight, speed) -- Play the Animation with spefic fadeTime and speed, (Deault - fadeTime = 0.100000001, weight = 1, speed = 1)
+Animator:Stop(fadeTime) -- Stop the Animation with spefic fadeTime, (Default - fadeTime = 0.100000001)
+Animator:Destroy() -- Stop current animation and destroy the instance
+Animator:GetMarkerReachedSignal(name) -- When it hit the marker, this will be fired, (Args - Value)
+Animator:GetTimeOfKeyframe(keyframeName) -- Get time position of the given frame name (first one)
 Animator:AdjustSpeed(speed) -- Set playback Speed
 
 -- Properties --
@@ -50,7 +52,7 @@ Animator.Player -- The player that the animator is assigned to
 
 Animator.Stopped:Connect() -- Run when the animation ended
 Animator.DidLooped:Connect() -- Run when the animation loop
-~~Animator.KeyframeReached:Connect(keyframeName) -- On keyframe reached (Only trigger if the keyframe name isn't Keyframe~~ -- Will be added later
+Animator.KeyframeReached:Connect(keyframeName) -- On keyframe reached (Only trigger if the keyframe name isn't Keyframe
 
 -- Globals --
 

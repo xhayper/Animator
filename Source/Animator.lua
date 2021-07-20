@@ -28,6 +28,10 @@ function Animator.new(Player, AnimationResolvable)
 		c.AnimationData = AnimationResolvable
 	elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("KeyframeSequence") then -- Assuming that Resolvable is KeyframeSequence
 		c.AnimationData = Parser:parseAnimationData(AnimationResolvable)
+	elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("Animation") then -- Assuming that Resolvable is Animation
+		local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable.AnimationId))[1]
+		if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
+		c.AnimationData = Parser:parseAnimationData(animationInstance)
 	else
 		error(format("invalid argument 2 to 'new' (number,string,KeyframeSequence expected, got %s)", Player.ClassName))
 	end
@@ -38,6 +42,11 @@ function Animator.new(Player, AnimationResolvable)
 	c.DidLoop = Signal.new()
 	c.Stopped = Signal.new()
 	c.KeyframeReached = Signal.new()
+
+	c._maid = Maid.new()
+	c._maid:GiveTask(c.DidLoop)
+	c._maid:GiveTask(c.Stopped)
+	c._maid:GiveTask(c.KeyframeReached)
 	return c
 end
 
@@ -139,6 +148,7 @@ end
 function Animator:GetMarkerReachedSignal(name)
 	if not self._markerSignal[name] then
 		self._markerSignal[name] = Signal.new()
+		self._maid:GiveTask(self._markerSignal[name])
 	end
 	return self._markerSignal[name]
 end
@@ -150,6 +160,13 @@ end
 function Animator:Stop(fadeTime)
 	self._stopped = true
 	self._stopFadeTime = fadeTime or 0.100000001
+end
+
+function Animator:Destroy()
+	self:Stop()
+	self.Stopped:Wait()
+	self._maid:Destroy()
+	self = nil
 end
 
 return Animator
