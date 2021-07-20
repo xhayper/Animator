@@ -123,10 +123,6 @@ local Play = Main.Button({
 	Text = "Play",
 	Callback = function()
 		if currentAnim ~= nil then
-			if currentAnim.isPlaying == true then
-				currentAnim:Stop()
-				currentAnim.Stopped:Wait()
-			end
 			currentAnim:Destroy()
 		end
 		currentAnim = Animator.new(plr, Animation:GetText())
