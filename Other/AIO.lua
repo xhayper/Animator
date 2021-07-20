@@ -250,7 +250,7 @@ if getgenv()["Animator"] == nil then
     local RunService = game:GetService("RunService")
     local TweenService = game:GetService("TweenService")
 
-    local Animator = {AnimationData = {}, _motorIgnoreList = {}, Stoplayer = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
+    local Animator = {AnimationData = {}, Player = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _motorIgnoreList = {}, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
     Animator.__index = Animator
     
     function Animator.new(Player, AnimationResolvable)
@@ -437,6 +437,9 @@ if getgenv()["Animator"] == nil then
         self.DidLoop:Destroy()
         self.Stopped:Destroy()
         self.KeyframeReached:Destroy()
+        for _,s in next, self._markerSignal do
+            s:Destroy()
+        end
         self = nil
     end
 
