@@ -111,7 +111,7 @@ function Animator:Play(fadeTime, weight, speed)
 					for _,p in next, f.Pose do
 						fadeTime += f.Time
 						if i ~= 1 then
-							fadeTime = (f.Time*self.Speed-self.AnimationData.Frames[i-1].Time)/speed or self.Speed
+							fadeTime = (f.Time*self.Speed-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
 						end
 						self:_playPose(p, nil, fadeTime)
 					end
