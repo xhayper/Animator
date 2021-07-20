@@ -122,10 +122,12 @@ local Loop = Main.Toggle({
 local Play = Main.Button({
 	Text = "Play",
 	Callback = function()
-		if currentAnim ~= nil and currentAnim.isPlaying == true then
-			currentAnim:Stop()
-			currentAnim.Stopped:Wait()
-			currentAnim:Destroy()
+		if currentAnim ~= nil then
+			if currentAnim.isPlaying == true 
+				currentAnim:Stop()
+				currentAnim.Stopped:Wait()
+				currentAnim:Destroy()
+			end
 		end
 		currentAnim = Animator.new(plr, Animation:GetText())
 		currentAnim.Looped = Loop:GetState()
@@ -140,7 +142,7 @@ local Play = Main.Button({
 local Stop = Main.Button({
 	Text = "Stop",
 	Callback = function()
-		if currentAnim.IsPlaying == true then
+		if currentAnim ~= nil and currentAnim.IsPlaying == true then
 			currentAnim:Stop()
 		end
 	end
