@@ -33,7 +33,7 @@ getgenv().hookAnimatorFunction = function()
 		end
 		return OldFunc(Object, ...)
 	end)
-	Utility:sendNotif("Hook by Whited", nil, 5)
+	Utility:sendNotif("Hook Loaded\nby whited#4382", nil, 5)
 end
 
 Utility:sendNotif("API Loaded", nil, 5)
