@@ -117,7 +117,7 @@ function Animator:Play(fadeTime, weight, speed)
 					end
 				end
 			end
-			if self.Looped then
+			if self.Looped == true and self._stopped ~= true then
 				self.DidLoop:Fire()
 				self._isLooping = true
 				return self:Play(fadeTime, weight, speed)
