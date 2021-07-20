@@ -80,7 +80,6 @@ end
 function Animator:Play(fadeTime, weight, speed)
 	fadeTime = fadeTime or 0.100000001
 	if self._playing == false or self._isLooping == true then
-		self.IsPlaying = true
 		self._playing = true
 		self._isLooping = false
 		self.IsPlaying = true
