@@ -152,19 +152,18 @@ if getgenv()["Animator"] == nil then
 		end
 	end
 
-	function Utility:getMotors(Player, IgnoreList)
+    function Utility:getMotors(Player, IgnoreList)
         IgnoreList = IgnoreList or {}
-
-		if not Player:IsA("Player") then
-			error(format("invalid argument 1 to 'getMotors' (Player expected, got %s)", Player.ClassName))
-		end
-
+        if not Player:IsA("Player") then
+            error(format("invalid argument 1 to 'getMotors' (Player expected, got %s)", Player.ClassName))
+        end
+    
         if typeof(IgnoreList) ~= "table" then
             error(format("invalid argument 1 to 'getMotors' (Table expected, got %s)", typeof(IgnoreList)))
         end
     
-		local MotorList = {}
-
+        local MotorList = {}
+    
         for _,i in next, Player.Character:GetDescendants() do
             if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
                 for _,i2 in next, IgnoreList do
@@ -177,9 +176,9 @@ if getgenv()["Animator"] == nil then
                 table.insert(MotorList, i)
             end
         end
-
-		return MotorList
-	end
+    
+        return MotorList
+    end
 
 	-----------------------------------------------------------------
 
@@ -284,7 +283,7 @@ if getgenv()["Animator"] == nil then
 	end
 
 	function Animator:_playPose(pose, parent, fade)
-		local RigList = Utility:getMotors(self.Player)
+		local RigList = Utility:getMotors(self.Player, self._motorIgnoreList)
 		if pose.Subpose then
 			for _,sp in next, pose.Subpose do
 				self:_playPose(sp, pose, fade)
@@ -358,7 +357,7 @@ if getgenv()["Animator"] == nil then
 					return self:Play(fadeTime, weight, speed)
 				end
 				RunService.RenderStepped:Wait()
-				for _,r in next, Utility:getMotors(self.Player) do
+				for _,r in next, Utility:getMotors(self.Player, self._motorIgnoreList) do
 					if self._stopFadeTime > 0 then
 						TweenService:Create(r, TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
 							Transform = CFrame.new(),
