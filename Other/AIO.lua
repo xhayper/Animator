@@ -393,7 +393,7 @@ if getgenv()["Animator"] == nil then
 	function Animator:Destroy()
 		self:Stop(0)
 		self.Stopped:Wait()
-		self = nil
+		setmetatable(self, nil)
 	end
 
 	------------------------------------------------------------------
