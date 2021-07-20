@@ -489,6 +489,8 @@ if getgenv()["Animator"] == nil then
 				if not Character.Humanoid:FindFirstChild("Animator") then
 					Instance.new("Animator", Character.Humanoid)
 				end
+                self._stopped = false
+                self._playing = false
 				self.IsPlaying = false
 				self.Stopped:Fire()
 			end)()
