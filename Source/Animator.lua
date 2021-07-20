@@ -9,7 +9,7 @@ local Maid = animatorRequire("Nevermore/Maid.lua")
 
 local format = string.format
 
-local Animator = {AnimationData = {}, Player = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _playing = false, _stopped = false, _isLooping = false}
+local Animator = {AnimationData = {}, Player = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
 Animator.__index = Animator
 
 function Animator.new(Player, AnimationResolvable)
@@ -37,6 +37,7 @@ function Animator.new(Player, AnimationResolvable)
 
 	c.DidLoop = Signal.new()
 	c.Stopped = Signal.new()
+	c.KeyframeReached = Signal.new()
 	return c
 end
 
@@ -67,7 +68,8 @@ function Animator:_playPose(pose, parent, fade)
 	end
 end
 
-function Animator:Play()
+function Animator:Play(fadeTime, weight, speed)
+	fadeTime = fadeTime or 0.100000001
 	if self._playing == false or self._isLooping == true then
 		self._playing = true
 		self._isLooping = false
@@ -86,11 +88,21 @@ function Animator:Play()
 				if self._stopped == true then
 					break;
 				end
+				if f.Name ~= "Keyframe" then
+					self.KeyframeReached:Fire(f.Name)
+				end
+				if f["Marker"] then
+					for k,v in next, f["Marker"] do
+						if self._markerSignal[k] then
+							self._markerSignal[k]:Fire(v)
+						end
+					end
+				end
 				if f.Pose then
 					for _,p in next, f.Pose do
-						local fadeTime = f.Time
+						fadeTime += f.Time
 						if i ~= 1 then
-							fadeTime = (f.Time*self.Speed-self.AnimationData.Frames[i-1].Time)/self.Speed
+							fadeTime = (f.Time*self.Speed-self.AnimationData.Frames[i-1].Time)/speed or self.Speed
 						end
 						self:_playPose(p, nil, fadeTime)
 					end
@@ -99,11 +111,13 @@ function Animator:Play()
 			if self.Looped then
 				self.DidLoop:Fire()
 				self._isLooping = true
-				self:Play()
+				self:Play(fadeTime, weight, speed)
 			end
+			RunService.RenderStepped:Wait()
 			for _,r in next, Utility:getMotors(self.Player) do
-				RunService.RenderStepped:Wait()
-				r.Transform = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+				TweenService:Create(r, TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+					Transform = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+				})
 			end
 			if not Character.Humanoid:FindFirstChild("Animator") then
 				Instance.new("Animator", Character.Humanoid)
@@ -113,12 +127,29 @@ function Animator:Play()
 	end
 end
 
+function Animator:GetTimeOfKeyframe(keyframeName)
+	for i,f in next, self.AnimationData.Frames do
+		if i.Name == keyframeName then
+			return f.Time
+		end
+	end
+	return math.huge
+end
+
+function Animator:GetMarkerReachedSignal(name)
+	if not self._markerSignal[name] then
+		self._markerSignal[name] = Signal.new()
+	end
+	return self._markerSignal[name]
+end
+
 function Animator:AdjustSpeed(speed)
 	self.Speed = speed
 end
 
-function Animator:Stop()
+function Animator:Stop(fadeTime)
 	self._stopped = true
+	self._stopFadeTime = fadeTime or 0.100000001
 end
 
 return Animator

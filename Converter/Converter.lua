@@ -154,10 +154,13 @@ function parseKeyframeData(keyframe)
 		if p:IsA("Pose") then
 			table.insert(keyframeData.Pose, parsePoseData(p))
 		elseif p:IsA("KeyframeMarker") then
-			if not keyframeData["Marker"] then
+			if not keyframeData.Marker then
 				keyframeData.Marker = {}
 			end
-			table.insert(keyframeData.Marker, p.Name)
+			if not keyframeData.Marker[p.Name] then
+				keyframeData.Marker[p.Name] = {}
+			end
+			table.insert(keyframeData.Marker[p.Name], {Value = p.Value})
 		end
 	end
 	return keyframeData
