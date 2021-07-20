@@ -7,7 +7,6 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 * Easy To Use
 * Can play Non-Trusted Animation / Raw Animation Data (Use [Converter](https://github.com/xhayper/Animator/tree/main/Converter))
 * R6, R15, Custom Rig/Animation Support
-* Compatible with Nullware Reanimate (Used to replicate Animation)
 * Simillar to Roblox's AnimationTrack Instance
 
 ## Planned Feature
