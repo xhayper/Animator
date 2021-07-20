@@ -8,7 +8,7 @@ local Signal = animatorRequire("Nevermore/Signal.lua")
 
 local format = string.format
 
-local Animator = {__mode = "kv", AnimationData = {}, _motorIgnoreList = {}, Stoplayer = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
+local Animator = {AnimationData = {}, _motorIgnoreList = {}, Stoplayer = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
 Animator.__index = Animator
 
 function Animator.new(Player, AnimationResolvable)
