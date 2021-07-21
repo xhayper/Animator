@@ -57,6 +57,7 @@ Animator:GetMotorIgnoreList() -- Return Table of Instance that the animator will
 
 -- Properties --
 
+Animator.handleVanillaAnimator -- Should the animator delete humanoid's animator on play and add it back on stop
 Animator.Looped -- Do you want the animation to Loop?
 Animator.IsPlaying -- Is the animation playing?
 Animator.Length -- Animation Length

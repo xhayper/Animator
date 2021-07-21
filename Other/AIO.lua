@@ -252,7 +252,7 @@ if getgenv()["Animator"] == nil then
 	local RunService = game:GetService("RunService")
 	local TweenService = game:GetService("TweenService")
 
-	local Animator = {AnimationData = {}, Character = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _motorIgnoreList = {}, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
+	local Animator = {AnimationData = {}, handleVanillaAnimator = true, Character = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _motorIgnoreList = {}, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
 	Animator.__index = Animator
 
 	function Animator.new(Character, AnimationResolvable)
@@ -332,7 +332,7 @@ if getgenv()["Animator"] == nil then
 			self._playing = true
 			self._isLooping = false
 			self.IsPlaying = true
-			if self.Character:FindFirstChildOfClass("Humanoid") then
+			if self.Character:FindFirstChildOfClass("Humanoid") and self.handleVanillaAnimator == true then
 				if self.Character.Humanoid:FindFirstChildOfClass("Animator") then
 					self.Character.Humanoid.Animator:Destroy()
 				end
@@ -394,7 +394,7 @@ if getgenv()["Animator"] == nil then
 								r.Transform = CFrame.new()
 							end
 						end
-						if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") then
+						if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") and self.handleVanillaAnimator == true then
 							Instance.new("Animator", self.Character.Humanoid)
 						end
 						con:Disconnect()
