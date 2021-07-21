@@ -74,6 +74,11 @@ HttpRequire("HttpLink") -- Require the module using GET Request, Must start with
 animatorRequire("Path") -- Used by Animator, Same as HttpRequire but with this repo link as the prefix
 hookAnimatorFunction() -- Hook animator to Humanoid:LoadAnimation()
 HttpRequireCach -- Cache used by HttpRequire, Clear it by assigning it to Empty table
+
+-- Hooks --
+-- This will only work if you call hookAnimatorFunction()
+
+Humanoid:LoadAnimation(AnimationResolvable, UseDefaultLoadAnimation) -- AnimationResolvable - Should Be AnimationID as String/Number or KeyframeSequnce or Raw Animation Data or Animation Instance, UseDefaultLoadAnimation - Boolean
 ```
 
 ## Example
