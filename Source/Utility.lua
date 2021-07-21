@@ -49,11 +49,9 @@ function Utility:getMotors(Character, IgnoreList)
 		if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
 			local IsTained = false
 			for _,i2 in next, IgnoreList do
-				if typeof(i2) == "Instance" then
-					if i:IsDescendantOf(i2) then
-						IsTained = true
-						break
-					end
+				if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+					IsTained = true
+					break
 				end
 			end
 			if IsTained ~= true then

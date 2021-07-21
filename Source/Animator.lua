@@ -32,7 +32,7 @@ function Animator.new(Character, AnimationResolvable)
 		if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
 		c.AnimationData = Parser:parseAnimationData(animationInstance)
 	else
-		error(format("invalid argument 2 to 'new' (number,string,Instance expected, got %s)", typeof(AnimationResolvable)))
+		error(format("invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)", typeof(AnimationResolvable)))
 	end
 
 	c.Looped = c.AnimationData.Loop
@@ -52,10 +52,10 @@ function Animator:_playPose(pose, parent, fade)
 		end
 	end
 	if parent then
+		local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
 		for _,motor in next, RigList do
 			if motor.Part0.Name == parent.Name and motor.Part1.Name == pose.Name then
 				if fade > 0 then
-					local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
 					if self._stopped ~= true then
 						TweenService:Create(motor, TI, {Transform = pose.CFrame}):Play()
 					end
@@ -108,7 +108,7 @@ function Animator:Play(fadeTime, weight, speed)
 					if i ~= 1 and f.Time > os.clock()-start then
 						repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true
 					end
-					if self._stopped == true then
+					if self == nil or self._stopped == true then
 						break;
 					end
 					if f.Name ~= "Keyframe" then
@@ -131,31 +131,34 @@ function Animator:Play(fadeTime, weight, speed)
 						end
 					end
 				end
-				if self.Looped == true and self._stopped ~= true then
-					self.DidLoop:Fire()
-					self._isLooping = true
-					return self:Play(fadeTime, weight, speed)
-				end
-				RunService.RenderStepped:Wait()
-				for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
-					if self._stopFadeTime > 0 then
-						TweenService:Create(r, TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-							Transform = CFrame.new(),
-							CurrentAngle = 0
-						}):Play()
-					else
-						r.CurrentAngle = 0
-						r.Transform = CFrame.new()
+				if self ~= nil then
+					if self.Looped == true and self._stopped ~= true then
+						self.DidLoop:Fire()
+						self._isLooping = true
+						return self:Play(fadeTime, weight, speed)
 					end
+					RunService.RenderStepped:Wait()
+					local TI = TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+					for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
+						if self._stopFadeTime > 0 then
+							TweenService:Create(r, TI, {
+								Transform = CFrame.new(),
+								CurrentAngle = 0
+							}):Play()
+						else
+							r.CurrentAngle = 0
+							r.Transform = CFrame.new()
+						end
+					end
+					if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") then
+						Instance.new("Animator", self.Character.Humanoid)
+					end
+					con:Disconnect()
+					self._stopped = false
+					self._playing = false
+					self.IsPlaying = false
+					self.Stopped:Fire()
 				end
-				if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") then
-					Instance.new("Animator", self.Character.Humanoid)
-				end
-				con:Disconnect()
-				self._stopped = false
-				self._playing = false
-				self.IsPlaying = false
-				self.Stopped:Fire()
 			end)()
 		end
 	end
@@ -192,12 +195,15 @@ function Animator:Destroy()
 
 	-- Maid won't work properly so.
 	self.DidLoop:Destroy()
+	self.DidLoop = nil
 	self.Stopped:Destroy()
+	self.Stopped = nil
 	self.KeyframeReached:Destroy()
+	self.KeyframeReached = nil
 	for _,s in next, self._markerSignal do
 		s:Destroy()
+		s = nil
 	end
 	self = nil
 end
-
 return Animator
