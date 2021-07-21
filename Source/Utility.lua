@@ -60,7 +60,7 @@ function Utility:getBones(Character, IgnoreList)
 		end
 	end
 
-	return MotorList
+	return BoneList
 end
 
 function Utility:getMotors(Character, IgnoreList)
