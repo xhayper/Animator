@@ -33,6 +33,36 @@ function Utility:convertEnum(enum)
 	end
 end
 
+function Utility:getBones(Character, IgnoreList)
+	IgnoreList = IgnoreList or {}
+	if typeof(Character) ~= "Instance" then
+		error(format("invalid argument 1 to 'getBones' (Instance expected, got %s)", typeof(Character)))
+	end
+
+	if typeof(IgnoreList) ~= "table" then
+		error(format("invalid argument 1 to 'getBones' (Table expected, got %s)", typeof(IgnoreList)))
+	end
+
+	local BoneList = {}
+
+	for _,i in next, Character:GetDescendants() do
+		if i:IsA("Bone") then
+			local IsTained = false
+			for _,i2 in next, IgnoreList do
+				if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+					IsTained = true
+					break
+				end
+			end
+			if IsTained ~= true then
+				table.insert(BoneList, i)
+			end
+		end
+	end
+
+	return MotorList
+end
+
 function Utility:getMotors(Character, IgnoreList)
 	IgnoreList = IgnoreList or {}
 	if typeof(Character) ~= "Instance" then

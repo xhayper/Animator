@@ -21,7 +21,8 @@ local Animator = {
 	_playing = false,
 	_stopped = false,
 	_isLooping = false,
-	_markerSignal = {}
+	_markerSignal = {},
+	_boneIgnoreList = {}
 }
 
 Animator.__index = Animator
@@ -60,7 +61,8 @@ function Animator.new(Character, AnimationResolvable)
 end
 
 function Animator:_playPose(pose, parent, fade)
-	local RigList = Utility:getMotors(self.Character, self._motorIgnoreList)
+	local MotorList = Utility:getMotors(self.Character, self._motorIgnoreList)
+	local BoneList = Utility:getBones(self.Character, self._boneIgnoreList)
 	if pose.Subpose then
 		for _,sp in next, pose.Subpose do
 			self:_playPose(sp, pose, fade)
@@ -68,7 +70,7 @@ function Animator:_playPose(pose, parent, fade)
 	end
 	if parent then
 		local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
-		for _,motor in next, RigList do
+		for _,motor in next, MotorList do
 			if motor.Part0.Name == parent.Name and motor.Part1.Name == pose.Name then
 				if fade > 0 then
 					if self._stopped ~= true then
@@ -76,6 +78,17 @@ function Animator:_playPose(pose, parent, fade)
 					end
 				else
 					motor.Transform = pose.CFrame
+				end
+			end
+		end
+		for _, bone in next, BoneList do
+			if parent.Name == bone.Parent.Name and bone.Name == pose.Name then
+				if fade > 0 then
+					if self._stopped ~= true then
+						TweenService:Create(bone, TI, {Transform = pose.CFrame}):Play()
+					end
+				else
+					bone.Transform = pose.CFrame
 				end
 			end
 		end
@@ -95,6 +108,17 @@ end
 
 function Animator:GetMotorIgnoreList()
 	return self._motorIgnoreList
+end
+
+function Animator:IgnoreBoneIn(ignoreList)
+	if typeof(ignoreList) ~= "table" then
+		error(format("invalid argument 1 to 'IgnoreBoneIn' (Table expected, got %s)", typeof(ignoreList)))
+	end
+	self._boneIgnoreList = ignoreList
+end
+
+function Animator:GetBoneIgnoreList()
+	return self._boneIgnoreList
 end
 
 function Animator:Play(fadeTime, weight, speed)
@@ -163,6 +187,16 @@ function Animator:Play(fadeTime, weight, speed)
 						else
 							r.CurrentAngle = 0
 							r.Transform = CFrame.new()
+						end
+					end
+					for _, b in next, Utility:getBones(self.Character, self._boneIgnoreList) do
+						if self._stopFadeTime > 0 then
+							if self._stopped ~= true then
+								TweenService:Create(b, TI, {Transform = CFrame.new(), CurrentAngle = 0}):Play()
+							end
+						else
+							b.CurrentAngle = 0
+							b.Transform = CFrame.new()
 						end
 					end
 					if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") and self.handleVanillaAnimator == true then
