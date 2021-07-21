@@ -7,6 +7,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 * Easy To Use
 * Can play Non-Trusted Animation / Raw Animation Data (Use [Converter](https://github.com/xhayper/Animator/tree/main/Converter))
 * R6, R15, Custom Rig/Animation Support
+* Mesh Deformation Support
 * Simillar to Roblox's AnimationTrack Instance
 
 ## Planned Feature
@@ -62,8 +63,10 @@ Animator:Destroy() -- Stop current animation and destroy the instance
 Animator:GetMarkerReachedSignal(name) -- Return a signal that will fire when an marker with same name has been reached, (Args - Value)
 Animator:GetTimeOfKeyframe(keyframeName) -- Get time position of the given frame name (first one)
 Animator:AdjustSpeed(speed) -- Set playback Speed
-Animator:IgnoreMotorIn(tableOfInstance) -- Ignore motor in the table (must be table of Instance)
-Animator:GetMotorIgnoreList() -- Return Table of Instance that the animator will use as Ignore list
+Animator:IgnoreMotorIn(tableOfInstance) -- Ignore motor that's a descendant of instance inside the table (must be table of Instance)
+Animator:GetMotorIgnoreList() -- Return Table of Instance that the animator will use as Ignore list for Motor
+Animator:IgnoreBoneIn(tableOfInstance) -- Ignore Bone that's a descendant of instance inside the table (must be table of Instance)
+Animator:GetBoneIgnoreList() -- Return Table of Instance that the animator will use as Ignore list for Bone
 
 -- Properties --
 
