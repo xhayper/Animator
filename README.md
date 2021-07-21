@@ -19,7 +19,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 
 ## Limitation
 * Part need to be linked with Motor6D
-* Can only do up to n Character, more than that, it will lag like hell
+* Can only do up to n (Usually 2) Character, more than that, it will lag like hell
 
 ## Credits
 * Whited - Metatable Hook
