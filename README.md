@@ -217,6 +217,7 @@ Nullware.Button({
 			options["Head Movement"] = true
 			getgenv().Nullware_ReanimateConfiguration = options
 			HttpRequire(NullwareLink:GetText())
+			currentAnim:IgnoreMotorIn(Player.Character[Player.Name])
 		end
 	end
 })

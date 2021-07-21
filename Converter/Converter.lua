@@ -3,7 +3,7 @@
   Thank you, Pyseph!
 ]]--
 
-local gsub, match, rep, sub,format, len = string.gsub, string.match, string.rep, string.sub, string.format, string.len
+local gsub, match, rep, sub,format = string.gsub, string.match, string.rep, string.sub, string.format
 
 local SpecialCharacters = {['\a'] = '\\a', ['\b'] = '\\b', ['\f'] = '\\f', ['\n'] = '\\n', ['\r'] = '\\r', ['\t'] = '\\t', ['\v'] = '\\v', ['\0'] = '\\0'}
 local Keywords = { ['and'] = true, ['break'] = true, ['do'] = true, ['else'] = true, ['elseif'] = true, ['end'] = true, ['false'] = true, ['for'] = true, ['function'] = true, ['if'] = true, ['in'] = true, ['local'] = true, ['nil'] = true, ['not'] = true, ['or'] = true, ['repeat'] = true, ['return'] = true, ['then'] = true, ['true'] = true, ['until'] = true, ['while'] = true, ['continue'] = true}
@@ -110,7 +110,9 @@ local function TableToString(Table, IgnoredTables, DepthData, Path)
 end
 
 -- Below is my Code --
-function convertEnum(enum)
+local Utility = {}
+
+function Utility:convertEnum(enum)
 	local a = tostring(enum):split(".")
 	if a[1] == "Enum" then
 		local p = a[2]
@@ -129,30 +131,32 @@ function convertEnum(enum)
 	end
 end
 
-function parsePoseData(pose)
+local Parser = {}
+
+function Parser:parsePoseData(pose)
 	if not pose:IsA("Pose") then
 		error(format("invalid argument 1 to '_parsePoseData' (Pose expected, got %s)", pose.ClassName))
 	end
-	local poseData = {Name = pose.Name, CFrame = pose.CFrame, EasingDirection = convertEnum(pose.EasingDirection), EasingStyle = convertEnum(pose.EasingStyle), Weight = pose.Weight}
+	local poseData = {Name = pose.Name, CFrame = pose.CFrame, EasingDirection = Utility:convertEnum(pose.EasingDirection), EasingStyle = Utility:convertEnum(pose.EasingStyle), Weight = pose.Weight}
 	if #pose:GetChildren() > 0 then
 		poseData.Subpose = {}
 		for _,p in next, pose:GetChildren() do
 			if p:IsA("Pose") then
-				table.insert(poseData.Subpose, parsePoseData(p))
+				table.insert(poseData.Subpose, Parser:parsePoseData(p))
 			end
 		end
 	end
 	return poseData
 end
 
-function parseKeyframeData(keyframe)
+function Parser:parseKeyframeData(keyframe)
 	if not keyframe:IsA("Keyframe") then
 		error(format("invalid argument 1 to '_parseKeyframeData' (Keyframe expected, got %s)", keyframe.ClassName))
 	end
 	local keyframeData = {Name = keyframe.Name, Time = keyframe.Time, Pose = {}}
 	for _,p in next, keyframe:GetChildren() do
 		if p:IsA("Pose") then
-			table.insert(keyframeData.Pose, parsePoseData(p))
+			table.insert(keyframeData.Pose, Parser:parsePoseData(p))
 		elseif p:IsA("KeyframeMarker") then
 			if not keyframeData.Marker then
 				keyframeData.Marker = {}
@@ -160,20 +164,20 @@ function parseKeyframeData(keyframe)
 			if not keyframeData.Marker[p.Name] then
 				keyframeData.Marker[p.Name] = {}
 			end
-			table.insert(keyframeData.Marker[p.Name], {Value = p.Value})
+			table.insert(keyframeData.Marker, p.Name)
 		end
 	end
 	return keyframeData
 end
 
-function parseAnimationData(keyframeSequence)
+function Parser:parseAnimationData(keyframeSequence)
 	if not keyframeSequence:IsA("KeyframeSequence") then
 		error(format("invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)", keyframeSequence.ClassName))
 	end
 	local animationData = {Loop = keyframeSequence.Loop, Priority = keyframeSequence.Priority, Frames = {}}
 	for _,f in next, keyframeSequence:GetChildren() do
 		if f:IsA("Keyframe") then
-			table.insert(animationData.Frames, parseKeyframeData(f))
+			table.insert(animationData.Frames, Parser:parseKeyframeData(f))
 		end
 	end
 
@@ -185,7 +189,7 @@ function parseAnimationData(keyframeSequence)
 end
 
 local KeyframeSequnce = path.to.KeyframeSequnce
-local AnimationData = TableToString(parseAnimationData(KeyframeSequnce))
+local AnimationData = TableToString(Parser:parseAnimationData(KeyframeSequnce))
 local stringValue = Instance.new("StringValue", KeyframeSequnce)
 stringValue.Name = "AnimationData"
 stringValue.Value = "local AnimationData = " .. AnimationData
