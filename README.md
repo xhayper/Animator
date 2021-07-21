@@ -20,6 +20,14 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 ## Limitation
 * Part need to be linked with Motor6D
 * Can only do up to n (Usually 2) Character, more than that, it will lag like hell
+* If your obfuscator do metatable stuff, it have a high chance of crashing the game, there's a work around
+```lua
+if getgenv()["Animator"] == nil then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
+end
+--Obfuscated code below
+kldjfu8o efjPISEJISDosiogpjiegpwkoepwjoegspifjpsia local a,b,c = sdifuofhwuioeksafojjifwquj
+```
 
 ## Credits
 * Whited - Metatable Hook
