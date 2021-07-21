@@ -41,7 +41,7 @@ end
 ```lua
 -- Constructor --
 
-Animator.new(Player, AnimationData) -- Animation Data Should Be AnimationID as String/Number or KeyframeSequnce or Raw Animation Data or Animation Instance
+Animator.new(Character, AnimationResolvable) -- AnimationResolvable Should Be AnimationID as String/Number or KeyframeSequnce or Raw Animation Data or Animation Instance
 
 -- Functions --
 
@@ -60,7 +60,7 @@ Animator.Looped -- Do you want the animation to Loop?
 Animator.IsPlaying -- Is the animation playing?
 Animator.Length -- Animation Length
 Animator.Speed -- Playback Speed
-Animator.Player -- The player that the animator is assigned to
+Animator.Character -- The Character that the animator is assigned to
 
 -- Signals --
 

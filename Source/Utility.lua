@@ -33,10 +33,10 @@ function Utility:convertEnum(enum)
 	end
 end
 
-function Utility:getMotors(Player, IgnoreList)
+function Utility:getMotors(Character, IgnoreList)
 	IgnoreList = IgnoreList or {}
-	if not Player:IsA("Player") then
-		error(format("invalid argument 1 to 'getMotors' (Player expected, got %s)", Player.ClassName))
+	if typeof(Character) ~= "Instance" then
+		error(format("invalid argument 1 to 'getMotors' (Instance expected, got %s)", typeof(Character)))
 	end
 
 	if typeof(IgnoreList) ~= "table" then
@@ -45,7 +45,7 @@ function Utility:getMotors(Player, IgnoreList)
 
 	local MotorList = {}
 
-	for _,i in next, Player.Character:GetDescendants() do
+	for _,i in next, Character:GetDescendants() do
 		if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
 			local IsTained = false
 			for _,i2 in next, IgnoreList do
