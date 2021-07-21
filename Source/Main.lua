@@ -28,10 +28,10 @@ getgenv().hookAnimatorFunction = function()
 	OldFunc = hookmetamethod(game, "__namecall", function(Object, ...)
 		local NamecallMethod = getnamecallmethod()
 		if Object.ClassName == "Humanoid" and NamecallMethod == "LoadAnimation" and checkcaller() then
-			for k,v in next, ... do
-				print(k,v)
+			local args = {...}
+			if not args[2] or args[2] and args[2] ~= true then
+				return Animator.new(Object.Parent, ...)
 			end
-			return Animator.new(Object.Parent, ...)
 		end
 		return OldFunc(Object, ...)
 	end)
