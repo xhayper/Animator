@@ -189,9 +189,9 @@ function Animator:Play(fadeTime, weight, speed)
 					end
 					for _, b in next, Utility:getBones(self.Character, self._boneIgnoreList) do
 						if self._stopFadeTime > 0 then
-							TweenService:Create(b, TI, {Transform = CFrame.new(0,0,0)}):Play()
+							TweenService:Create(b, TI, {Transform = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)}):Play()
 						else
-							b.Transform = CFrame.new(0,0,0)
+							b.Transform = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)
 						end
 					end
 					if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") and self.handleVanillaAnimator == true then
