@@ -157,22 +157,20 @@ if getgenv()["Animator"] == nil then
 		if typeof(Character) ~= "Instance" then
 			error(format("invalid argument 1 to 'getMotors' (Instance expected, got %s)", typeof(Character)))
 		end
-	
+
 		if typeof(IgnoreList) ~= "table" then
 			error(format("invalid argument 1 to 'getMotors' (Table expected, got %s)", typeof(IgnoreList)))
 		end
-	
+
 		local MotorList = {}
-	
+
 		for _,i in next, Character:GetDescendants() do
 			if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
 				local IsTained = false
 				for _,i2 in next, IgnoreList do
-					if typeof(i2) == "Instance" then
-						if i:IsDescendantOf(i2) then
-							IsTained = true
-							break
-						end
+					if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+						IsTained = true
+						break
 					end
 				end
 				if IsTained ~= true then
@@ -180,13 +178,17 @@ if getgenv()["Animator"] == nil then
 				end
 			end
 		end
-	
+
 		return MotorList
 	end
 
 	-----------------------------------------------------------------
 
 	---------------------------- PRASER ----------------------------
+
+	local Utility = animatorRequire("Utility.lua")
+
+	local format = string.format
 
 	local Parser = {}
 
@@ -250,17 +252,17 @@ if getgenv()["Animator"] == nil then
 	local RunService = game:GetService("RunService")
 	local TweenService = game:GetService("TweenService")
 
-	local Animator = {AnimationData = {}, Character = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _motorIgnoreList = {}, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
+	local Animator = {AnimationData = {}, Character = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _motorIgnoreList = {}, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
 	Animator.__index = Animator
 
 	function Animator.new(Character, AnimationResolvable)
 		if typeof(Character) ~= "Instance" then
 			error(format("invalid argument 1 to 'new' (Instace expected, got %s)", typeof(Character)))
 		end
-	
+
 		local c = setmetatable({}, Animator)
 		c.Character = Character
-	
+
 		if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then -- Assuming that Resolvable is animation id
 			local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable))[1]
 			if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID expected)") end
@@ -274,7 +276,7 @@ if getgenv()["Animator"] == nil then
 			if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
 			c.AnimationData = Parser:parseAnimationData(animationInstance)
 		else
-			error(format("invalid argument 2 to 'new' (number,string,Instance expected, got %s)", typeof(AnimationResolvable)))
+			error(format("invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)", typeof(AnimationResolvable)))
 		end
 
 		c.Looped = c.AnimationData.Loop
@@ -294,10 +296,10 @@ if getgenv()["Animator"] == nil then
 			end
 		end
 		if parent then
+			local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
 			for _,motor in next, RigList do
 				if motor.Part0.Name == parent.Name and motor.Part1.Name == pose.Name then
 					if fade > 0 then
-						local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
 						if self._stopped ~= true then
 							TweenService:Create(motor, TI, {Transform = pose.CFrame}):Play()
 						end
@@ -338,7 +340,7 @@ if getgenv()["Animator"] == nil then
 			local con
 			con = self.Character:GetPropertyChangedSignal("Parent"):Connect(function()
 				if self.Character.Parent == nil then
-                    self = nil
+					self = nil
 					con:Disconnect()
 				end
 			end)
@@ -350,7 +352,7 @@ if getgenv()["Animator"] == nil then
 						if i ~= 1 and f.Time > os.clock()-start then
 							repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true
 						end
-						if self._stopped == true then
+						if self == nil or self._stopped == true then
 							break;
 						end
 						if f.Name ~= "Keyframe" then
@@ -373,31 +375,34 @@ if getgenv()["Animator"] == nil then
 							end
 						end
 					end
-					if self.Looped == true and self._stopped ~= true then
-						self.DidLoop:Fire()
-						self._isLooping = true
-						return self:Play(fadeTime, weight, speed)
-					end
-					RunService.RenderStepped:Wait()
-					for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
-						if self._stopFadeTime > 0 then
-							TweenService:Create(r, TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-								Transform = CFrame.new(),
-								CurrentAngle = 0
-							}):Play()
-						else
-							r.CurrentAngle = 0
-							r.Transform = CFrame.new()
+					if self ~= nil then
+						if self.Looped == true and self._stopped ~= true then
+							self.DidLoop:Fire()
+							self._isLooping = true
+							return self:Play(fadeTime, weight, speed)
 						end
+						RunService.RenderStepped:Wait()
+						local TI = TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+						for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
+							if self._stopFadeTime > 0 then
+								TweenService:Create(r, TI, {
+									Transform = CFrame.new(),
+									CurrentAngle = 0
+								}):Play()
+							else
+								r.CurrentAngle = 0
+								r.Transform = CFrame.new()
+							end
+						end
+						if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") then
+							Instance.new("Animator", self.Character.Humanoid)
+						end
+						con:Disconnect()
+						self._stopped = false
+						self._playing = false
+						self.IsPlaying = false
+						self.Stopped:Fire()
 					end
-					if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") then
-						Instance.new("Animator", self.Character.Humanoid)
-					end
-					con:Disconnect()
-					self._stopped = false
-					self._playing = false
-					self.IsPlaying = false
-					self.Stopped:Fire()
 				end)()
 			end
 		end
@@ -434,10 +439,14 @@ if getgenv()["Animator"] == nil then
 
 		-- Maid won't work properly so.
 		self.DidLoop:Destroy()
+		self.DidLoop = nil
 		self.Stopped:Destroy()
+		self.Stopped = nil
 		self.KeyframeReached:Destroy()
+		self.KeyframeReached = nil
 		for _,s in next, self._markerSignal do
 			s:Destroy()
+			s = nil
 		end
 		self = nil
 	end
