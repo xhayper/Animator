@@ -216,10 +216,6 @@ if getgenv()["Animator"] == nil then
 
 	---------------------------- PRASER ----------------------------
 
-	local Utility = animatorRequire("Utility.lua")
-
-	local format = string.format
-
 	local Parser = {}
 
 	function Parser:parsePoseData(pose)
@@ -334,6 +330,21 @@ if getgenv()["Animator"] == nil then
 		return c
 	end
 
+	function Animator:GetMotorIgnoreList()
+		return self._motorIgnoreList
+	end
+
+	function Animator:IgnoreBoneIn(ignoreList)
+		if typeof(ignoreList) ~= "table" then
+			error(format("invalid argument 1 to 'IgnoreBoneIn' (Table expected, got %s)", typeof(ignoreList)))
+		end
+		self._boneIgnoreList = ignoreList
+	end
+
+	function Animator:GetBoneIgnoreList()
+		return self._boneIgnoreList
+	end
+
 	function Animator:_playPose(pose, parent, fade)
 		local MotorList = Utility:getMotors(self.Character, self._motorIgnoreList)
 		local BoneList = Utility:getBones(self.Character, self._boneIgnoreList)
@@ -367,7 +378,7 @@ if getgenv()["Animator"] == nil then
 				end
 			end
 		else
-			if self.Character[pose.Name] then
+			if self.Character:FindFirstChild(pose.Name) then
 				self.Character[pose.Name].CFrame *= pose.CFrame
 			end
 		end
@@ -380,31 +391,14 @@ if getgenv()["Animator"] == nil then
 		self._motorIgnoreList = ignoreList
 	end
 
-	function Animator:GetMotorIgnoreList()
-		return self._motorIgnoreList
-	end
-
-	function Animator:IgnoreBoneIn(ignoreList)
-		if typeof(ignoreList) ~= "table" then
-			error(format("invalid argument 1 to 'IgnoreBoneIn' (Table expected, got %s)", typeof(ignoreList)))
-		end
-		self._boneIgnoreList = ignoreList
-	end
-
-	function Animator:GetBoneIgnoreList()
-		return self._boneIgnoreList
-	end
-
 	function Animator:Play(fadeTime, weight, speed)
 		fadeTime = fadeTime or 0.100000001
 		if self._playing == false or self._isLooping == true then
 			self._playing = true
 			self._isLooping = false
 			self.IsPlaying = true
-			if self.Character:FindFirstChildOfClass("Humanoid") and self.handleVanillaAnimator == true then
-				if self.Character.Humanoid:FindFirstChildOfClass("Animator") then
-					self.Character.Humanoid.Animator:Destroy()
-				end
+			if self.Character:FindFirstChild("Humanoid") and self.Character.Humanoid:FindFirstChild("Animator") and self.handleVanillaAnimator == true then
+				self.Character.Humanoid.Animator:Destroy()
 			end
 			local con
 			con = self.Character:GetPropertyChangedSignal("Parent"):Connect(function()
@@ -466,10 +460,9 @@ if getgenv()["Animator"] == nil then
 						for _, b in next, Utility:getBones(self.Character, self._boneIgnoreList) do
 							if self._stopFadeTime > 0 then
 								if self._stopped ~= true then
-									TweenService:Create(b, TI, {Transform = CFrame.new(), CurrentAngle = 0}):Play()
+									TweenService:Create(b, TI, {Transform = CFrame.new()}):Play()
 								end
 							else
-								b.CurrentAngle = 0
 								b.Transform = CFrame.new()
 							end
 						end
