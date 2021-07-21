@@ -60,6 +60,13 @@ function Animator.new(Character, AnimationResolvable)
 	return c
 end
 
+function Animator:IgnoreMotorIn(ignoreList)
+	if typeof(ignoreList) ~= "table" then
+		error(format("invalid argument 1 to 'IgnoreMotorIn' (Table expected, got %s)", typeof(ignoreList)))
+	end
+	self._motorIgnoreList = ignoreList
+end
+
 function Animator:GetMotorIgnoreList()
 	return self._motorIgnoreList
 end
@@ -112,13 +119,6 @@ function Animator:_playPose(pose, parent, fade)
 			self.Character[pose.Name].CFrame *= pose.CFrame
 		end
 	end
-end
-
-function Animator:IgnoreMotorIn(ignoreList)
-	if typeof(ignoreList) ~= "table" then
-		error(format("invalid argument 1 to 'IgnoreMotorIn' (Table expected, got %s)", typeof(ignoreList)))
-	end
-	self._motorIgnoreList = ignoreList
 end
 
 function Animator:Play(fadeTime, weight, speed)

@@ -132,7 +132,7 @@ if getgenv()["Animator"] == nil then
 			Callback = Callback or nil;
 		})
 	end
-
+	
 	function Utility:convertEnum(enum)
 		local a = tostring(enum):split(".")
 		if a[1] == "Enum" then
@@ -151,19 +151,19 @@ if getgenv()["Animator"] == nil then
 			return enum
 		end
 	end
-
+	
 	function Utility:getBones(Character, IgnoreList)
 		IgnoreList = IgnoreList or {}
 		if typeof(Character) ~= "Instance" then
 			error(format("invalid argument 1 to 'getBones' (Instance expected, got %s)", typeof(Character)))
 		end
-
+	
 		if typeof(IgnoreList) ~= "table" then
 			error(format("invalid argument 1 to 'getBones' (Table expected, got %s)", typeof(IgnoreList)))
 		end
-
+	
 		local BoneList = {}
-
+	
 		for _,i in next, Character:GetDescendants() do
 			if i:IsA("Bone") then
 				local IsTained = false
@@ -178,22 +178,22 @@ if getgenv()["Animator"] == nil then
 				end
 			end
 		end
-
+	
 		return BoneList
 	end
-
+	
 	function Utility:getMotors(Character, IgnoreList)
 		IgnoreList = IgnoreList or {}
 		if typeof(Character) ~= "Instance" then
 			error(format("invalid argument 1 to 'getMotors' (Instance expected, got %s)", typeof(Character)))
 		end
-
+	
 		if typeof(IgnoreList) ~= "table" then
 			error(format("invalid argument 1 to 'getMotors' (Table expected, got %s)", typeof(IgnoreList)))
 		end
-
+	
 		local MotorList = {}
-
+	
 		for _,i in next, Character:GetDescendants() do
 			if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
 				local IsTained = false
@@ -208,7 +208,7 @@ if getgenv()["Animator"] == nil then
 				end
 			end
 		end
-
+	
 		return MotorList
 	end
 
@@ -233,7 +233,7 @@ if getgenv()["Animator"] == nil then
 		end
 		return poseData
 	end
-
+	
 	function Parser:parseKeyframeData(keyframe)
 		if not keyframe:IsA("Keyframe") then
 			error(format("invalid argument 1 to '_parseKeyframeData' (Keyframe expected, got %s)", keyframe.ClassName))
@@ -254,7 +254,7 @@ if getgenv()["Animator"] == nil then
 		end
 		return keyframeData
 	end
-
+	
 	function Parser:parseAnimationData(keyframeSequence)
 		if not keyframeSequence:IsA("KeyframeSequence") then
 			error(format("invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)", keyframeSequence.ClassName))
@@ -265,11 +265,11 @@ if getgenv()["Animator"] == nil then
 				table.insert(animationData.Frames, Parser:parseKeyframeData(f))
 			end
 		end
-
+	
 		table.sort(animationData.Frames, function(l, r)
 			return l.Time < r.Time
 		end)
-
+	
 		return animationData
 	end
 
@@ -330,6 +330,13 @@ if getgenv()["Animator"] == nil then
 		return c
 	end
 
+	function Animator:IgnoreMotorIn(ignoreList)
+		if typeof(ignoreList) ~= "table" then
+			error(format("invalid argument 1 to 'IgnoreMotorIn' (Table expected, got %s)", typeof(ignoreList)))
+		end
+		self._motorIgnoreList = ignoreList
+	end
+
 	function Animator:GetMotorIgnoreList()
 		return self._motorIgnoreList
 	end
@@ -379,16 +386,9 @@ if getgenv()["Animator"] == nil then
 			end
 		else
 			if self.Character:FindFirstChild(pose.Name) then
-				self.Character[pose.Name].CFrame *= pose.CFrame
+				self.Character[pose.Name].CFrame = self.Character[pose.Name].CFrame * pose.CFrame
 			end
 		end
-	end
-
-	function Animator:IgnoreMotorIn(ignoreList)
-		if typeof(ignoreList) ~= "table" then
-			error(format("invalid argument 1 to 'IgnoreMotorIn' (Table expected, got %s)", typeof(ignoreList)))
-		end
-		self._motorIgnoreList = ignoreList
 	end
 
 	function Animator:Play(fadeTime, weight, speed)
@@ -411,7 +411,7 @@ if getgenv()["Animator"] == nil then
 				local start = os.clock()
 				coroutine.wrap(function()
 					for i,f in next, self.AnimationData.Frames do
-						f.Time /= self.Speed
+						f.Time = f.Time / self.Speed
 						if i ~= 1 and f.Time > os.clock()-start then
 							repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true
 						end
@@ -430,7 +430,7 @@ if getgenv()["Animator"] == nil then
 						end
 						if f.Pose then
 							for _,p in next, f.Pose do
-								fadeTime += f.Time
+								fadeTime = fadeTime + f.Time
 								if i ~= 1 then
 									fadeTime = (f.Time*self.Speed-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
 								end
@@ -459,11 +459,9 @@ if getgenv()["Animator"] == nil then
 						end
 						for _, b in next, Utility:getBones(self.Character, self._boneIgnoreList) do
 							if self._stopFadeTime > 0 then
-								if self._stopped ~= true then
-									TweenService:Create(b, TI, {Transform = CFrame.new()}):Play()
-								end
+								TweenService:Create(b, TI, {Transform = CFrame.new(0,0,0)}):Play()
 							else
-								b.Transform = CFrame.new()
+								b.Transform = CFrame.new(0,0,0)
 							end
 						end
 						if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") and self.handleVanillaAnimator == true then
