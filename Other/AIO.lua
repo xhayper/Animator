@@ -152,6 +152,36 @@ if getgenv()["Animator"] == nil then
 		end
 	end
 
+	function Utility:getBones(Character, IgnoreList)
+		IgnoreList = IgnoreList or {}
+		if typeof(Character) ~= "Instance" then
+			error(format("invalid argument 1 to 'getBones' (Instance expected, got %s)", typeof(Character)))
+		end
+
+		if typeof(IgnoreList) ~= "table" then
+			error(format("invalid argument 1 to 'getBones' (Table expected, got %s)", typeof(IgnoreList)))
+		end
+
+		local BoneList = {}
+
+		for _,i in next, Character:GetDescendants() do
+			if i:IsA("Bone") then
+				local IsTained = false
+				for _,i2 in next, IgnoreList do
+					if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+						IsTained = true
+						break
+					end
+				end
+				if IsTained ~= true then
+					table.insert(BoneList, i)
+				end
+			end
+		end
+
+		return BoneList
+	end
+
 	function Utility:getMotors(Character, IgnoreList)
 		IgnoreList = IgnoreList or {}
 		if typeof(Character) ~= "Instance" then
@@ -265,7 +295,8 @@ if getgenv()["Animator"] == nil then
 		_playing = false,
 		_stopped = false,
 		_isLooping = false,
-		_markerSignal = {}
+		_markerSignal = {},
+		_boneIgnoreList = {}
 	}
 
 	Animator.__index = Animator
@@ -304,7 +335,8 @@ if getgenv()["Animator"] == nil then
 	end
 
 	function Animator:_playPose(pose, parent, fade)
-		local RigList = Utility:getMotors(self.Character, self._motorIgnoreList)
+		local MotorList = Utility:getMotors(self.Character, self._motorIgnoreList)
+		local BoneList = Utility:getBones(self.Character, self._boneIgnoreList)
 		if pose.Subpose then
 			for _,sp in next, pose.Subpose do
 				self:_playPose(sp, pose, fade)
@@ -312,7 +344,7 @@ if getgenv()["Animator"] == nil then
 		end
 		if parent then
 			local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
-			for _,motor in next, RigList do
+			for _,motor in next, MotorList do
 				if motor.Part0.Name == parent.Name and motor.Part1.Name == pose.Name then
 					if fade > 0 then
 						if self._stopped ~= true then
@@ -320,6 +352,17 @@ if getgenv()["Animator"] == nil then
 						end
 					else
 						motor.Transform = pose.CFrame
+					end
+				end
+			end
+			for _, bone in next, BoneList do
+				if parent.Name == bone.Parent.Name and bone.Name == pose.Name then
+					if fade > 0 then
+						if self._stopped ~= true then
+							TweenService:Create(bone, TI, {Transform = pose.CFrame}):Play()
+						end
+					else
+						bone.Transform = pose.CFrame
 					end
 				end
 			end
@@ -339,6 +382,17 @@ if getgenv()["Animator"] == nil then
 
 	function Animator:GetMotorIgnoreList()
 		return self._motorIgnoreList
+	end
+
+	function Animator:IgnoreBoneIn(ignoreList)
+		if typeof(ignoreList) ~= "table" then
+			error(format("invalid argument 1 to 'IgnoreBoneIn' (Table expected, got %s)", typeof(ignoreList)))
+		end
+		self._boneIgnoreList = ignoreList
+	end
+
+	function Animator:GetBoneIgnoreList()
+		return self._boneIgnoreList
 	end
 
 	function Animator:Play(fadeTime, weight, speed)
@@ -407,6 +461,16 @@ if getgenv()["Animator"] == nil then
 							else
 								r.CurrentAngle = 0
 								r.Transform = CFrame.new()
+							end
+						end
+						for _, b in next, Utility:getBones(self.Character, self._boneIgnoreList) do
+							if self._stopFadeTime > 0 then
+								if self._stopped ~= true then
+									TweenService:Create(b, TI, {Transform = CFrame.new(), CurrentAngle = 0}):Play()
+								end
+							else
+								b.CurrentAngle = 0
+								b.Transform = CFrame.new()
 							end
 						end
 						if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") and self.handleVanillaAnimator == true then
