@@ -74,7 +74,6 @@ Animator.KeyframeReached:Connect(keyframeName) -- On keyframe reached (Only trig
 HttpRequire("HttpLink") -- Require the module using GET Request, Must start with 'http://' or 'https://'
 animatorRequire("Path") -- Used by Animator, Same as HttpRequire but with this repo link as the prefix
 hookAnimatorFunction() -- Hook animator to Humanoid:LoadAnimation()
-HttpRequireCach -- Cache used by HttpRequire, Clear it by assigning it to Empty table
 
 -- Hooks --
 -- This will only work if you call hookAnimatorFunction()
