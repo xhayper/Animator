@@ -168,7 +168,7 @@ local Play = Main.Button({
 			currentAnim.Stopped:Wait()
 			RunService.RenderStepped:Wait()
 		end
-		currentAnim = Animator.new(Player, Animation:GetText())
+		currentAnim = Animator.new(Player.Character, Animation:GetText())
 		currentAnim.Looped = Loop:GetState()
 		currentAnim:Play()
 		spawn(function()
