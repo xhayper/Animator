@@ -1,9 +1,3 @@
-local RunService = game:GetService("RunService")
-
-local Players = game:GetService("Players")
-
-local Player = Players.LocalPlayer
-
 local pathToGithub = "https://raw.githubusercontent.com/xhayper/Animator/main/Source/"
 
 getgenv().HttpRequireCache = {}
@@ -33,8 +27,11 @@ getgenv().hookAnimatorFunction = function()
 	local OldFunc
 	OldFunc = hookmetamethod(game, "__namecall", function(Object, ...)
 		local NamecallMethod = getnamecallmethod()
-		if Object.ClassName == "Humanoid" and Object.Parent == Player.Character and NamecallMethod == "LoadAnimation" and checkcaller() then
-			return Animator.new(Player, ...)
+		if Object.ClassName == "Humanoid" and NamecallMethod == "LoadAnimation" and checkcaller() then
+			for k,v in next, ... do
+				print(k,v)
+			end
+			return Animator.new(Object.Parent, ...)
 		end
 		return OldFunc(Object, ...)
 	end)

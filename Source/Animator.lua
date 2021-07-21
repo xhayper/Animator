@@ -8,16 +8,16 @@ local Signal = animatorRequire("Nevermore/Signal.lua")
 
 local format = string.format
 
-local Animator = {AnimationData = {}, Player = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _motorIgnoreList = {}, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
+local Animator = {AnimationData = {}, Character = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _motorIgnoreList = {}, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
 Animator.__index = Animator
 
-function Animator.new(Player, AnimationResolvable)
-	if not Player:IsA("Player") then
-		error(format("invalid argument 1 to 'new' (Player expected, got %s)", Player.ClassName))
+function Animator.new(Character, AnimationResolvable)
+	if typeof(Character) ~= "Instance" then
+		error(format("invalid argument 1 to 'new' (Instace expected, got %s)", typeof(Character)))
 	end
 
 	local c = setmetatable({}, Animator)
-	c.Player = Player
+	c.Character = Character
 
 	if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then -- Assuming that Resolvable is animation id
 		local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable))[1]
@@ -32,7 +32,7 @@ function Animator.new(Player, AnimationResolvable)
 		if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
 		c.AnimationData = Parser:parseAnimationData(animationInstance)
 	else
-		error(format("invalid argument 2 to 'new' (number,string,KeyframeSequence expected, got %s)", Player.ClassName))
+		error(format("invalid argument 2 to 'new' (number,string,Instance expected, got %s)", typeof(AnimationResolvable)))
 	end
 
 	c.Looped = c.AnimationData.Loop
@@ -45,7 +45,7 @@ function Animator.new(Player, AnimationResolvable)
 end
 
 function Animator:_playPose(pose, parent, fade)
-	local RigList = Utility:getMotors(self.Player, self._motorIgnoreList)
+	local RigList = Utility:getMotors(self.Character, self._motorIgnoreList)
 	if pose.Subpose then
 		for _,sp in next, pose.Subpose do
 			self:_playPose(sp, pose, fade)
@@ -65,8 +65,8 @@ function Animator:_playPose(pose, parent, fade)
 			end
 		end
 	else
-		if self.Player.Character[pose.Name] then
-			self.Player.Character[pose.Name].CFrame *= pose.CFrame
+		if self.Character[pose.Name] then
+			self.Character[pose.Name].CFrame *= pose.CFrame
 		end
 	end
 end
@@ -88,15 +88,14 @@ function Animator:Play(fadeTime, weight, speed)
 		self._playing = true
 		self._isLooping = false
 		self.IsPlaying = true
-		local Character = self.Player.Character
-		if Character:FindFirstChildOfClass("Humanoid") then
-			if Character.Humanoid:FindFirstChildOfClass("Animator") then
-				Character.Humanoid.Animator:Destroy()
+		if self.Character:FindFirstChildOfClass("Humanoid") then
+			if self.Character.Humanoid:FindFirstChildOfClass("Animator") then
+				self.Character.Humanoid.Animator:Destroy()
 			end
 		end
 		local con
-		con = Character:GetPropertyChangedSignal("Parent"):Connect(function()
-			if Character.Parent == nil then
+		con = self.Character:GetPropertyChangedSignal("Parent"):Connect(function()
+			if self.Character.Parent == nil then
 				self = nil
 				con:Disconnect()
 			end
@@ -138,7 +137,7 @@ function Animator:Play(fadeTime, weight, speed)
 					return self:Play(fadeTime, weight, speed)
 				end
 				RunService.RenderStepped:Wait()
-				for _,r in next, Utility:getMotors(self.Player, self._motorIgnoreList) do
+				for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
 					if self._stopFadeTime > 0 then
 						TweenService:Create(r, TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
 							Transform = CFrame.new(),
@@ -149,10 +148,8 @@ function Animator:Play(fadeTime, weight, speed)
 						r.Transform = CFrame.new()
 					end
 				end
-				if Character:FindFirstChildOfClass("Humanoid") and not Character.Humanoid:FindFirstChildOfClass("Animator") then
-					Instance.new("Animator", Character.Humanoid)
-				else
-					self:Destroy()
+				if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") then
+					Instance.new("Animator", self.Character.Humanoid)
 				end
 				con:Disconnect()
 				self._stopped = false

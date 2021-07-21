@@ -152,19 +152,19 @@ if getgenv()["Animator"] == nil then
 		end
 	end
 
-	function Utility:getMotors(Player, IgnoreList)
+	function Utility:getMotors(Character, IgnoreList)
 		IgnoreList = IgnoreList or {}
-		if not Player:IsA("Player") then
-			error(format("invalid argument 1 to 'getMotors' (Player expected, got %s)", Player.ClassName))
+		if typeof(Character) ~= "Instance" then
+			error(format("invalid argument 1 to 'getMotors' (Instance expected, got %s)", typeof(Character)))
 		end
-
+	
 		if typeof(IgnoreList) ~= "table" then
 			error(format("invalid argument 1 to 'getMotors' (Table expected, got %s)", typeof(IgnoreList)))
 		end
-
+	
 		local MotorList = {}
-
-		for _,i in next, Player.Character:GetDescendants() do
+	
+		for _,i in next, Character:GetDescendants() do
 			if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
 				local IsTained = false
 				for _,i2 in next, IgnoreList do
@@ -180,7 +180,7 @@ if getgenv()["Animator"] == nil then
 				end
 			end
 		end
-
+	
 		return MotorList
 	end
 
@@ -250,17 +250,17 @@ if getgenv()["Animator"] == nil then
 	local RunService = game:GetService("RunService")
 	local TweenService = game:GetService("TweenService")
 
-	local Animator = {AnimationData = {}, Player = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _motorIgnoreList = {}, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
+	local Animator = {AnimationData = {}, Character = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _stopFadeTime = 0.100000001, _motorIgnoreList = {}, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
 	Animator.__index = Animator
 
-	function Animator.new(Player, AnimationResolvable)
-		if not Player:IsA("Player") then
-			error(format("invalid argument 1 to 'new' (Player expected, got %s)", Player.ClassName))
+	function Animator.new(Character, AnimationResolvable)
+		if typeof(Character) ~= "Instance" then
+			error(format("invalid argument 1 to 'new' (Instace expected, got %s)", typeof(Character)))
 		end
-
+	
 		local c = setmetatable({}, Animator)
-		c.Player = Player
-
+		c.Character = Character
+	
 		if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then -- Assuming that Resolvable is animation id
 			local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable))[1]
 			if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID expected)") end
@@ -274,7 +274,7 @@ if getgenv()["Animator"] == nil then
 			if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
 			c.AnimationData = Parser:parseAnimationData(animationInstance)
 		else
-			error(format("invalid argument 2 to 'new' (number,string,KeyframeSequence expected, got %s)", Player.ClassName))
+			error(format("invalid argument 2 to 'new' (number,string,Instance expected, got %s)", typeof(AnimationResolvable)))
 		end
 
 		c.Looped = c.AnimationData.Loop
@@ -287,7 +287,7 @@ if getgenv()["Animator"] == nil then
 	end
 
 	function Animator:_playPose(pose, parent, fade)
-		local RigList = Utility:getMotors(self.Player, self._motorIgnoreList)
+		local RigList = Utility:getMotors(self.Character, self._motorIgnoreList)
 		if pose.Subpose then
 			for _,sp in next, pose.Subpose do
 				self:_playPose(sp, pose, fade)
@@ -307,8 +307,8 @@ if getgenv()["Animator"] == nil then
 				end
 			end
 		else
-			if self.Player.Character[pose.Name] then
-				self.Player.Character[pose.Name].CFrame = self.Player.Character[pose.Name].CFrame * pose.CFrame
+			if self.Character.Character[pose.Name] then
+				self.Character.Character[pose.Name].CFrame = self.Character.Character[pose.Name].CFrame * pose.CFrame
 			end
 		end
 	end
@@ -330,7 +330,7 @@ if getgenv()["Animator"] == nil then
 			self._playing = true
 			self._isLooping = false
 			self.IsPlaying = true
-			local Character = self.Player.Character
+			local Character = self.Character.Character
 			if Character:FindFirstChildOfClass("Humanoid") then
 				if Character.Humanoid:FindFirstChildOfClass("Animator") then
 					Character.Humanoid.Animator:Destroy()
@@ -380,7 +380,7 @@ if getgenv()["Animator"] == nil then
 						return self:Play(fadeTime, weight, speed)
 					end
 					RunService.RenderStepped:Wait()
-					for _,r in next, Utility:getMotors(self.Player, self._motorIgnoreList) do
+					for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
 						if self._stopFadeTime > 0 then
 							TweenService:Create(r, TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
 								Transform = CFrame.new(),
@@ -447,11 +447,7 @@ if getgenv()["Animator"] == nil then
 
 	------------------------------------------------------------------
 
-	---------------------------- MAIN ----------------------------
-
-	local Players = game:GetService("Players")
-
-	local Player = Players.LocalPlayer
+	---------------------------- MAIN ---------------------------
 
 	getgenv().Animator = Animator
 
@@ -459,8 +455,8 @@ if getgenv()["Animator"] == nil then
 		local OldFunc
 		OldFunc = hookmetamethod(game, "__namecall", function(Object, ...)
 			local NamecallMethod = getnamecallmethod()
-			if Object.ClassName == "Humanoid" and Object.Parent == Player.Character and NamecallMethod == "LoadAnimation" and checkcaller() then
-				return Animator.new(Player, ...)
+			if Object.ClassName == "Humanoid" and NamecallMethod == "LoadAnimation" and checkcaller() then
+				return Animator.new(Object.Parent, ...)
 			end
 			return OldFunc(Object, ...)
 		end)
