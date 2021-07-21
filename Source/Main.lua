@@ -6,12 +6,19 @@ local Player = Players.LocalPlayer
 
 local pathToGithub = "https://raw.githubusercontent.com/xhayper/Animator/main/Source/"
 
+getgenv().HttpRequireCache = {}
+
 getgenv().HttpRequire = function(path)
-	if string.sub(path, 1, 8) == "https://" or string.sub(path, 1, 7) == "http://" then
-		return loadstring(game:HttpGet(path))()
+	local res
+	if HttpRequire[path] then
+		res = HttpRequire[path]
+	elseif string.sub(path, 1, 8) == "https://" or string.sub(path, 1, 7) == "http://" then
+		res = loadstring(game:HttpGet(path))()
 	else
-		return require(path)
+		res = require(path)
 	end
+	HttpRequire[path] = res
+	return res
 end
 
 getgenv().animatorRequire = function(path)
