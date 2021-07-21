@@ -307,8 +307,8 @@ if getgenv()["Animator"] == nil then
 				end
 			end
 		else
-			if self.Character.Character[pose.Name] then
-				self.Character.Character[pose.Name].CFrame = self.Character.Character[pose.Name].CFrame * pose.CFrame
+			if self.Character[pose.Name] then
+				self.Character[pose.Name].CFrame = self.Character[pose.Name].CFrame * pose.CFrame
 			end
 		end
 	end
@@ -330,15 +330,14 @@ if getgenv()["Animator"] == nil then
 			self._playing = true
 			self._isLooping = false
 			self.IsPlaying = true
-			local Character = self.Character.Character
-			if Character:FindFirstChildOfClass("Humanoid") then
-				if Character.Humanoid:FindFirstChildOfClass("Animator") then
-					Character.Humanoid.Animator:Destroy()
+			if self.Character:FindFirstChildOfClass("Humanoid") then
+				if self.Character.Humanoid:FindFirstChildOfClass("Animator") then
+					self.Character.Humanoid.Animator:Destroy()
 				end
 			end
 			local con
-			con = Character:GetPropertyChangedSignal("Parent"):Connect(function()
-				if Character.Parent == nil then
+			con = self.Character:GetPropertyChangedSignal("Parent"):Connect(function()
+				if self.Character.Parent == nil then
                     self = nil
 					con:Disconnect()
 				end
@@ -391,10 +390,8 @@ if getgenv()["Animator"] == nil then
 							r.Transform = CFrame.new()
 						end
 					end
-					if Character:FindFirstChildOfClass("Humanoid") and not Character.Humanoid:FindFirstChildOfClass("Animator") then
-						Instance.new("Animator", Character.Humanoid)
-					else
-						self:Destroy()
+					if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") then
+						Instance.new("Animator", self.Character.Humanoid)
 					end
 					con:Disconnect()
 					self._stopped = false
