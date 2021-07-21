@@ -252,7 +252,22 @@ if getgenv()["Animator"] == nil then
 	local RunService = game:GetService("RunService")
 	local TweenService = game:GetService("TweenService")
 
-	local Animator = {AnimationData = {}, handleVanillaAnimator = true, Character = nil, Looped = false, Length = 0, Speed = 1, IsPlaying = false, _motorIgnoreList = {}, _stopFadeTime = 0.100000001, _playing = false, _stopped = false, _isLooping = false, _markerSignal = {}}
+	local Animator = {
+		AnimationData = {},
+		handleVanillaAnimator = true, 
+		Character = nil, 
+		Looped = false, 
+		Length = 0,
+		Speed = 1,
+		IsPlaying = false,
+		_motorIgnoreList = {},
+		_stopFadeTime = 0.100000001,
+		_playing = false,
+		_stopped = false,
+		_isLooping = false,
+		_markerSignal = {}
+	}
+
 	Animator.__index = Animator
 
 	function Animator.new(Character, AnimationResolvable)
@@ -263,15 +278,15 @@ if getgenv()["Animator"] == nil then
 		local c = setmetatable({}, Animator)
 		c.Character = Character
 
-		if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then -- Assuming that Resolvable is animation id
+		if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then
 			local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable))[1]
 			if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID expected)") end
 			c.AnimationData = Parser:parseAnimationData(animationInstance)
-		elseif typeof(AnimationResolvable) == "table" then -- Assuming that Resolvable is animation data table
+		elseif typeof(AnimationResolvable) == "table" then
 			c.AnimationData = AnimationResolvable
-		elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("KeyframeSequence") then -- Assuming that Resolvable is KeyframeSequence
+		elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("KeyframeSequence") then
 			c.AnimationData = Parser:parseAnimationData(AnimationResolvable)
-		elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("Animation") then -- Assuming that Resolvable is Animation
+		elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("Animation") then
 			local animationInstance = game:GetObjects(AnimationResolvable.AnimationId)[1]
 			if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
 			c.AnimationData = Parser:parseAnimationData(animationInstance)
@@ -310,7 +325,7 @@ if getgenv()["Animator"] == nil then
 			end
 		else
 			if self.Character[pose.Name] then
-				self.Character[pose.Name].CFrame = self.Character[pose.Name].CFrame * pose.CFrame
+				self.Character[pose.Name].CFrame *= pose.CFrame
 			end
 		end
 	end
@@ -348,7 +363,7 @@ if getgenv()["Animator"] == nil then
 				local start = os.clock()
 				coroutine.wrap(function()
 					for i,f in next, self.AnimationData.Frames do
-						f.Time = f.Time / self.Speed
+						f.Time /= self.Speed
 						if i ~= 1 and f.Time > os.clock()-start then
 							repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true
 						end
@@ -367,7 +382,7 @@ if getgenv()["Animator"] == nil then
 						end
 						if f.Pose then
 							for _,p in next, f.Pose do
-								fadeTime = fadeTime + f.Time
+								fadeTime += f.Time
 								if i ~= 1 then
 									fadeTime = (f.Time*self.Speed-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
 								end
