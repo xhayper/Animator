@@ -4,7 +4,6 @@
 -- always pass signal arguments by value, meaning tables will be deep copied.
 -- Roblox's deep copy method parses to a non-lua table compatable format.
 -- @classmod Signal
--- @author Nevermore
 
 local HttpService = game:GetService("HttpService")
 
