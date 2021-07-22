@@ -107,7 +107,7 @@ local Player = game:GetService("Players").LocalPlayer
 
 local AnimationData = 123456789 -- Can also be KeyframeSequnce Instance, Table of data or ID as string
 
-local Anim = Animator.new(Player, AnimationData)
+local Anim = Animator.new(Player.Character, AnimationData)
 Anim:Play()
 Anim.Stopped:Wait()
 print("Done!")
