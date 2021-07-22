@@ -144,7 +144,7 @@ function Animator:Play(fadeTime, weight, speed)
 					if self == nil or self._stopped == true then
 						break;
 					end
-					f.Time = f.Time / (speed or self.Speed)
+					local t = f.Time / (speed or self.Speed)
 					if f.Name ~= "Keyframe" then
 						self.KeyframeReached:Fire(f.Name)
 					end
@@ -157,15 +157,15 @@ function Animator:Play(fadeTime, weight, speed)
 					end
 					if f.Pose then
 						for _,p in next, f.Pose do
-							fadeTime += f.Time
+							local ft = fadeTime + t
 							if i ~= 1 then
-								fadeTime = (f.Time*(speed or self.Speed)-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
+								ft = (t*(speed or self.Speed)-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
 							end
-							self:_playPose(p, nil, fadeTime)
+							self:_playPose(p, nil, ft)
 						end
 					end
-					if f.Time > os.clock()-start then
-						repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true
+					if t > os.clock()-start then
+						repeat RunService.RenderStepped:Wait() until os.clock()-start >= t or self._stopped == true
 					end
 				end
 				if self ~= nil then
