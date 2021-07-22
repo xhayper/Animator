@@ -114,10 +114,6 @@ function Animator:_playPose(pose, parent, fade)
 				end
 			end
 		end
-	else
-		if self.Character:FindFirstChild(pose.Name) then
-			self.Character[pose.Name].CFrame *= pose.CFrame
-		end
 	end
 end
 
