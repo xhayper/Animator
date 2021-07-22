@@ -10,6 +10,10 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 * Mesh Deformation Support
 * Simillar to Roblox's AnimationTrack Instance
 
+## Note
+
+* I gonna be real with you, this code is not that optimized
+
 ## Planned Feature
 
 * Priority Support (Idk how)
