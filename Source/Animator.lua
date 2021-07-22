@@ -48,7 +48,7 @@ function Animator.new(Character, AnimationResolvable)
 		if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
 		c.AnimationData = Parser:parseAnimationData(animationInstance)
 	else
-		error(format("invalid argument 2 to 'new' (number,string,table,KeyframeSequence,Animation expected, got %s)", typeof(AnimationResolvable)))
+		error(format("invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)", typeof(AnimationResolvable)))
 	end
 
 	c.Looped = c.AnimationData.Loop
