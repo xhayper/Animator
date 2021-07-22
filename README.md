@@ -13,6 +13,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 ## Note
 
 * I gonna be real with you, this code is not that optimized
+* This will lag a lot in some game, Until heavy optimization can be made, don't play it
 
 ## Planned Feature
 
