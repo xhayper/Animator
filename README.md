@@ -184,6 +184,10 @@ local Play = Main.Button({
 			RunService.RenderStepped:Wait()
 		end
 		currentAnim = Animator.new(Player.Character, Animation:GetText())
+		if Player.Character:FindFirstChild(Player.Name) then -- Nullware Complatible
+			currentAnim:IgnoreMotorIn({Player.Character[Player.Name]})
+			currentAnim:IgnoreBoneIn({Player.Character[Player.Name]})
+		end
 		currentAnim.Looped = Loop:GetState()
 		currentAnim:Play()
 		spawn(function()
