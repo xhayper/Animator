@@ -142,9 +142,6 @@ function Animator:Play(fadeTime, weight, speed)
 			coroutine.wrap(function()
 				for i,f in next, self.AnimationData.Frames do
 					f.Time /= self.Speed
-					if i ~= 1 and f.Time > os.clock()-start then
-						repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true
-					end
 					if self == nil or self._stopped == true then
 						break;
 					end
@@ -166,6 +163,9 @@ function Animator:Play(fadeTime, weight, speed)
 							end
 							self:_playPose(p, nil, fadeTime)
 						end
+					end
+					if f.Time > os.clock()-start then
+						repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true
 					end
 				end
 				if self ~= nil then
