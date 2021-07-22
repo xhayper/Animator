@@ -243,7 +243,7 @@ if getgenv()["Animator"] == nil then
 			if p:IsA("Pose") then
 				table.insert(keyframeData.Pose, Parser:parsePoseData(p))
 			elseif p:IsA("KeyframeMarker") then
-				if not keyframeData.Marker then
+				if not keyframeData["Marker"] then
 					keyframeData.Marker = {}
 				end
 				if not keyframeData.Marker[p.Name] then
