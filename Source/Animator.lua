@@ -139,7 +139,7 @@ function Animator:Play(fadeTime, weight, speed)
 		end)
 		if self ~= nil then
 			local start = os.clock()
-			coroutine.wrap(function()
+			spawn(function()
 				for i,f in next, self.AnimationData.Frames do
 					if self == nil or self._stopped == true then
 						break;
@@ -205,7 +205,7 @@ function Animator:Play(fadeTime, weight, speed)
 						self.Stopped:Fire()
 					end
 				end
-			end)()
+			end)
 		end
 	end
 end
