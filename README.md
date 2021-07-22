@@ -16,6 +16,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 * Weight System (Idk how)
 * Seeking froward, Backward (Idk how)
 * Weak table for animator class (Have been trying to do it, doesn't work)
+* Heavy Optimization
 * ~~Character instead of Player~~ Completed!
 
 ## Credits
