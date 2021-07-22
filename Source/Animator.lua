@@ -144,7 +144,7 @@ function Animator:Play(fadeTime, weight, speed)
 					if self == nil or self._stopped == true then
 						break;
 					end
-					f.Time = f.Time / speed or self.Speed
+					f.Time = f.Time / (speed or self.Speed)
 					if f.Name ~= "Keyframe" then
 						self.KeyframeReached:Fire(f.Name)
 					end
