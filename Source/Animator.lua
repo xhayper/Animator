@@ -140,7 +140,6 @@ function Animator:Play(fadeTime, weight, speed)
 		if self ~= nil then
 			local start = os.clock()
 			spawn(function()
-				print("Bye, Cache")
 				for i,f in next, self.AnimationData.Frames do
 					if self == nil or self._stopped == true then
 						break;
@@ -171,40 +170,38 @@ function Animator:Play(fadeTime, weight, speed)
 				end
 				if self ~= nil then
 					if self.Looped == true and self._stopped ~= true then
-						print("Looping")
 						self.DidLoop:Fire()
 						self._isLooping = true
-						self:Play(fadeTime, weight, speed)
-					else
-						RunService.RenderStepped:Wait()
-						local TI = TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-						for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
-							if self._stopFadeTime > 0 then
-								TweenService:Create(r, TI, {
-									Transform = CFrame.new(),
-									CurrentAngle = 0
-								}):Play()
-							else
-								r.CurrentAngle = 0
-								r.Transform = CFrame.new()
-							end
-						end
-						for _, b in next, Utility:getBones(self.Character, self._boneIgnoreList) do
-							if self._stopFadeTime > 0 then
-								TweenService:Create(b, TI, {Transform = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)}):Play()
-							else
-								b.Transform = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)
-							end
-						end
-						if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") and self.handleVanillaAnimator == true then
-							Instance.new("Animator", self.Character.Humanoid)
-						end
-						con:Disconnect()
-						self._stopped = false
-						self._playing = false
-						self.IsPlaying = false
-						self.Stopped:Fire()
+						return self:Play(fadeTime, weight, speed)
 					end
+					RunService.RenderStepped:Wait()
+					local TI = TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+					for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
+						if self._stopFadeTime > 0 then
+							TweenService:Create(r, TI, {
+								Transform = CFrame.new(),
+								CurrentAngle = 0
+							}):Play()
+						else
+							r.CurrentAngle = 0
+							r.Transform = CFrame.new()
+						end
+					end
+					for _, b in next, Utility:getBones(self.Character, self._boneIgnoreList) do
+						if self._stopFadeTime > 0 then
+							TweenService:Create(b, TI, {Transform = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)}):Play()
+						else
+							b.Transform = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)
+						end
+					end
+					if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") and self.handleVanillaAnimator == true then
+						Instance.new("Animator", self.Character.Humanoid)
+					end
+					con:Disconnect()
+					self._stopped = false
+					self._playing = false
+					self.IsPlaying = false
+					self.Stopped:Fire()
 				end
 			end)
 		end
