@@ -397,17 +397,24 @@ if getgenv()["Animator"] == nil then
 			self._playing = true
 			self._isLooping = false
 			self.IsPlaying = true
-			if self.Character:FindFirstChild("Humanoid") and self.Character.Humanoid:FindFirstChild("Animator") and self.handleVanillaAnimator == true then
-				self.Character.Humanoid.Animator:Destroy()
-			end
 			local con
-			con = self.Character:GetPropertyChangedSignal("Parent"):Connect(function()
-				if self.Character.Parent == nil then
+			if self.Character:FindFirstChild("Humanoid") then
+				con = self.Character.Humanoid.Died:Connect(function()
 					self = nil
 					con:Disconnect()
+				end)
+				if self.Character.Humanoid:FindFirstChild("Animator") and self.handleVanillaAnimator == true then
+					self.Character.Humanoid.Animator:Destroy()
+				end
+			end
+			local con2
+			con2 = self.Character:GetPropertyChangedSignal("Parent"):Connect(function()
+				if self.Character.Parent == nil then
+					self = nil
+					con2:Disconnect()
 				end
 			end)
-			if self ~= nil then
+			if self ~= nil and self.Character.Parent ~= nil then
 				local start = os.clock()
 				spawn(function()
 					for i,f in next, self.AnimationData.Frames do
@@ -427,7 +434,7 @@ if getgenv()["Animator"] == nil then
 						end
 						if f.Pose then
 							for _,p in next, f.Pose do
-								local ft = fadeTime + t
+								local ft = 0 --fadeTime + t
 								if i ~= 1 then
 									ft = (t*(speed or self.Speed)-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
 								end
@@ -435,7 +442,7 @@ if getgenv()["Animator"] == nil then
 							end
 						end
 						if t > os.clock()-start then
-							repeat RunService.RenderStepped:Wait() until os.clock()-start >= t or self._stopped == true
+							repeat RunService.RenderStepped:Wait() until os.clock()-start >= t or self._stopped == true or self == nil
 						end
 					end
 					if self ~= nil then
@@ -467,7 +474,10 @@ if getgenv()["Animator"] == nil then
 						if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") and self.handleVanillaAnimator == true then
 							Instance.new("Animator", self.Character.Humanoid)
 						end
-						con:Disconnect()
+						if con then
+							con:Disconnect()
+						end
+						con2:Disconnect()
 						self._stopped = false
 						self._playing = false
 						self.IsPlaying = false
