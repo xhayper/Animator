@@ -98,28 +98,30 @@ function Animator:_playPose(pose, parent, fade)
 	end
 	if not parent then return end
 	local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
-	for _,motor in next, MotorList do
-		if motor.Part0.Name == parent.Name and motor.Part1.Name == pose.Name then
-			if fade > 0 then
-				if self._stopped ~= true then
+	coroutine.wrap(function()
+		for _,motor in next, MotorList do
+			if motor.Part0.Name == parent.Name and motor.Part1.Name == pose.Name then
+				if self == nil or self._stopped == true then break end
+				if fade > 0 then
 					TweenService:Create(motor, TI, {Transform = pose.CFrame}):Play()
+				else
+					motor.Transform = pose.CFrame
 				end
-			else
-				motor.Transform = pose.CFrame
 			end
 		end
-	end
-	for _, bone in next, BoneList do
-		if parent.Name == bone.Parent.Name and bone.Name == pose.Name then
-			if fade > 0 then
-				if self._stopped ~= true then
+	end)()
+	coroutine.wrap(function()
+		for _, bone in next, BoneList do
+			if parent.Name == bone.Parent.Name and bone.Name == pose.Name then
+				if self == nil or self._stopped == true then break end
+				if fade > 0 then
 					TweenService:Create(bone, TI, {Transform = pose.CFrame}):Play()
+				else
+					bone.Transform = pose.CFrame
 				end
-			else
-				bone.Transform = pose.CFrame
 			end
 		end
-	end
+	end)
 end
 
 function Animator:Play(fadeTime, weight, speed)
@@ -147,7 +149,7 @@ function Animator:Play(fadeTime, weight, speed)
 		end)
 		if self ~= nil and self.Character.Parent ~= nil then
 			local start = clock()
-			spawn(function()
+			coroutine.wrap(function()
 				for i,f in next, self.AnimationData.Frames do
 					if self == nil or self._stopped == true then break end
 					local t = f.Time / (speed or self.Speed)
@@ -175,43 +177,43 @@ function Animator:Play(fadeTime, weight, speed)
 					end
 				end
 				if self == nil then return end
-					if self.Looped == true and self._stopped ~= true then
-						self.DidLoop:Fire()
-						self._isLooping = true
-						return self:Play(fadeTime, weight, speed)
+				if self.Looped == true and self._stopped ~= true then
+					self.DidLoop:Fire()
+					self._isLooping = true
+					return self:Play(fadeTime, weight, speed)
+				end
+				RunService.RenderStepped:Wait()
+				local TI = TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+				for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
+					if self._stopFadeTime > 0 then
+						TweenService:Create(r, TI, {
+							Transform = DefaultMotorCF,
+							CurrentAngle = 0
+						}):Play()
+					else
+						r.CurrentAngle = 0
+						r.Transform = DefaultMotorCF
 					end
-					RunService.RenderStepped:Wait()
-					local TI = TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-					for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
-						if self._stopFadeTime > 0 then
-							TweenService:Create(r, TI, {
-								Transform = DefaultMotorCF,
-								CurrentAngle = 0
-							}):Play()
-						else
-							r.CurrentAngle = 0
-							r.Transform = DefaultMotorCF
-						end
+				end
+				for _, b in next, Utility:getBones(self.Character, self._boneIgnoreList) do
+					if self._stopFadeTime > 0 then
+						TweenService:Create(b, TI, {Transform = DefaultBoneCF}):Play()
+					else
+						b.Transform = DefaultBoneCF
 					end
-					for _, b in next, Utility:getBones(self.Character, self._boneIgnoreList) do
-						if self._stopFadeTime > 0 then
-							TweenService:Create(b, TI, {Transform = DefaultBoneCF}):Play()
-						else
-							b.Transform = DefaultBoneCF
-						end
-					end
-					if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") and self.handleVanillaAnimator == true then
-						Instance.new("Animator", self.Character.Humanoid)
-					end
-					if con then
-						con:Disconnect()
-					end
-					con2:Disconnect()
-					self._stopped = false
-					self._playing = false
-					self.IsPlaying = false
-					self.Stopped:Fire()
-			end)
+				end
+				if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") and self.handleVanillaAnimator == true then
+					Instance.new("Animator", self.Character.Humanoid)
+				end
+				if con then
+					con:Disconnect()
+				end
+				con2:Disconnect()
+				self._stopped = false
+				self._playing = false
+				self.IsPlaying = false
+				self.Stopped:Fire()
+			end)()
 		end
 	end
 end
