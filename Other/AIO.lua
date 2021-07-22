@@ -384,10 +384,6 @@ if getgenv()["Animator"] == nil then
 					end
 				end
 			end
-		else
-			if self.Character:FindFirstChild(pose.Name) then
-				self.Character[pose.Name].CFrame = self.Character[pose.Name].CFrame * pose.CFrame
-			end
 		end
 	end
 	
