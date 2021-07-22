@@ -39,6 +39,7 @@ _POvADrkE5HG1O8cJ, Protected_by_MoonSecV2, Discord = 'discord.gg/gQEH2uZxUk'
 
 * Minified - [Here](https://github.com/xhayper/Animator/blob/main/Other/Minified.lua)
 * AIO - [Here](https://github.com/xhayper/Animator/blob/main/Other/AIO.lua)
+* Studio - [Here](https://github.com/xhayper/Animator/blob/main/Other)
 
 ## Installation
 
