@@ -141,10 +141,10 @@ function Animator:Play(fadeTime, weight, speed)
 			local start = os.clock()
 			coroutine.wrap(function()
 				for i,f in next, self.AnimationData.Frames do
-					f.Time /= self.Speed
 					if self == nil or self._stopped == true then
 						break;
 					end
+					f.Time = f.Time / speed or self.Speed
 					if f.Name ~= "Keyframe" then
 						self.KeyframeReached:Fire(f.Name)
 					end
@@ -159,7 +159,7 @@ function Animator:Play(fadeTime, weight, speed)
 						for _,p in next, f.Pose do
 							fadeTime += f.Time
 							if i ~= 1 then
-								fadeTime = (f.Time*self.Speed-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
+								fadeTime = (f.Time*(speed or self.Speed)-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
 							end
 							self:_playPose(p, nil, fadeTime)
 						end
@@ -170,6 +170,7 @@ function Animator:Play(fadeTime, weight, speed)
 				end
 				if self ~= nil then
 					if self.Looped == true and self._stopped ~= true then
+						print("Looping")
 						self.DidLoop:Fire()
 						self._isLooping = true
 						return self:Play(fadeTime, weight, speed)
