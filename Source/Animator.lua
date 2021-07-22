@@ -140,6 +140,7 @@ function Animator:Play(fadeTime, weight, speed)
 		if self ~= nil then
 			local start = os.clock()
 			spawn(function()
+				print("Bye, Cache")
 				for i,f in next, self.AnimationData.Frames do
 					if self == nil or self._stopped == true then
 						break;
