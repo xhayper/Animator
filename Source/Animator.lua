@@ -6,8 +6,6 @@ local Utility = animatorRequire("Utility.lua")
 
 local Signal = animatorRequire("Nevermore/Signal.lua")
 
-local format = string.format
-
 local Animator = {
 	AnimationData = {},
 	handleVanillaAnimator = true, 
@@ -24,6 +22,14 @@ local Animator = {
 	_markerSignal = {},
 	_boneIgnoreList = {}
 }
+
+local CF,Angles = CFrame.new, CFrame.Angles
+local deg = math.deg
+local clock = os.clock
+local format = string.format
+
+local DefaultMotorCF = CF()
+local DefaultBoneCF = CF(0,0,0)*Angles(deg(0),deg(0),deg(0))
 
 Animator.__index = Animator
 
@@ -90,28 +96,27 @@ function Animator:_playPose(pose, parent, fade)
 			self:_playPose(sp, pose, fade)
 		end
 	end
-	if parent then
-		local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
-		for _,motor in next, MotorList do
-			if motor.Part0.Name == parent.Name and motor.Part1.Name == pose.Name then
-				if fade > 0 then
-					if self._stopped ~= true then
-						TweenService:Create(motor, TI, {Transform = pose.CFrame}):Play()
-					end
-				else
-					motor.Transform = pose.CFrame
+	if not parent then return end
+	local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
+	for _,motor in next, MotorList do
+		if motor.Part0.Name == parent.Name and motor.Part1.Name == pose.Name then
+			if fade > 0 then
+				if self._stopped ~= true then
+					TweenService:Create(motor, TI, {Transform = pose.CFrame}):Play()
 				end
+			else
+				motor.Transform = pose.CFrame
 			end
 		end
-		for _, bone in next, BoneList do
-			if parent.Name == bone.Parent.Name and bone.Name == pose.Name then
-				if fade > 0 then
-					if self._stopped ~= true then
-						TweenService:Create(bone, TI, {Transform = pose.CFrame}):Play()
-					end
-				else
-					bone.Transform = pose.CFrame
+	end
+	for _, bone in next, BoneList do
+		if parent.Name == bone.Parent.Name and bone.Name == pose.Name then
+			if fade > 0 then
+				if self._stopped ~= true then
+					TweenService:Create(bone, TI, {Transform = pose.CFrame}):Play()
 				end
+			else
+				bone.Transform = pose.CFrame
 			end
 		end
 	end
@@ -141,18 +146,16 @@ function Animator:Play(fadeTime, weight, speed)
 			end
 		end)
 		if self ~= nil and self.Character.Parent ~= nil then
-			local start = os.clock()
+			local start = clock()
 			spawn(function()
 				for i,f in next, self.AnimationData.Frames do
-					if self == nil or self._stopped == true then
-						break;
-					end
+					if self == nil or self._stopped == true then break end
 					local t = f.Time / (speed or self.Speed)
 					if f.Name ~= "Keyframe" then
 						self.KeyframeReached:Fire(f.Name)
 					end
 					if f["Marker"] then
-						for k,v in next, f["Marker"] do
+						for k,v in next, f.Marker do
 							if self._markerSignal[k] then
 								self._markerSignal[k]:Fire(v)
 							end
@@ -167,11 +170,11 @@ function Animator:Play(fadeTime, weight, speed)
 							self:_playPose(p, nil, ft)
 						end
 					end
-					if t > os.clock()-start then
-						repeat RunService.RenderStepped:Wait() until self == nil or self._stopped == true or os.clock()-start >= t
+					if t > clock()-start then
+						repeat RunService.RenderStepped:Wait() until self == nil or self._stopped == true or clock()-start >= t
 					end
 				end
-				if self ~= nil then
+				if self == nil then return end
 					if self.Looped == true and self._stopped ~= true then
 						self.DidLoop:Fire()
 						self._isLooping = true
@@ -182,19 +185,19 @@ function Animator:Play(fadeTime, weight, speed)
 					for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
 						if self._stopFadeTime > 0 then
 							TweenService:Create(r, TI, {
-								Transform = CFrame.new(),
+								Transform = DefaultMotorCF,
 								CurrentAngle = 0
 							}):Play()
 						else
 							r.CurrentAngle = 0
-							r.Transform = CFrame.new()
+							r.Transform = DefaultMotorCF
 						end
 					end
 					for _, b in next, Utility:getBones(self.Character, self._boneIgnoreList) do
 						if self._stopFadeTime > 0 then
-							TweenService:Create(b, TI, {Transform = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)}):Play()
+							TweenService:Create(b, TI, {Transform = DefaultBoneCF}):Play()
 						else
-							b.Transform = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)
+							b.Transform = DefaultBoneCF
 						end
 					end
 					if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") and self.handleVanillaAnimator == true then
@@ -208,7 +211,6 @@ function Animator:Play(fadeTime, weight, speed)
 					self._playing = false
 					self.IsPlaying = false
 					self.Stopped:Fire()
-				end
 			end)
 		end
 	end
