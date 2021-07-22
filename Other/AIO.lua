@@ -277,7 +277,7 @@ if getgenv()["Animator"] == nil then
 
 	local RunService = game:GetService("RunService")
 	local TweenService = game:GetService("TweenService")
-
+	
 	local Animator = {
 		AnimationData = {},
 		handleVanillaAnimator = true, 
@@ -294,17 +294,17 @@ if getgenv()["Animator"] == nil then
 		_markerSignal = {},
 		_boneIgnoreList = {}
 	}
-
+	
 	Animator.__index = Animator
-
+	
 	function Animator.new(Character, AnimationResolvable)
 		if typeof(Character) ~= "Instance" then
 			error(format("invalid argument 1 to 'new' (Instace expected, got %s)", typeof(Character)))
 		end
-
+	
 		local c = setmetatable({}, Animator)
 		c.Character = Character
-
+	
 		if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then
 			local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable))[1]
 			if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID expected)") end
@@ -320,38 +320,38 @@ if getgenv()["Animator"] == nil then
 		else
 			error(format("invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)", typeof(AnimationResolvable)))
 		end
-
+	
 		c.Looped = c.AnimationData.Loop
 		c.Length = c.AnimationData.Frames[#c.AnimationData.Frames].Time
-
+	
 		c.DidLoop = Signal.new()
 		c.Stopped = Signal.new()
 		c.KeyframeReached = Signal.new()
 		return c
 	end
-
+	
 	function Animator:IgnoreMotorIn(ignoreList)
 		if typeof(ignoreList) ~= "table" then
 			error(format("invalid argument 1 to 'IgnoreMotorIn' (Table expected, got %s)", typeof(ignoreList)))
 		end
 		self._motorIgnoreList = ignoreList
 	end
-
+	
 	function Animator:GetMotorIgnoreList()
 		return self._motorIgnoreList
 	end
-
+	
 	function Animator:IgnoreBoneIn(ignoreList)
 		if typeof(ignoreList) ~= "table" then
 			error(format("invalid argument 1 to 'IgnoreBoneIn' (Table expected, got %s)", typeof(ignoreList)))
 		end
 		self._boneIgnoreList = ignoreList
 	end
-
+	
 	function Animator:GetBoneIgnoreList()
 		return self._boneIgnoreList
 	end
-
+	
 	function Animator:_playPose(pose, parent, fade)
 		local MotorList = Utility:getMotors(self.Character, self._motorIgnoreList)
 		local BoneList = Utility:getBones(self.Character, self._boneIgnoreList)
@@ -390,7 +390,7 @@ if getgenv()["Animator"] == nil then
 			end
 		end
 	end
-
+	
 	function Animator:Play(fadeTime, weight, speed)
 		fadeTime = fadeTime or 0.100000001
 		if self._playing == false or self._isLooping == true then
@@ -409,7 +409,7 @@ if getgenv()["Animator"] == nil then
 			end
 			local con2
 			con2 = self.Character:GetPropertyChangedSignal("Parent"):Connect(function()
-				if self.Character.Parent == nil then
+				if self == nil or self.Character.Parent == nil then
 					self = nil
 					con2:Disconnect()
 				end
@@ -434,7 +434,7 @@ if getgenv()["Animator"] == nil then
 						end
 						if f.Pose then
 							for _,p in next, f.Pose do
-								local ft = 0 --fadeTime + t
+								local ft = 0
 								if i ~= 1 then
 									ft = (t*(speed or self.Speed)-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
 								end
@@ -442,7 +442,7 @@ if getgenv()["Animator"] == nil then
 							end
 						end
 						if t > os.clock()-start then
-							repeat RunService.RenderStepped:Wait() until os.clock()-start >= t or self._stopped == true or self == nil
+							repeat RunService.RenderStepped:Wait() until self == nil or self._stopped == true or os.clock()-start >= t
 						end
 					end
 					if self ~= nil then
@@ -487,7 +487,7 @@ if getgenv()["Animator"] == nil then
 			end
 		end
 	end
-
+	
 	function Animator:GetTimeOfKeyframe(keyframeName)
 		for _,f in next, self.AnimationData.Frames do
 			if f.Name == keyframeName then
@@ -496,27 +496,27 @@ if getgenv()["Animator"] == nil then
 		end
 		return math.huge
 	end
-
+	
 	function Animator:GetMarkerReachedSignal(name)
 		if not self._markerSignal[name] then
 			self._markerSignal[name] = Signal.new()
 		end
 		return self._markerSignal[name]
 	end
-
+	
 	function Animator:AdjustSpeed(speed)
 		self.Speed = speed
 	end
-
+	
 	function Animator:Stop(fadeTime)
 		self._stopFadeTime = fadeTime or 0.100000001
 		self._stopped = true
 	end
-
+	
 	function Animator:Destroy()
 		self:Stop(0)
 		self.Stopped:Wait()
-
+	
 		-- Maid won't work properly so.
 		self.DidLoop:Destroy()
 		self.DidLoop = nil

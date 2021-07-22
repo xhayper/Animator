@@ -139,7 +139,7 @@ function Animator:Play(fadeTime, weight, speed)
 		end
 		local con2
 		con2 = self.Character:GetPropertyChangedSignal("Parent"):Connect(function()
-			if self.Character.Parent == nil then
+			if self == nil or self.Character.Parent == nil then
 				self = nil
 				con2:Disconnect()
 			end
@@ -164,7 +164,7 @@ function Animator:Play(fadeTime, weight, speed)
 					end
 					if f.Pose then
 						for _,p in next, f.Pose do
-							local ft = 0 --fadeTime + t
+							local ft = 0
 							if i ~= 1 then
 								ft = (t*(speed or self.Speed)-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
 							end
@@ -172,7 +172,7 @@ function Animator:Play(fadeTime, weight, speed)
 						end
 					end
 					if t > os.clock()-start then
-						repeat RunService.RenderStepped:Wait() until os.clock()-start >= t or self._stopped == true or self == nil
+						repeat RunService.RenderStepped:Wait() until self == nil or self._stopped == true or os.clock()-start >= t
 					end
 				end
 				if self ~= nil then
