@@ -3,6 +3,7 @@
 
 ## MainModule
 * Roblox Module Version
+* Doesn't support Animation ID, Animation Instance, Support Raw Animation Data and Keyframe Sequnce
 
 ## AIO
 * Animator but without HTTP requests and require
