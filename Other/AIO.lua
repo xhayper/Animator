@@ -132,7 +132,7 @@ if getgenv()["Animator"] == nil then
 			Callback = Callback or nil;
 		})
 	end
-	
+
 	function Utility:convertEnum(enum)
 		local a = tostring(enum):split(".")
 		if a[1] == "Enum" then
@@ -151,19 +151,19 @@ if getgenv()["Animator"] == nil then
 			return enum
 		end
 	end
-	
+
 	function Utility:getBones(Character, IgnoreList)
 		IgnoreList = IgnoreList or {}
 		if typeof(Character) ~= "Instance" then
 			error(format("invalid argument 1 to 'getBones' (Instance expected, got %s)", typeof(Character)))
 		end
-	
+
 		if typeof(IgnoreList) ~= "table" then
 			error(format("invalid argument 1 to 'getBones' (Table expected, got %s)", typeof(IgnoreList)))
 		end
-	
+
 		local BoneList = {}
-	
+
 		for _,i in next, Character:GetDescendants() do
 			if i:IsA("Bone") then
 				local IsTained = false
@@ -178,22 +178,22 @@ if getgenv()["Animator"] == nil then
 				end
 			end
 		end
-	
+
 		return BoneList
 	end
-	
+
 	function Utility:getMotors(Character, IgnoreList)
 		IgnoreList = IgnoreList or {}
 		if typeof(Character) ~= "Instance" then
 			error(format("invalid argument 1 to 'getMotors' (Instance expected, got %s)", typeof(Character)))
 		end
-	
+
 		if typeof(IgnoreList) ~= "table" then
 			error(format("invalid argument 1 to 'getMotors' (Table expected, got %s)", typeof(IgnoreList)))
 		end
-	
+
 		local MotorList = {}
-	
+
 		for _,i in next, Character:GetDescendants() do
 			if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
 				local IsTained = false
@@ -208,7 +208,7 @@ if getgenv()["Animator"] == nil then
 				end
 			end
 		end
-	
+
 		return MotorList
 	end
 
@@ -233,7 +233,7 @@ if getgenv()["Animator"] == nil then
 		end
 		return poseData
 	end
-	
+
 	function Parser:parseKeyframeData(keyframe)
 		if not keyframe:IsA("Keyframe") then
 			error(format("invalid argument 1 to '_parseKeyframeData' (Keyframe expected, got %s)", keyframe.ClassName))
@@ -254,7 +254,7 @@ if getgenv()["Animator"] == nil then
 		end
 		return keyframeData
 	end
-	
+
 	function Parser:parseAnimationData(keyframeSequence)
 		if not keyframeSequence:IsA("KeyframeSequence") then
 			error(format("invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)", keyframeSequence.ClassName))
@@ -265,11 +265,11 @@ if getgenv()["Animator"] == nil then
 				table.insert(animationData.Frames, Parser:parseKeyframeData(f))
 			end
 		end
-	
+
 		table.sort(animationData.Frames, function(l, r)
 			return l.Time < r.Time
 		end)
-	
+
 		return animationData
 	end
 
@@ -409,15 +409,12 @@ if getgenv()["Animator"] == nil then
 			end)
 			if self ~= nil then
 				local start = os.clock()
-				coroutine.wrap(function()
+				spawn(function()
 					for i,f in next, self.AnimationData.Frames do
-						f.Time = f.Time / self.Speed
-						if i ~= 1 and f.Time > os.clock()-start then
-							repeat RunService.RenderStepped:Wait() until os.clock()-start > f.Time or self._stopped == true
-						end
 						if self == nil or self._stopped == true then
 							break;
 						end
+						local t = f.Time / (speed or self.Speed)
 						if f.Name ~= "Keyframe" then
 							self.KeyframeReached:Fire(f.Name)
 						end
@@ -430,12 +427,15 @@ if getgenv()["Animator"] == nil then
 						end
 						if f.Pose then
 							for _,p in next, f.Pose do
-								fadeTime = fadeTime + f.Time
+								local ft = fadeTime + t
 								if i ~= 1 then
-									fadeTime = (f.Time*self.Speed-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
+									ft = (t*(speed or self.Speed)-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
 								end
-								self:_playPose(p, nil, fadeTime)
+								self:_playPose(p, nil, ft)
 							end
+						end
+						if t > os.clock()-start then
+							repeat RunService.RenderStepped:Wait() until os.clock()-start >= t or self._stopped == true
 						end
 					end
 					if self ~= nil then
@@ -473,7 +473,7 @@ if getgenv()["Animator"] == nil then
 						self.IsPlaying = false
 						self.Stopped:Fire()
 					end
-				end)()
+				end)
 			end
 		end
 	end
