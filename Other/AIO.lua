@@ -448,12 +448,12 @@ if getgenv()["Animator"] == nil then
 						end
 					end
 					if self == nil then return end
+					RunService.RenderStepped:Wait()
 					if self.Looped == true and self._stopped ~= true then
 						self.DidLoop:Fire()
 						self._isLooping = true
 						return self:Play(fadeTime, weight, speed)
 					end
-					RunService.RenderStepped:Wait()
 					local TI = TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
 					for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
 						if self._stopFadeTime > 0 then
