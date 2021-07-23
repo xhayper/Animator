@@ -436,7 +436,7 @@ if getgenv()["Animator"] == nil then
 						end
 						if f.Pose then
 							for _,p in next, f.Pose do
-								local ft = 0
+								local ft = fadeTime
 								if i ~= 1 then
 									ft = (t*(speed or self.Speed)-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
 								end
@@ -454,9 +454,9 @@ if getgenv()["Animator"] == nil then
 						self._isLooping = true
 						return self:Play(fadeTime, weight, speed)
 					end
-					local TI = TweenInfo.new(self._stopFadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+					local TI = TweenInfo.new(self._stopFadeTime or fadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
 					for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
-						if self._stopFadeTime > 0 then
+						if (self._stopFadeTime or fadeTime) > 0 then
 							TweenService:Create(r, TI, {
 								Transform = DefaultMotorCF,
 								CurrentAngle = 0
@@ -467,7 +467,7 @@ if getgenv()["Animator"] == nil then
 						end
 					end
 					for _, b in next, Utility:getBones(self.Character, self._boneIgnoreList) do
-						if self._stopFadeTime > 0 then
+						if (self._stopFadeTime or fadeTime) > 0 then
 							TweenService:Create(b, TI, {Transform = DefaultBoneCF}):Play()
 						else
 							b.Transform = DefaultBoneCF
