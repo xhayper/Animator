@@ -1,7 +1,7 @@
-local HatList = {}
+local AccessoryList = {}
 
 for _,i in next, path.to.Character:GetChildren() do
-    if i:IsA("Accessory") and table.find(HatList, i.Name) then
+    if i:IsA("Accessory") and table.find(AccessoryList, i.Name) then
         i.Handle.Name = i.Name
         local Motor = Instance.new("Motor6D", i[i.Name])
         Motor.Name = i.Name
