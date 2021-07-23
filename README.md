@@ -5,7 +5,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 ## Features
 
 * Easy To Use
-* Can play Non-Trusted Animation / Raw Animation Data (Use [Converter](https://github.com/xhayper/Animator/tree/main/Converter))
+* Can play Trusted/Non-Trusted Animation (AnimationID, KeyframeSequence Instance and Animation Instance) / Raw Animation Data (Use [KeyframeSequence-To-AnimationData](https://github.com/xhayper/Animator/tree/main/Utility))
 * R6, R15, Custom Rig/Animation Support
 * Mesh Deformation Support
 * Simillar to Roblox's AnimationTrack Instance
