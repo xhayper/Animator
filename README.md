@@ -183,9 +183,9 @@ local Play = Main.Button({
 			RunService.RenderStepped:Wait()
 		end
 		currentAnim = Animator.new(Player.Character, Animation:GetText())
-		if Player.Character:FindFirstChild(Player.Name) then -- Nullware Complatible
-			currentAnim:IgnoreMotorIn({Player.Character[Player.Name]})
-			currentAnim:IgnoreBoneIn({Player.Character[Player.Name]})
+		if getgenv()["NullwareAPI"] then -- Nullware Complatible
+			currentAnim:IgnoreMotorIn({NullwareAPI:GetCharacter("MainChar")})
+			currentAnim:IgnoreBoneIn({NullwareAPI:GetCharacter("MainChar")})
 		end
 		currentAnim.Looped = Loop:GetState()
 		currentAnim:Play()
