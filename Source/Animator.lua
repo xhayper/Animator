@@ -1,5 +1,5 @@
-local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
 local Parser = animatorRequire("Parser.lua")
 local Utility = animatorRequire("Utility.lua")
@@ -38,32 +38,34 @@ function Animator.new(Character, AnimationResolvable)
 		error(format("invalid argument 1 to 'new' (Instace expected, got %s)", typeof(Character)))
 	end
 
-	local c = setmetatable({}, Animator)
-	c.Character = Character
+	local self = setmetatable({}, Animator)
+	self.Character = Character
 
 	if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then
 		local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable))[1]
 		if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID expected)") end
-		c.AnimationData = Parser:parseAnimationData(animationInstance)
+		self.AnimationData = Parser:parseAnimationData(animationInstance)
 	elseif typeof(AnimationResolvable) == "table" then
-		c.AnimationData = AnimationResolvable
-	elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("KeyframeSequence") then
-		c.AnimationData = Parser:parseAnimationData(AnimationResolvable)
-	elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("Animation") then
-		local animationInstance = game:GetObjects(AnimationResolvable.AnimationId)[1]
-		if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
-		c.AnimationData = Parser:parseAnimationData(animationInstance)
+		self.AnimationData = AnimationResolvable
+	elseif typeof(AnimationResolvable) == "Instance" then
+		if AnimationResolvable:IsA("KeyframeSequence") then
+			self.AnimationData = Parser:parseAnimationData(AnimationResolvable)
+		elseif AnimationResolvable:IsA("Animation") then
+			local animationInstance = game:GetObjects(AnimationResolvable.AnimationId)[1]
+			if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
+			self.AnimationData = Parser:parseAnimationData(animationInstance)
+		end
 	else
 		error(format("invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)", typeof(AnimationResolvable)))
 	end
 
-	c.Looped = c.AnimationData.Loop
-	c.Length = c.AnimationData.Frames[#c.AnimationData.Frames].Time
+	self.Looped = self.AnimationData.Loop
+	self.Length = self.AnimationData.Frames[#self.AnimationData.Frames].Time
 
-	c.DidLoop = Signal.new()
-	c.Stopped = Signal.new()
-	c.KeyframeReached = Signal.new()
-	return c
+	self.DidLoop = Signal.new()
+	self.Stopped = Signal.new()
+	self.KeyframeReached = Signal.new()
+	return self
 end
 
 function Animator:IgnoreMotorIn(ignoreList)
@@ -99,7 +101,8 @@ function Animator:_playPose(pose, parent, fade)
 	if not parent then return end
 	local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
 	coroutine.wrap(function()
-		for _,motor in next, MotorList do
+		for count=1, #MotorList do
+			local motor = MotorList[count]
 			if motor.Part0.Name == parent.Name and motor.Part1.Name == pose.Name then
 				if self == nil or self._stopped == true then break end
 				if fade > 0 then
@@ -111,17 +114,17 @@ function Animator:_playPose(pose, parent, fade)
 		end
 	end)()
 	coroutine.wrap(function()
-		for _, bone in next, BoneList do
-			if parent.Name == bone.Parent.Name and bone.Name == pose.Name then
-				if self == nil or self._stopped == true then break end
-				if fade > 0 then
-					TweenService:Create(bone, TI, {Transform = pose.CFrame}):Play()
-				else
-					bone.Transform = pose.CFrame
-				end
+		for count=1, #BoneList do
+			local bone = BoneList[count]
+			if parent.Name ~= bone.Parent.Name or bone.Name ~= pose.Name then continue end
+			if self == nil or self._stopped == true then break end
+			if fade > 0 then
+				TweenService:Create(bone, TI, {Transform = pose.CFrame}):Play()
+			else
+				bone.Transform = pose.CFrame
 			end
 		end
-	end)
+	end)()
 end
 
 function Animator:Play(fadeTime, weight, speed)
@@ -131,6 +134,8 @@ function Animator:Play(fadeTime, weight, speed)
 		self._isLooping = false
 		self.IsPlaying = true
 		local con
+		local con2
+		if not self.Character then return end
 		if self.Character:FindFirstChild("Humanoid") then
 			con = self.Character.Humanoid.Died:Connect(function()
 				self = nil
@@ -140,7 +145,6 @@ function Animator:Play(fadeTime, weight, speed)
 				self.Character.Humanoid.Animator:Destroy()
 			end
 		end
-		local con2
 		con2 = self.Character:GetPropertyChangedSignal("Parent"):Connect(function()
 			if self == nil or self.Character.Parent == nil then
 				self = nil
@@ -150,7 +154,8 @@ function Animator:Play(fadeTime, weight, speed)
 		if self ~= nil and self.Character.Parent ~= nil then
 			local start = clock()
 			coroutine.wrap(function()
-				for i,f in next, self.AnimationData.Frames do
+				for i=1, #self.AnimationData.Frames do
+					local f = self.AnimationData.Frames[i]
 					if self == nil or self._stopped == true then break end
 					local t = f.Time / (speed or self.Speed)
 					if f.Name ~= "Keyframe" then
@@ -158,52 +163,59 @@ function Animator:Play(fadeTime, weight, speed)
 					end
 					if f["Marker"] then
 						for k,v in next, f.Marker do
-							if self._markerSignal[k] then
-								self._markerSignal[k]:Fire(v)
-							end
+							if not self._markerSignal[k] then continue end
+							self._markerSignal[k]:Fire(v)
 						end
 					end
 					if f.Pose then
 						for _,p in next, f.Pose do
-							local ft = fadeTime
-							if i ~= 1 then
-								ft = (t*(speed or self.Speed)-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
-							end
-							self:_playPose(p, nil, ft)
+							coroutine.wrap(function()
+								local ft = fadeTime
+								if i ~= 1 then
+									ft = (t*(speed or self.Speed)-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
+								end
+								self:_playPose(p, nil, ft)
+							end)()
 						end
 					end
 					if t > clock()-start then
-						repeat RunService.RenderStepped:Wait() until self == nil or self._stopped == true or clock()-start >= t
+						repeat RunService.Stepped:Wait() until self == nil or self._stopped == true or clock()-start >= t
 					end
 				end
 				if self == nil then return end
-				RunService.RenderStepped:Wait()
 				if self.Looped == true and self._stopped ~= true then
 					self.DidLoop:Fire()
 					self._isLooping = true
 					return self:Play(fadeTime, weight, speed)
 				end
-				local TI = TweenInfo.new(self._stopFadeTime or fadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
-				for _,r in next, Utility:getMotors(self.Character, self._motorIgnoreList) do
-					if (self._stopFadeTime or fadeTime) > 0 then
-						TweenService:Create(r, TI, {
-							Transform = DefaultMotorCF,
-							CurrentAngle = 0
-						}):Play()
-					else
-						r.CurrentAngle = 0
-						r.Transform = DefaultMotorCF
+				RunService.Stepped:Wait()
+				local TI = TweenInfo.new(self._stopFadeTime or fadeTime, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
+				if self.Character then
+					local MotorList = Utility:getMotors(self.Character, self._motorIgnoreList)
+					local BoneList = Utility:getBones(self.Character, self._boneIgnoreList)
+					for count=1, #MotorList do
+						local r = MotorList[count]
+						if (self._stopFadeTime or fadeTime) > 0 then
+							TweenService:Create(r, TI, {
+								Transform = DefaultMotorCF,
+								CurrentAngle = 0
+							}):Play()
+						else
+							r.CurrentAngle = 0
+							r.Transform = DefaultMotorCF
+						end
 					end
-				end
-				for _, b in next, Utility:getBones(self.Character, self._boneIgnoreList) do
-					if (self._stopFadeTime or fadeTime) > 0 then
-						TweenService:Create(b, TI, {Transform = DefaultBoneCF}):Play()
-					else
-						b.Transform = DefaultBoneCF
+					for count=1, #BoneList do
+						local b = BoneList[count]
+						if (self._stopFadeTime or fadeTime) > 0 then
+							TweenService:Create(b, TI, {Transform = DefaultBoneCF}):Play()
+						else
+							b.Transform = DefaultBoneCF
+						end
 					end
-				end
-				if self.Character:FindFirstChildOfClass("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") and self.handleVanillaAnimator == true then
-					Instance.new("Animator", self.Character.Humanoid)
+					if self.handleVanillaAnimator == true and self.Character:FindFirstChild("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") then
+						Instance.new("Animator", self.Character.Humanoid)
+					end
 				end
 				if con then
 					con:Disconnect()
@@ -219,10 +231,10 @@ function Animator:Play(fadeTime, weight, speed)
 end
 
 function Animator:GetTimeOfKeyframe(keyframeName)
-	for _,f in next, self.AnimationData.Frames do
-		if f.Name == keyframeName then
-			return f.Time
-		end
+	for count=1, #self.AnimationData.Frames do
+		local f = self.AnimationData.Frames[count]
+		if f.Name ~= keyframeName then continue end
+		return f.Time
 	end
 	return math.huge
 end
@@ -254,7 +266,9 @@ function Animator:Destroy()
 	self.Stopped = nil
 	self.KeyframeReached:Destroy()
 	self.KeyframeReached = nil
-	for _,s in next, self._markerSignal do
+	local MarkerSignal = self._markerSignal
+	for count=1, #MarkerSignal do
+		local s = MarkerSignal[count]
 		s:Destroy()
 		s = nil
 	end
