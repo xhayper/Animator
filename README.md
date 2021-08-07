@@ -177,7 +177,7 @@ local Play = Main.Button({
 		if currentAnim ~= nil and currentAnim.IsPlaying == true then
 			currentAnim:Stop(0) -- Honestly, :Destroy() might work better, but i can't seem to get it to work
 			currentAnim.Stopped:Wait()
-			RunService.RenderStepped:Wait()
+			RunService.Heartbeat:Wait()
 		end
 		currentAnim = Animator.new(Player.Character, Animation:GetText())
 		if getgenv()["NullwareAPI"] then -- Nullware Complatible
