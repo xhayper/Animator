@@ -59,6 +59,8 @@ function Animator.new(Character, AnimationResolvable)
 		error(format("invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)", typeof(AnimationResolvable)))
 	end
 
+	self.Character = Character
+
 	self.Looped = self.AnimationData.Loop
 	self.Length = self.AnimationData.Frames[#self.AnimationData.Frames].Time
 
@@ -100,7 +102,9 @@ function Animator:_playPose(pose, parent, fade)
 	local MotorList = Utility:getMotors(self.Character, self._motorIgnoreList)
 	local BoneList = Utility:getBones(self.Character, self._boneIgnoreList)
 	if pose.Subpose then
-		for _,sp in next, pose.Subpose do
+		local SubPose = pose.Subpose
+		for count=1, #SubPose do
+			local sp = SubPose[count]
 			self:_playPose(sp, pose, fade)
 		end
 	end
@@ -143,7 +147,7 @@ function Animator:Play(fadeTime, weight, speed)
 	if not self.Character then return end
 	if self.Character:FindFirstChild("Humanoid") then
 		con = self.Character.Humanoid.Died:Connect(function()
-			self = nil
+			self:Destroy()
 			con:Disconnect()
 		end)
 		if self.handleVanillaAnimator and self.Character.Humanoid:FindFirstChild("Animator") then
@@ -152,7 +156,7 @@ function Animator:Play(fadeTime, weight, speed)
 	end
 	con2 = self.Character:GetPropertyChangedSignal("Parent"):Connect(function()
 		if self ~= nil and self.Character.Parent ~= nil then return end
-		self = nil
+		self:Destroy()
 		con2:Disconnect()
 	end)
 	if self == nil or self.Character.Parent == nil then return end
