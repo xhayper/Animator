@@ -22,7 +22,7 @@ Contains useful script that will help you
 
 -- Marker Data
 
-"Marker Name" = {
+[string] = {
 	Value: any
 }
 
