@@ -13,3 +13,6 @@
 * Doesn't support Hooking
 * HttpRequire isn't included in this version
 * AnimatorRequire isn't included in this version
+
+## Minified
+* Minified Version of AIO
