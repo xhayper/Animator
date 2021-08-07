@@ -31,7 +31,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 ## Limitation
 * Part need to be linked with Motor6D
 * Can only do up to n (Usually 2) Character, more than that, it will lag like hell
-* If your obfuscator do metatable stuff, it have a high chance of crashing the minified and AIO verson, if that's the case, do not obfuscate the animator, obfuscate your code and put animator code at the top
+* If your obfuscator do metatable stuff, it have a high chance of crashing the AIO verson, if that's the case, do not obfuscate the animator, obfuscate your code and put animator code at the top
 
 ## Resources
 
