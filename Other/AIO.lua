@@ -306,7 +306,7 @@ if getgenv()["Animator"] == nil then
 
 	function Animator.new(Character, AnimationResolvable)
 		if typeof(Character) ~= "Instance" then
-			error(format("invalid argument 1 to 'new' (Instace expected, got %s)", typeof(Character)))
+			error(format("invalid argument 1 to 'new' (Instance expected, got %s)", typeof(Character)))
 		end
 
 		local c = setmetatable({}, Animator)
@@ -318,12 +318,14 @@ if getgenv()["Animator"] == nil then
 			c.AnimationData = Parser:parseAnimationData(animationInstance)
 		elseif typeof(AnimationResolvable) == "table" then
 			c.AnimationData = AnimationResolvable
-		elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("KeyframeSequence") then
-			c.AnimationData = Parser:parseAnimationData(AnimationResolvable)
-		elseif typeof(AnimationResolvable) == "Instance" and AnimationResolvable:IsA("Animation") then
-			local animationInstance = game:GetObjects(AnimationResolvable.AnimationId)[1]
-			if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
-			c.AnimationData = Parser:parseAnimationData(animationInstance)
+		elseif typeof(AnimationResolvable) == "Instance" then
+			if AnimationResolvable:IsA("KeyframeSequence") then
+				c.AnimationData = Parser:parseAnimationData(AnimationResolvable)
+			elseif AnimationResolvable:IsA("Animation") then
+				local animationInstance = game:GetObjects(AnimationResolvable.AnimationId)[1]
+				if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
+				c.AnimationData = Parser:parseAnimationData(animationInstance)
+			end
 		else
 			error(format("invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)", typeof(AnimationResolvable)))
 		end

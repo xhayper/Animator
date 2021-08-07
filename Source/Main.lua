@@ -20,13 +20,12 @@ getgenv().hookAnimatorFunction = function()
 	local OldFunc
 	OldFunc = hookmetamethod(game, "__namecall", function(Object, ...)
 		local NamecallMethod = getnamecallmethod()
-		if Object.ClassName == "Humanoid" and NamecallMethod == "LoadAnimation" and checkcaller() then
-			local args = {...}
-			if not args[2] or args[2] and args[2] ~= true then
-				return Animator.new(Object.Parent, ...)
-			end
+		if Object.ClassName ~= "Humanoid" or NamecallMethod ~= "LoadAnimation" or not checkcaller() then return OldFunc(Object, ...) end
+		local args = {...}
+		if not args[2] or args[2] and args[2] ~= true then
+			return Animator.new(Object.Parent, ...)
 		end
-		return OldFunc(Object, ...)
+
 	end)
 	Utility:sendNotif("Hook Loaded\nby whited#4382", nil, 5)
 end

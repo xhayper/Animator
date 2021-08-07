@@ -44,19 +44,21 @@ function Utility:getBones(Character, IgnoreList)
 	end
 
 	local BoneList = {}
+	local Descendants = Character:GetDescendants() 
 
-	for _,i in next, Character:GetDescendants() do
-		if i:IsA("Bone") then
-			local IsTained = false
-			for _,i2 in next, IgnoreList do
-				if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
-					IsTained = true
-					break
-				end
+	for count=1, #Descendants do
+		local i = Descendants[count]
+		if not i:IsA("Bone") then continue end
+		local IsTained = false
+		for count2=1, #IgnoreList do
+			local i2 = IgnoreList[count2]
+			if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+				IsTained = true
+				break
 			end
-			if IsTained ~= true then
-				table.insert(BoneList, i)
-			end
+		end
+		if IsTained ~= true then
+			table.insert(BoneList, i)
 		end
 	end
 
@@ -74,22 +76,23 @@ function Utility:getMotors(Character, IgnoreList)
 	end
 
 	local MotorList = {}
+	local Descendants = Character:GetDescendants() 
 
-	for _,i in next, Character:GetDescendants() do
-		if i:IsA("Motor6D") and i.Part0 ~= nil and i.Part1 ~= nil then
-			local IsTained = false
-			for _,i2 in next, IgnoreList do
-				if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
-					IsTained = true
-					break
-				end
-			end
-			if IsTained ~= true then
-				table.insert(MotorList, i)
+	for count=1, #Descendants do
+		local i = Descendants[count]
+		if not i:IsA("Motor6D") or i.Part0 == nil or i.Part1 == nil then continue end
+		local IsTained = false
+		for count2=1, #IgnoreList do
+			local i2 = IgnoreList[count2]
+			if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+				IsTained = true
+				break
 			end
 		end
+		if IsTained ~= true then
+			table.insert(MotorList, i)
+		end
 	end
-
 	return MotorList
 end
 
