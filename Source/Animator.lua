@@ -5,11 +5,12 @@ local Parser = animatorRequire("Parser.lua")
 local Utility = animatorRequire("Utility.lua")
 
 local Signal = animatorRequire("Nevermore/Signal.lua")
+local Maid = animatorRequire("Nevermore/Maid.lua")
 
 local Animator = {
 	AnimationData = {},
-	handleVanillaAnimator = true, 
-	Character = nil, 
+	handleVanillaAnimator = true,
+	Character = nil,
 	Looped = false, 
 	Length = 0,
 	Speed = 1,
@@ -39,7 +40,6 @@ function Animator.new(Character, AnimationResolvable)
 	end
 
 	local self = setmetatable({}, Animator)
-	self.Character = Character
 
 	if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then
 		local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable))[1]
@@ -62,9 +62,15 @@ function Animator.new(Character, AnimationResolvable)
 	self.Looped = self.AnimationData.Loop
 	self.Length = self.AnimationData.Frames[#self.AnimationData.Frames].Time
 
+	self._maid = Maid.new()
+
 	self.DidLoop = Signal.new()
 	self.Stopped = Signal.new()
 	self.KeyframeReached = Signal.new()
+	
+	self._maid.DidLoop = self.DidLoop 
+	self._maid.Stopped = self.Stopped
+	self._maid.KeyframeReached = self.KeyframeReached
 	return self
 end
 
@@ -238,6 +244,7 @@ end
 function Animator:GetMarkerReachedSignal(name)
 	if not self._markerSignal[name] then
 		self._markerSignal[name] = Signal.new()
+		self._maid["Marker_"..name] = self._markerSignal[name]
 	end
 	return self._markerSignal[name]
 end
@@ -254,21 +261,8 @@ end
 function Animator:Destroy()
 	self:Stop(0)
 	self.Stopped:Wait()
-
-	-- Maid won't work properly so.
-	self.DidLoop:Destroy()
-	self.DidLoop = nil
-	self.Stopped:Destroy()
-	self.Stopped = nil
-	self.KeyframeReached:Destroy()
-	self.KeyframeReached = nil
-	local MarkerSignal = self._markerSignal
-	for count=1, #MarkerSignal do
-		local s = MarkerSignal[count]
-		s:Destroy()
-		s = nil
-	end
-	self = nil
+	self._maid:DoCleaning()
+	setmetatable(self, nil)
 end
 
 return Animator
