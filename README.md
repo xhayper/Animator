@@ -218,7 +218,9 @@ local ReanimateConfiguration = Nullware.ChipSet({
 	Options = {
 		["Anti-Fling"] = false,
 		["R15 To R6"] = true,
-		["Godmode"] = true
+		["Godmode"] = false,
+		["Disable Torso Collisions"] = false,
+		["Enable Limb Collisions"] = false
 	}
 })
 
@@ -227,9 +229,9 @@ Nullware.Button({
 	Callback = function()
 		if getgenv()["NullwareAPI"] == nil then
 			local options = ReanimateConfiguration:GetOptions()
-			options["Hats To Align"] = {}
+			options["Hats To Align"] = {"All"}
 			options["Netless"] = true
-			options["Head Movement"] = true
+			options["Head Movement Without Godmode"] = true
 			getgenv().Nullware_ReanimateConfiguration = options
 			HttpRequire(NullwareLink:GetText())
 		end
