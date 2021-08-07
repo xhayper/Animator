@@ -35,9 +35,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 
 ## Resources
 
-* Minified - [Here](https://github.com/xhayper/Animator/blob/main/Other/Minified.lua)
 * AIO - [Here](https://github.com/xhayper/Animator/blob/main/Other/AIO.lua)
-* Studio - [Here](https://github.com/xhayper/Animator/blob/main/Other)
 
 ## Installation
 
