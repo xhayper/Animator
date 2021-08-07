@@ -1,9 +1,4 @@
---[[
-  Table to String Created by Pyseph#1015
-  Thank you, Pyseph!
-]]--
-
-local gsub, match, rep, sub,format = string.gsub, string.match, string.rep, string.sub, string.format
+-- Created by Pyseph#1015
 
 local SpecialCharacters = {['\a'] = '\\a', ['\b'] = '\\b', ['\f'] = '\\f', ['\n'] = '\\n', ['\r'] = '\\r', ['\t'] = '\\t', ['\v'] = '\\v', ['\0'] = '\\0'}
 local Keywords = { ['and'] = true, ['break'] = true, ['do'] = true, ['else'] = true, ['elseif'] = true, ['end'] = true, ['false'] = true, ['for'] = true, ['function'] = true, ['if'] = true, ['in'] = true, ['local'] = true, ['nil'] = true, ['not'] = true, ['or'] = true, ['repeat'] = true, ['return'] = true, ['then'] = true, ['true'] = true, ['until'] = true, ['while'] = true, ['continue'] = true}
@@ -14,7 +9,7 @@ function GetHierarchy(Object)
 
 	local ChainLength = 1
 	local Parent = Object
-
+	
 	while Parent do
 		Parent = Parent.Parent
 		ChainLength = ChainLength + 1
@@ -25,10 +20,10 @@ function GetHierarchy(Object)
 	while Parent do
 		Num = Num + 1
 
-		local ObjName = gsub(Parent.Name, '[%c%z]', SpecialCharacters)
+		local ObjName = string.gsub(Parent.Name, '[%c%z]', SpecialCharacters)
 		ObjName = Parent == game and 'game' or ObjName
 
-		if Keywords[ObjName] or not match(ObjName, '^[_%a][_%w]*$') then
+		if Keywords[ObjName] or not string.match(ObjName, '^[_%a][_%w]*$') then
 			ObjName = '["' .. ObjName .. '"]'
 		elseif Num ~= ChainLength - 1 then
 			ObjName = '.' .. ObjName
@@ -43,10 +38,10 @@ end
 local function SerializeType(Value, Class)
 	if Class == 'string' then
 		-- Not using %q as it messes up the special characters fix
-		return format('"%s"', gsub(Value, '[%c%z]', SpecialCharacters))
+		return string.format('"%s"', string.gsub(Value, '[%c%z]', SpecialCharacters))
 	elseif Class == 'Instance' then
 		return GetHierarchy(Value)
-	elseif type(Value) ~= Class and Class ~= "EnumItem" then -- CFrame, Vector3, UDim2, ...
+	elseif type(Value) ~= Class and type(Value)  ~= "EnumItem" then -- CFrame, Vector3, UDim2, ...
 		return Class .. '.new(' .. tostring(Value) .. ')'
 	elseif Class == 'function' then
 		return Functions[Value] or '\'[Unknown ' .. (pcall(setfenv, Value, getfenv(Value)) and 'Lua' or 'C')  .. ' ' .. tostring(Value) .. ']\''
@@ -72,8 +67,8 @@ local function TableToString(Table, IgnoredTables, DepthData, Path)
 	DepthData[2] = Path
 
 	IgnoredTables[Table] = DepthData
-	local Tab = rep('    ', Depth)
-	local TrailingTab = rep('    ', Depth - 1)
+	local Tab = string.rep('    ', Depth)
+	local TrailingTab = string.rep('    ', Depth - 1)
 	local Result = '{'
 
 	local LineTab = '\n' .. Tab
@@ -92,27 +87,28 @@ local function TableToString(Table, IgnoredTables, DepthData, Path)
 		local KeyClass, ValueClass = typeof(Key), typeof(Value)
 		local HasBrackets = false
 		if KeyClass == 'string' then
-			Key = gsub(Key, '[%c%z]', SpecialCharacters)
-			if Keywords[Key] or not match(Key, '^[_%a][_%w]*$') then
+			Key = string.gsub(Key, '[%c%z]', SpecialCharacters)
+			if Keywords[Key] or not string.match(Key, '^[_%a][_%w]*$') then
 				HasBrackets = true
-				Key = format('["%s"]', Key)
+				Key = string.format('["%s"]', Key)
 			end
 		else
 			HasBrackets = true
-			Key = '[' .. (KeyClass == 'table' and gsub(TableToString(Key, IgnoredTables, {Depth, Path}), '^%s*(.-)%s*$', '%1') or SerializeType(Key, KeyClass)) .. ']'
+			Key = '[' .. (KeyClass == 'table' and string.gsub(TableToString(Key, IgnoredTables, {Depth + 1, Path}), '^%s*(.-)%s*$', '%1') or SerializeType(Key, KeyClass)) .. ']'
 		end
 
-		Value = ValueClass == 'table' and TableToString(Value, IgnoredTables, {Depth, Path}, Path .. (HasBrackets and '' or '.') .. Key) or SerializeType(Value, ValueClass)
+		Value = ValueClass == 'table' and TableToString(Value, IgnoredTables, {Depth + 1, Path}, Path .. (HasBrackets and '' or '.') .. Key) or SerializeType(Value, ValueClass)
 		Result = Result .. LineTab .. (HasOrder and Value or Key .. ' = ' .. Value) .. ','
 	end
 
-	return IsEmpty and Result .. '}' or sub(Result,  1, -2) .. '\n' .. TrailingTab .. '}'
+	return IsEmpty and Result .. '}' or string.sub(Result,  1, -2) .. '\n' .. TrailingTab .. '}'
 end
 
--- Below is my Code --
-local Utility = {}
+------------------------------------------------------------------------------------------------------------------------------
 
-function Utility:convertEnum(enum)
+local format = string.format
+
+function convertEnum(enum)
 	local a = tostring(enum):split(".")
 	if a[1] == "Enum" then
 		local p = a[2]
@@ -131,34 +127,98 @@ function Utility:convertEnum(enum)
 	end
 end
 
-local Parser = {}
-
-function Parser:parsePoseData(pose)
-	if not pose:IsA("Pose") then
-		error(format("invalid argument 1 to '_parsePoseData' (Pose expected, got %s)", pose.ClassName))
+function getBones(Character, IgnoreList)
+	IgnoreList = IgnoreList or {}
+	if typeof(Character) ~= "Instance" then
+		error(format("invalid argument 1 to 'getBones' (Instance expected, got %s)", typeof(Character)))
 	end
-	local poseData = {Name = pose.Name, CFrame = pose.CFrame, EasingDirection = Utility:convertEnum(pose.EasingDirection), EasingStyle = Utility:convertEnum(pose.EasingStyle), Weight = pose.Weight}
+
+	if typeof(IgnoreList) ~= "table" then
+		error(format("invalid argument 1 to 'getBones' (Table expected, got %s)", typeof(IgnoreList)))
+	end
+
+	local BoneList = {}
+	local Descendants = Character:GetDescendants() 
+
+	for count=1, #Descendants do
+		local i = Descendants[count]
+		if not i:IsA("Bone") then continue end
+		local IsTained = false
+		for count2=1, #IgnoreList do
+			local i2 = IgnoreList[count2]
+			if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+				IsTained = true
+				break
+			end
+		end
+		if IsTained ~= true then
+			table.insert(BoneList, i)
+		end
+	end
+
+	return BoneList
+end
+
+function getMotors(Character, IgnoreList)
+	IgnoreList = IgnoreList or {}
+	if typeof(Character) ~= "Instance" then
+		error(format("invalid argument 1 to 'getMotors' (Instance expected, got %s)", typeof(Character)))
+	end
+
+	if typeof(IgnoreList) ~= "table" then
+		error(format("invalid argument 1 to 'getMotors' (Table expected, got %s)", typeof(IgnoreList)))
+	end
+
+	local MotorList = {}
+	local Descendants = Character:GetDescendants() 
+
+	for count=1, #Descendants do
+		local i = Descendants[count]
+		if not i:IsA("Motor6D") or i.Part0 == nil or i.Part1 == nil then continue end
+		local IsTained = false
+		for count2=1, #IgnoreList do
+			local i2 = IgnoreList[count2]
+			if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+				IsTained = true
+				break
+			end
+		end
+		if IsTained ~= true then
+			table.insert(MotorList, i)
+		end
+	end
+	return MotorList
+end
+
+function parsePoseData(pose)
+	if not pose:IsA("Pose") then
+		error(format("invalid argument 1 to 'parsePoseData' (Pose expected, got %s)", pose.ClassName))
+	end
+	local poseData = {Name = pose.Name, CFrame = pose.CFrame, EasingDirection = convertEnum(pose.EasingDirection), EasingStyle = convertEnum(pose.EasingStyle), Weight = pose.Weight}
 	if #pose:GetChildren() > 0 then
 		poseData.Subpose = {}
-		for _,p in next, pose:GetChildren() do
-			if p:IsA("Pose") then
-				table.insert(poseData.Subpose, Parser:parsePoseData(p))
-			end
+		local Children = pose:GetChildren()
+		for count=1, #Children do
+			local p = Children[count]
+			if not p:IsA("Pose") then continue end
+			table.insert(poseData.Subpose, parsePoseData(p))
 		end
 	end
 	return poseData
 end
 
-function Parser:parseKeyframeData(keyframe)
+function parseKeyframeData(keyframe)
 	if not keyframe:IsA("Keyframe") then
-		error(format("invalid argument 1 to '_parseKeyframeData' (Keyframe expected, got %s)", keyframe.ClassName))
+		error(format("invalid argument 1 to 'parseKeyframeData' (Keyframe expected, got %s)", keyframe.ClassName))
 	end
 	local keyframeData = {Name = keyframe.Name, Time = keyframe.Time, Pose = {}}
-	for _,p in next, keyframe:GetChildren() do
+	local Children = keyframe:GetChildren()
+	for count=1, #Children do
+		local p = Children[count]
 		if p:IsA("Pose") then
-			table.insert(keyframeData.Pose, Parser:parsePoseData(p))
+			table.insert(keyframeData.Pose, parsePoseData(p))
 		elseif p:IsA("KeyframeMarker") then
-			if not keyframeData.Marker then
+			if not keyframeData["Marker"] then
 				keyframeData.Marker = {}
 			end
 			if not keyframeData.Marker[p.Name] then
@@ -170,15 +230,16 @@ function Parser:parseKeyframeData(keyframe)
 	return keyframeData
 end
 
-function Parser:parseAnimationData(keyframeSequence)
+function parseAnimationData(keyframeSequence)
 	if not keyframeSequence:IsA("KeyframeSequence") then
 		error(format("invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)", keyframeSequence.ClassName))
 	end
 	local animationData = {Loop = keyframeSequence.Loop, Priority = keyframeSequence.Priority, Frames = {}}
-	for _,f in next, keyframeSequence:GetChildren() do
-		if f:IsA("Keyframe") then
-			table.insert(animationData.Frames, Parser:parseKeyframeData(f))
-		end
+	local Children = keyframeSequence:GetChildren()
+	for count=1, #Children do
+		local f = Children[count]
+		if not f:IsA("Keyframe") then continue end
+		table.insert(animationData.Frames, parseKeyframeData(f))
 	end
 
 	table.sort(animationData.Frames, function(l, r)
@@ -189,7 +250,7 @@ function Parser:parseAnimationData(keyframeSequence)
 end
 
 local KeyframeSequnce = path.to.KeyframeSequnce
-local AnimationData = TableToString(Parser:parseAnimationData(KeyframeSequnce))
+local AnimationData = TableToString(parseAnimationData(KeyframeSequnce))
 local stringValue = Instance.new("StringValue", KeyframeSequnce)
 stringValue.Name = "AnimationData"
 stringValue.Value = "local AnimationData = " .. AnimationData

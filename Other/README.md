@@ -1,16 +1,8 @@
 # Animator/Other
 * This folder contain other version of the Animator
 
-## MainModule
-* Roblox Module Version
-* Doesn't support Animation ID, Animation Instance, Support Raw Animation Data and KeyframeSequence
-* Doesn't support Hooking
-
 ## AIO
 * Animator but without HTTP requests and require
-* Much faster than the main one but at the cost of slower update
+* Much faster than the main one
 * HttpRequire isn't included in this version
 * AnimatorRequire isn't included in this version
-
-## Minified
-* Minified Version of AIO
