@@ -401,12 +401,11 @@ function parseAnimationData(keyframeSequence)
 end
 
 local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
 
 local Animator = {
 	AnimationData = {},
-	handleVanillaAnimator = true, 
-	Character = nil, 
+	handleVanillaAnimator = true,
+	Character = nil,
 	Looped = false, 
 	Length = 0,
 	Speed = 1,
@@ -423,6 +422,8 @@ local Animator = {
 local CF,Angles = CFrame.new, CFrame.Angles
 local deg = math.deg
 local clock = os.clock
+local format = string.format
+
 local DefaultMotorCF = CF()
 local DefaultBoneCF = CF(0,0,0)*Angles(deg(0),deg(0),deg(0))
 
@@ -504,7 +505,7 @@ function Animator:_playPose(pose, parent, fade)
 	end
 	if not parent then return end
 	local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
-	coroutine.wrap(function()
+	task.spawn(function()
 		for count=1, #MotorList do
 			local motor = MotorList[count]
 			if motor.Part0.Name ~= parent.Name or motor.Part1.Name ~= pose.Name then continue end
@@ -515,8 +516,8 @@ function Animator:_playPose(pose, parent, fade)
 				motor.Transform = pose.CFrame
 			end
 		end
-	end)()
-	coroutine.wrap(function()
+	end)
+	task.spawn(function()
 		for count=1, #BoneList do
 			local bone = BoneList[count]
 			if parent.Name ~= bone.Parent.Name or bone.Name ~= pose.Name then continue end
@@ -555,7 +556,7 @@ function Animator:Play(fadeTime, weight, speed)
 	end)
 	if self == nil or self.Character.Parent == nil then return end
 	local start = clock()
-	coroutine.wrap(function()
+	task.warp(function()
 		for i=1, #self.AnimationData.Frames do
 			local f = self.AnimationData.Frames[i]
 			if self == nil or self._stopped then break end
@@ -581,7 +582,7 @@ function Animator:Play(fadeTime, weight, speed)
 				end
 			end
 			if t > clock()-start then
-				repeat RunService.Stepped:Wait() until self == nil or self._stopped or clock()-start >= t
+				repeat task.wait() until self == nil or self._stopped or clock()-start >= t
 			end
 		end
 		if self == nil then return end
@@ -590,7 +591,7 @@ function Animator:Play(fadeTime, weight, speed)
 			self._isLooping = true
 			return self:Play(fadeTime, weight, speed)
 		end
-		RunService.Stepped:Wait()
+		task.wait()
 		local TI = TweenInfo.new(self._stopFadeTime or fadeTime, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 		if self.Character then
 			local MotorList = getMotors(self.Character, self._motorIgnoreList)
@@ -627,7 +628,7 @@ function Animator:Play(fadeTime, weight, speed)
 		self._playing = false
 		self.IsPlaying = false
 		self.Stopped:Fire()
-	end)()
+	end)
 end
 
 function Animator:GetTimeOfKeyframe(keyframeName)
@@ -642,6 +643,7 @@ end
 function Animator:GetMarkerReachedSignal(name)
 	if not self._markerSignal[name] then
 		self._markerSignal[name] = Signal.new()
+		self._maid["Marker_"..name] = self._markerSignal[name]
 	end
 	return self._markerSignal[name]
 end
