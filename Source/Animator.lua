@@ -1,5 +1,4 @@
 local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
 
 local Parser = animatorRequire("Parser.lua")
 local Utility = animatorRequire("Utility.lua")
@@ -110,7 +109,7 @@ function Animator:_playPose(pose, parent, fade)
 	end
 	if not parent then return end
 	local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
-	coroutine.wrap(function()
+	task.spawn(function()
 		for count=1, #MotorList do
 			local motor = MotorList[count]
 			if motor.Part0.Name ~= parent.Name or motor.Part1.Name ~= pose.Name then continue end
@@ -121,8 +120,8 @@ function Animator:_playPose(pose, parent, fade)
 				motor.Transform = pose.CFrame
 			end
 		end
-	end)()
-	coroutine.wrap(function()
+	end)
+	task.spawn(function()
 		for count=1, #BoneList do
 			local bone = BoneList[count]
 			if parent.Name ~= bone.Parent.Name or bone.Name ~= pose.Name then continue end
@@ -161,7 +160,7 @@ function Animator:Play(fadeTime, weight, speed)
 	end)
 	if self == nil or self.Character.Parent == nil then return end
 	local start = clock()
-	coroutine.wrap(function()
+	task.warp(function()
 		for i=1, #self.AnimationData.Frames do
 			local f = self.AnimationData.Frames[i]
 			if self == nil or self._stopped then break end
@@ -187,7 +186,7 @@ function Animator:Play(fadeTime, weight, speed)
 				end
 			end
 			if t > clock()-start then
-				repeat RunService.Stepped:Wait() until self == nil or self._stopped or clock()-start >= t
+				repeat task.wait() until self == nil or self._stopped or clock()-start >= t
 			end
 		end
 		if self == nil then return end
@@ -196,7 +195,7 @@ function Animator:Play(fadeTime, weight, speed)
 			self._isLooping = true
 			return self:Play(fadeTime, weight, speed)
 		end
-		RunService.Stepped:Wait()
+		task.wait()
 		local TI = TweenInfo.new(self._stopFadeTime or fadeTime, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 		if self.Character then
 			local MotorList = Utility:getMotors(self.Character, self._motorIgnoreList)
@@ -233,7 +232,7 @@ function Animator:Play(fadeTime, weight, speed)
 		self._playing = false
 		self.IsPlaying = false
 		self.Stopped:Fire()
-	end)()
+	end)
 end
 
 function Animator:GetTimeOfKeyframe(keyframeName)
