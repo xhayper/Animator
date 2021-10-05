@@ -132,7 +132,7 @@ function Animator:_playPose(pose, parent, fade)
 				bone.Transform = pose.CFrame
 			end
 		end
-	end)()
+	end)
 end
 
 function Animator:Play(fadeTime, weight, speed)
