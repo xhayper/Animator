@@ -439,16 +439,16 @@ function Animator.new(Character, AnimationResolvable)
 	if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then
 		local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable))[1]
 		if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID expected)") end
-		self.AnimationData = parseAnimationData(animationInstance)
+		self.AnimationData = Parser:parseAnimationData(animationInstance)
 	elseif typeof(AnimationResolvable) == "table" then
 		self.AnimationData = AnimationResolvable
 	elseif typeof(AnimationResolvable) == "Instance" then
 		if AnimationResolvable:IsA("KeyframeSequence") then
-			self.AnimationData = parseAnimationData(AnimationResolvable)
+			self.AnimationData = Parser:parseAnimationData(AnimationResolvable)
 		elseif AnimationResolvable:IsA("Animation") then
 			local animationInstance = game:GetObjects(AnimationResolvable.AnimationId)[1]
 			if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
-			self.AnimationData = parseAnimationData(animationInstance)
+			self.AnimationData = Parser:parseAnimationData(animationInstance)
 		end
 	else
 		error(format("invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)", typeof(AnimationResolvable)))
@@ -494,8 +494,8 @@ function Animator:GetBoneIgnoreList()
 end
 
 function Animator:_playPose(pose, parent, fade)
-	local MotorList = getMotors(self.Character, self._motorIgnoreList)
-	local BoneList = getBones(self.Character, self._boneIgnoreList)
+	local MotorList = Utility:getMotors(self.Character, self._motorIgnoreList)
+	local BoneList = Utility:getBones(self.Character, self._boneIgnoreList)
 	if pose.Subpose then
 		local SubPose = pose.Subpose
 		for count=1, #SubPose do
@@ -528,7 +528,7 @@ function Animator:_playPose(pose, parent, fade)
 				bone.Transform = pose.CFrame
 			end
 		end
-	end)()
+	end)
 end
 
 function Animator:Play(fadeTime, weight, speed)
@@ -556,7 +556,7 @@ function Animator:Play(fadeTime, weight, speed)
 	end)
 	if self == nil or self.Character.Parent == nil then return end
 	local start = clock()
-	task.warp(function()
+	task.spawn(function()
 		for i=1, #self.AnimationData.Frames do
 			local f = self.AnimationData.Frames[i]
 			if self == nil or self._stopped then break end
@@ -594,8 +594,8 @@ function Animator:Play(fadeTime, weight, speed)
 		task.wait()
 		local TI = TweenInfo.new(self._stopFadeTime or fadeTime, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 		if self.Character then
-			local MotorList = getMotors(self.Character, self._motorIgnoreList)
-			local BoneList = getBones(self.Character, self._boneIgnoreList)
+			local MotorList = Utility:getMotors(self.Character, self._motorIgnoreList)
+			local BoneList = Utility:getBones(self.Character, self._boneIgnoreList)
 			for count=1, #MotorList do
 				local r = MotorList[count]
 				if (self._stopFadeTime or fadeTime) > 0 then
