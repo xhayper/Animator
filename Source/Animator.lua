@@ -160,7 +160,7 @@ function Animator:Play(fadeTime, weight, speed)
 	end)
 	if self == nil or self.Character.Parent == nil then return end
 	local start = clock()
-	task.warp(function()
+	task.spawn(function()
 		for i=1, #self.AnimationData.Frames do
 			local f = self.AnimationData.Frames[i]
 			if self == nil or self._stopped then break end
