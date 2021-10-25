@@ -136,11 +136,8 @@ if getgenv()["Animator"] == nil then
 end
 
 -- Main --
-local RunService = game:GetService("RunService")
-
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
-
 
 local currentAnim
 
@@ -177,7 +174,7 @@ local Play = Main.Button({
 		if currentAnim ~= nil and currentAnim.IsPlaying == true then
 			currentAnim:Stop(0) -- Honestly, :Destroy() might work better, but i can't seem to get it to work
 			currentAnim.Stopped:Wait()
-			RunService.Heartbeat:Wait()
+			task.wait()
 		end
 		currentAnim = Animator.new(Player.Character, Animation:GetText())
 		if getgenv()["NullwareAPI"] then -- Nullware Complatible
