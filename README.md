@@ -2,8 +2,6 @@
 
 Alternative Roblox animation player to fit your "Animating/Whatever" need
 
-[Discord](https://discord.gg/D6A4WUe7hj)
-
 ## Features
 
 * Easy To Use
@@ -36,6 +34,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 ## Resources
 
 * AIO - [Here](https://github.com/xhayper/Animator/blob/main/Other/AIO.lua)
+* Minified - [Here](https://github.com/xhayper/Animator/blob/main/Other/Minified.lua)
 
 ## Installation
 
