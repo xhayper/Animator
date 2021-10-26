@@ -86,7 +86,10 @@ local function repr(value, reprSettings, dontEscape)
 	elseif type(v) == "nil" then
 		return "nil"
 	elseif type(v) == "table" and type(v.__tostring) == "function" then
-		return tostring(v.__tostring(v))
+	    	local success,string = pcall(function()
+			return tostring(v.__tostring(v)) 
+	    	end)
+		return success and string or "\"Error while calling \\\"__tostring\\\"\""
 	elseif type(v) == "table" and getmetatable(v) and type(getmetatable(v).__tostring) == "function" then
 		return tostring(getmetatable(v).__tostring(v))
 	elseif type(v) == "table" then
