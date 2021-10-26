@@ -468,6 +468,8 @@ function Animator.new(Character, AnimationResolvable)
 	self._maid.DidLoop = self.DidLoop 
 	self._maid.Stopped = self.Stopped
 	self._maid.KeyframeReached = self.KeyframeReached
+	
+	self._table = self
 	return self
 end
 
@@ -661,7 +663,7 @@ function Animator:Destroy()
 	self:Stop(0)
 	self.Stopped:Wait()
 	self._maid:DoCleaning()
-	setmetatable(self, nil)
+	setmetatable(self._table, nil)
 end
 
 getgenv().Animator = Animator
