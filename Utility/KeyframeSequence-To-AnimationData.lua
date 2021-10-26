@@ -91,7 +91,10 @@ local function repr(value, reprSettings, dontEscape)
 	    	end)
 		return success and string or "\"Error while calling \\\"__tostring\\\"\""
 	elseif type(v) == "table" and getmetatable(v) and type(getmetatable(v).__tostring) == "function" then
-		return tostring(getmetatable(v).__tostring(v))
+	    	local success,string = pcall(function()
+	        	return tostring(getmetatable(v).__tostring(v))
+	    	end)
+		return success and string or "\"Error while calling \\\"getmetatable(v).__tostring(v)\\\"\""
 	elseif type(v) == "table" then
 		if shown[v] then return "{CYCLIC}" end
 		shown[v] = true
