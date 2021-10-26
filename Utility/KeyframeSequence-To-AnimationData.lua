@@ -96,7 +96,7 @@ local function repr(value, reprSettings, dontEscape)
 	    	end)
 		return success and string or "\"Error while calling \\\"getmetatable(v).__tostring(v)\\\"\""
 	elseif type(v) == "table" then
-		if shown[v] then return "{CYCLIC}" end
+		if shown[v] then return "\"{CYCLIC}\"" end
 		shown[v] = true
 		local str = "{" .. (reprSettings.pretty and ("\n" .. INDENT .. tabs) or "")
 		local isArray = true
@@ -235,16 +235,16 @@ local function repr(value, reprSettings, dontEscape)
 			v.Density, v.Friction, v.Elasticity, v.FrictionWeight, v.ElasticityWeight
 			)
 		elseif typeof(v) == "Random" then
-			return "<Random>"
+			return "\"<Random>\""
 		elseif typeof(v) == "Ray" then
 			return ("Ray.new(%s, %s)"):format(
 			repr(v.Origin, reprSettings),
 			repr(v.Direction, reprSettings)
 			)
 		elseif typeof(v) == "RBXScriptConnection" then
-			return "<RBXScriptConnection>"
+			return "\"<RBXScriptConnection>\""
 		elseif typeof(v) == "RBXScriptSignal" then
-			return "<RBXScriptSignal>"
+			return "\"<RBXScriptSignal>\""
 		elseif typeof(v) == "Rect" then
 			return ("Rect.new(%d, %d, %d, %d)"):format(
 			v.Min.X, v.Min.Y, v.Max.X, v.Max.Y
@@ -283,12 +283,13 @@ local function repr(value, reprSettings, dontEscape)
 		elseif typeof(v) == "Vector3int16" then
 			return ("Vector3int16.new(%d, %d, %d)"):format(v.X, v.Y, v.Z)
 		else
-			return "<Roblox:" .. typeof(v) .. ">"
+			return "\"<Roblox:" .. typeof(v) .. ">\""
 		end
 	else
-		return "<" .. type(v) .. ">"
+		return "\"<" .. type(v) .. ">\""
 	end
 end
+
 ------------------------------------------------------------------------------------------------------------------------------
 
 local format = string.format
