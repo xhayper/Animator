@@ -302,7 +302,7 @@ function getBones(Character, IgnoreList)
 				break
 			end
 		end
-		if IsTained ~= true then
+		if not IsTained then
 			table.insert(BoneList, i)
 		end
 	end
@@ -334,7 +334,7 @@ function getMotors(Character, IgnoreList)
 				break
 			end
 		end
-		if IsTained ~= true then
+		if not IsTained then
 			table.insert(MotorList, i)
 		end
 	end
