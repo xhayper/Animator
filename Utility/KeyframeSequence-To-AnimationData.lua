@@ -145,9 +145,9 @@ local function repr(value, reprSettings)
 	elseif typeof then
 		-- Check Roblox types
 		if typeof(v) == "Instance" then
-			return  "\""..(reprSettings.robloxFullName
+			return  (reprSettings.robloxClassName and "\"" or "") .. (reprSettings.robloxFullName
 				and (reprSettings.robloxProperFullName and properFullName(v) or v:GetFullName())
-				or v.Name) .. (reprSettings.robloxClassName and ((" (%s)"):format(v.ClassName)) or "").."\""
+				or v.Name) .. (reprSettings.robloxClassName and ((" (%s)\""):format(v.ClassName)) or "")
 		elseif typeof(v) == "Axes" then
 			local s = {}
 			if v.X then table.insert(s, repr(Enum.Axis.X, reprSettings)) end
