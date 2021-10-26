@@ -81,9 +81,11 @@ Animator.KeyframeReached:Connect(keyframeName) -- On keyframe reached (Only trig
 
 -- Globals --
 
-HttpRequire("HttpLink") -- Require the module using GET Request, Must start with 'http://' or 'https://'
+HttpRequire("HttpLink", noCache) -- Require the module using GET Request, Must start with 'http://' or 'https://', Second arguement meant if the function should pull from cache if it exist
 animatorRequire("Path") -- Used by Animator, Same as HttpRequire but with this repo link as the prefix
 hookAnimatorFunction() -- Hook animator to Humanoid:LoadAnimation()
+
+httpRequireCache -- Used by HttpRequire to cache the response
 
 -- Hooks --
 -- This will only work if you call hookAnimatorFunction()
