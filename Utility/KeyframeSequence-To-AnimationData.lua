@@ -58,7 +58,7 @@ local shown
 local INDENT
 local reprSettings
 
-local function repr(value, reprSettings, dontEscape)
+local function repr(value, reprSettings)
 	reprSettings = reprSettings or defaultSettings
 	INDENT = (" "):rep(reprSettings.spaces or defaultSettings.spaces)
 	if reprSettings.tabs then
@@ -72,11 +72,7 @@ local function repr(value, reprSettings, dontEscape)
 		shown = {}
 	end
 	if type(v) == "string" then
-		local success,t = pcall(function()
-			return HttpService:JSONDecode(v)
-		end)
-		if success then return "game:GetService(\"HttpService\"):JSONEncode(" .. repr(t, reprSettings, true) .. ")" end
-		return dontEscape and v or ("%q"):format(v)
+		return ("%q"):format(v)
 	elseif type(v) == "number" then
 		if v == math.huge then return "math.huge" end
 		if v == -math.huge then return "-math.huge" end
