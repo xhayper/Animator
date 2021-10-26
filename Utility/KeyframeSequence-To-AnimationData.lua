@@ -58,7 +58,7 @@ local shown
 local INDENT
 local reprSettings
 
-local function repr(value, reprSettings)
+local function repr(value, reprSettings, dontEscape)
 	reprSettings = reprSettings or defaultSettings
 	INDENT = (" "):rep(reprSettings.spaces or defaultSettings.spaces)
 	if reprSettings.tabs then
@@ -72,7 +72,11 @@ local function repr(value, reprSettings)
 		shown = {}
 	end
 	if type(v) == "string" then
-		return ("%q"):format(v)
+		local success,t = pcall(function()
+			return HttpService:JSONDecode(v)
+		end)
+		if success then return "game:GetService(\"HttpService\"):JSONEncode(" .. repr(t, reprSettings, true) .. ")" end
+		return dontEscape and v or ("%q"):format(v)
 	elseif type(v) == "number" then
 		if v == math.huge then return "math.huge" end
 		if v == -math.huge then return "-math.huge" end
@@ -145,9 +149,9 @@ local function repr(value, reprSettings)
 	elseif typeof then
 		-- Check Roblox types
 		if typeof(v) == "Instance" then
-			return  (reprSettings.robloxFullName
+			return  "\""..(reprSettings.robloxFullName
 				and (reprSettings.robloxProperFullName and properFullName(v) or v:GetFullName())
-				or v.Name) .. (reprSettings.robloxClassName and ((" (%s)"):format(v.ClassName)) or "")
+				or v.Name) .. (reprSettings.robloxClassName and ((" (%s)"):format(v.ClassName)) or "").."\""
 		elseif typeof(v) == "Axes" then
 			local s = {}
 			if v.X then table.insert(s, repr(Enum.Axis.X, reprSettings)) end
@@ -285,7 +289,6 @@ local function repr(value, reprSettings)
 		return "\"<" .. type(v) .. ">\""
 	end
 end
-
 ------------------------------------------------------------------------------------------------------------------------------
 
 local format = string.format
