@@ -14,15 +14,17 @@ function Utility:sendNotif(Text, Icon, Duration, Button1, Button2, Callback)
 	})
 end
 
+local EnumTable = {
+	["PoseEasingDirection"] = "EasingDirection",
+	["PoseEasingStyle"] = "EasingStyle"
+}
+
 function Utility:convertEnum(enum)
 	local a = tostring(enum):split(".")
 	if a[1] == "Enum" then
 		local p = a[2]
 		local v = a[3]
-		local EnumTable = {
-			["PoseEasingDirection"] = "EasingDirection",
-			["PoseEasingStyle"] = "EasingStyle"
-		}
+		v = v == "Constant" and "Linear" or v
 		if EnumTable[p] then
 			return Enum[EnumTable[p]][v]
 		else
