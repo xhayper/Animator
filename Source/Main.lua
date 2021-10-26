@@ -4,12 +4,9 @@ local moduleCahce = {}
 
 getgenv().HttpRequire = function(path, noCache)
 	if string.sub(path, 1, 8) == "https://" or string.sub(path, 1, 7) == "http://" then
-		-- too lazy to do regex
-		local url = string.gsub(path, "https://", "")
-		url = string.gsub(url, "http://", "")
-		if not noCache and moduleCahce[url] then return moduleCahce[url] end
-		moduleCahce[url] = loadstring(syn and syn.request and syn.request({Url = path}).Body or game:HttpGet(path))()
-		return moduleCahce[url]
+		if not noCache and moduleCahce[path] then return moduleCahce[path] end
+		moduleCahce[path] = loadstring(syn and syn.request and syn.request({Url = path}).Body or game:HttpGet(path))()
+		return moduleCahce[path]
 	else
 		return require(path)
 	end
