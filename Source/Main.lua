@@ -1,8 +1,15 @@
 local pathToGithub = "https://raw.githubusercontent.com/xhayper/Animator/main/Source/"
 
-getgenv().HttpRequire = function(path)
+local moduleCahce = {}
+
+getgenv().HttpRequire = function(path, noCache)
 	if string.sub(path, 1, 8) == "https://" or string.sub(path, 1, 7) == "http://" then
-		return loadstring(syn and syn.request and syn.request({Url = path}).Body or game:HttpGet(path))()
+		-- too lazy to do regex
+		local url = string.gsub(path, "https://", "")
+		url = string.gsub(url, "http://", "")
+		if not noCache and moduleCahce[url] then return moduleCahce[url] end
+		moduleCahce[url] = loadstring(syn and syn.request and syn.request({Url = path}).Body or game:HttpGet(path))()
+		return moduleCahce[url]
 	else
 		return require(path)
 	end
