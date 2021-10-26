@@ -85,7 +85,8 @@ HttpRequire("HttpLink", noCache) -- Require the module using GET Request, Must s
 animatorRequire("Path") -- Used by Animator, Same as HttpRequire but with this repo link as the prefix
 hookAnimatorFunction() -- Hook animator to Humanoid:LoadAnimation()
 
-httpRequireCache -- Used by HttpRequire to cache the response
+httpRequireCache -- Table, Used by HttpRequire to cache the loadstring(response)()
+-- [URL Path] = loadstring(response)()
 
 -- Hooks --
 -- This will only work if you call hookAnimatorFunction()
