@@ -85,7 +85,7 @@ local function repr(value, reprSettings)
 	    	local success,string = pcall(function()
 			return tostring(v.__tostring(v)) 
 	    	end)
-		return success and string or "\"Error while calling \\\"__tostring\\\"\""
+		return success and string or "\"Error while calling \\\"__tostring(v)\\\"\""
 	elseif type(v) == "table" and getmetatable(v) and type(getmetatable(v).__tostring) == "function" then
 	    	local success,string = pcall(function()
 	        	return tostring(getmetatable(v).__tostring(v))
