@@ -234,7 +234,3 @@ Nullware.Button({
 	end
 })
 ```
-
-## Note
-* I did this for fun, if you get banned for this, it's your fault
-* I am bored so i make this
