@@ -619,7 +619,7 @@ function Animator:Play(fadeTime, weight, speed)
 				end
 			end
 			if self.handleVanillaAnimator and self.Character:FindFirstChild("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") then
-				Instance.new("Animator", self.Character.Humanoid)
+				Instance.new("Animator").Parent = self.Character.Humanoid
 			end
 		end
 		if con then
