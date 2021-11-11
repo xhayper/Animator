@@ -21,7 +21,6 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 * Weight System (Idk how)
 * Seeking froward, Backward (Idk how)
 * Heavy Optimization
-* ~~Character instead of Player~~ Completed!
 
 ## Credits
 * Whited - Metatable Hook
