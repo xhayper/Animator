@@ -29,7 +29,7 @@ local clock = os.clock
 local format = string.format
 
 local DefaultMotorCF = CF()
-local DefaultBoneCF = CF(0,0,0)*Angles(deg(0),deg(0),deg(0))
+local DefaultBoneCF = DefaultMotorCF*Angles(deg(0),deg(0),deg(0))
 
 Animator.__index = Animator
 
