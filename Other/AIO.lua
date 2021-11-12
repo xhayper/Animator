@@ -243,7 +243,7 @@ function Signal:Destroy()
 	setmetatable(self, nil)
 end
 
---------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
 
 local format = string.format
 
@@ -341,6 +341,8 @@ function getMotors(Character, IgnoreList)
 	return MotorList
 end
 
+---------------------------------------------------------------------------------------------------------------------------
+
 function parsePoseData(pose)
 	if not pose:IsA("Pose") then
 		error(format("invalid argument 1 to 'parsePoseData' (Pose expected, got %s)", pose.ClassName))
@@ -400,6 +402,8 @@ function parseAnimationData(keyframeSequence)
 	return animationData
 end
 
+---------------------------------------------------------------------------------------------------------------------------
+
 local TweenService = game:GetService("TweenService")
 
 local Animator = {
@@ -425,7 +429,7 @@ local clock = os.clock
 local format = string.format
 
 local DefaultMotorCF = CF()
-local DefaultBoneCF = CF(0,0,0)*Angles(deg(0),deg(0),deg(0))
+local DefaultBoneCF = DefaultMotorCF*Angles(deg(0),deg(0),deg(0))
 
 Animator.__index = Animator
 
@@ -468,8 +472,6 @@ function Animator.new(Character, AnimationResolvable)
 	self._maid.DidLoop = self.DidLoop 
 	self._maid.Stopped = self.Stopped
 	self._maid.KeyframeReached = self.KeyframeReached
-	
-	self._table = self
 	return self
 end
 
@@ -535,13 +537,12 @@ end
 
 function Animator:Play(fadeTime, weight, speed)
 	fadeTime = fadeTime or 0.100000001
-	if self._playing and not self._isLooping then return end
+	if not self.Character or self.Character.Parent == nil or self._playing and not self._isLooping then return end
 	self._playing = true
 	self._isLooping = false
 	self.IsPlaying = true
 	local con
 	local con2
-	if not self.Character then return end
 	if self.Character:FindFirstChild("Humanoid") then
 		con = self.Character.Humanoid.Died:Connect(function()
 			self:Destroy()
@@ -556,12 +557,11 @@ function Animator:Play(fadeTime, weight, speed)
 		self:Destroy()
 		con2:Disconnect()
 	end)
-	if self == nil or self.Character.Parent == nil then return end
 	local start = clock()
 	task.spawn(function()
 		for i=1, #self.AnimationData.Frames do
+			if self._stopped then break end
 			local f = self.AnimationData.Frames[i]
-			if self == nil or self._stopped then break end
 			local t = f.Time / (speed or self.Speed)
 			if f.Name ~= "Keyframe" then
 				self.KeyframeReached:Fire(f.Name)
@@ -584,10 +584,15 @@ function Animator:Play(fadeTime, weight, speed)
 				end
 			end
 			if t > clock()-start then
-				repeat task.wait() until self == nil or self._stopped or clock()-start >= t
+				repeat task.wait() until self._stopped or clock()-start >= t
 			end
 		end
-		if self == nil then return end
+		if con then
+			con:Disconnect()
+		end
+		if con2 then
+			con2:Disconnect()
+		end
 		if self.Looped and not self._stopped then
 			self.DidLoop:Fire()
 			self._isLooping = true
@@ -622,10 +627,6 @@ function Animator:Play(fadeTime, weight, speed)
 				Instance.new("Animator").Parent = self.Character.Humanoid
 			end
 		end
-		if con then
-			con:Disconnect()
-		end
-		con2:Disconnect()
 		self._stopped = false
 		self._playing = false
 		self.IsPlaying = false
@@ -639,7 +640,7 @@ function Animator:GetTimeOfKeyframe(keyframeName)
 		if f.Name ~= keyframeName then continue end
 		return f.Time
 	end
-	return math.huge
+	return 0
 end
 
 function Animator:GetMarkerReachedSignal(name)
@@ -663,8 +664,9 @@ function Animator:Destroy()
 	self:Stop(0)
 	self.Stopped:Wait()
 	self._maid:DoCleaning()
-	setmetatable(self._table, nil)
 end
+
+---------------------------------------------------------------------------------------------------------------------------
 
 getgenv().Animator = Animator
 
