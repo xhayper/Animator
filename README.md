@@ -14,6 +14,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 
 * I gonna be real with you, this code is not that optimized
 * This will lag a lot in some game, Until heavy optimization can be made, don't play that game if it lag
+* This doesn't replicate, you will need to re-animate with nullware
 
 ## Planned Feature
 
