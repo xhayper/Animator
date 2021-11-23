@@ -6,38 +6,69 @@
 local HttpService = game:GetService("HttpService")
 
 local defaultSettings = {
-	pretty = false;
-	robloxFullName = false;
-	robloxProperFullName = true;
-	robloxClassName = true;
-	tabs = false;
-	semicolons = false;
-	spaces = 3;
-	sortKeys = true;
+	pretty = false,
+	robloxFullName = false,
+	robloxProperFullName = true,
+	robloxClassName = true,
+	tabs = false,
+	semicolons = false,
+	spaces = 3,
+	sortKeys = true,
 }
 
 -- lua keywords
-local keywords = {["and"]=true, ["break"]=true, ["do"]=true, ["else"]=true,
-	["elseif"]=true, ["end"]=true, ["false"]=true, ["for"]=true, ["function"]=true,
-	["if"]=true, ["in"]=true, ["local"]=true, ["nil"]=true, ["not"]=true, ["or"]=true,
-	["repeat"]=true, ["return"]=true, ["then"]=true, ["true"]=true, ["until"]=true, ["while"]=true}
+local keywords = {
+	["and"] = true,
+	["break"] = true,
+	["do"] = true,
+	["else"] = true,
+	["elseif"] = true,
+	["end"] = true,
+	["false"] = true,
+	["for"] = true,
+	["function"] = true,
+	["if"] = true,
+	["in"] = true,
+	["local"] = true,
+	["nil"] = true,
+	["not"] = true,
+	["or"] = true,
+	["repeat"] = true,
+	["return"] = true,
+	["then"] = true,
+	["true"] = true,
+	["until"] = true,
+	["while"] = true,
+}
 
 local function isLuaIdentifier(str)
-	if type(str) ~= "string" then return false end
+	if type(str) ~= "string" then
+		return false
+	end
 	-- must be nonempty
-	if str:len() == 0 then return false end
+	if str:len() == 0 then
+		return false
+	end
 	-- can only contain a-z, A-Z, 0-9 and underscore
-	if str:find("[^%d%a_]") then return false end
+	if str:find("[^%d%a_]") then
+		return false
+	end
 	-- cannot begin with digit
-	if tonumber(str:sub(1, 1)) then return false end
+	if tonumber(str:sub(1, 1)) then
+		return false
+	end
 	-- cannot be keyword
-	if keywords[str] then return false end
+	if keywords[str] then
+		return false
+	end
 	return true
 end
 
 -- works like Instance:GetFullName(), but invalid Lua identifiers are fixed (e.g. workspace["The Dude"].Humanoid)
 local function properFullName(object, usePeriod)
-	if object == nil or object == game then return "" end
+	if object == nil or object == game then
+		return ""
+	end
 
 	local s = object.Name
 	local usePeriod = true
@@ -49,7 +80,7 @@ local function properFullName(object, usePeriod)
 	if not object.Parent or object.Parent == game then
 		return s
 	else
-		return properFullName(object.Parent) .. (usePeriod and "." or "") .. s 
+		return properFullName(object.Parent) .. (usePeriod and "." or "") .. s
 	end
 end
 
@@ -74,25 +105,31 @@ local function repr(value, reprSettings)
 	if type(v) == "string" then
 		return ("%q"):format(v)
 	elseif type(v) == "number" then
-		if v == math.huge then return "math.huge" end
-		if v == -math.huge then return "-math.huge" end
+		if v == math.huge then
+			return "math.huge"
+		end
+		if v == -math.huge then
+			return "-math.huge"
+		end
 		return tonumber(v)
 	elseif type(v) == "boolean" then
 		return tostring(v)
 	elseif type(v) == "nil" then
 		return "nil"
 	elseif type(v) == "table" and type(v.__tostring) == "function" then
-	    	local success,string = pcall(function()
-			return tostring(v.__tostring(v)) 
-	    	end)
-		return success and string or "\"Error while calling \\\"__tostring(v)\\\"\""
+		local success, string = pcall(function()
+			return tostring(v.__tostring(v))
+		end)
+		return success and string or '"Error while calling \\"__tostring(v)\\""'
 	elseif type(v) == "table" and getmetatable(v) and type(getmetatable(v).__tostring) == "function" then
-	    	local success,string = pcall(function()
-	        	return tostring(getmetatable(v).__tostring(v))
-	    	end)
-		return success and string or "\"Error while calling \\\"getmetatable(v).__tostring(v)\\\"\""
+		local success, string = pcall(function()
+			return tostring(getmetatable(v).__tostring(v))
+		end)
+		return success and string or '"Error while calling \\"getmetatable(v).__tostring(v)\\""'
 	elseif type(v) == "table" then
-		if shown[v] then return "\"{CYCLIC}\"" end
+		if shown[v] then
+			return '"{CYCLIC}"'
+		end
 		shown[v] = true
 		local str = "{" .. (reprSettings.pretty and ("\n" .. INDENT .. tabs) or "")
 		local isArray = true
@@ -105,7 +142,9 @@ local function repr(value, reprSettings)
 		if isArray then
 			for i = 1, #v do
 				if i ~= 1 then
-					str = str .. (reprSettings.semicolons and ";" or ",") .. (reprSettings.pretty and ("\n" .. INDENT .. tabs) or " ")
+					str = str
+						.. (reprSettings.semicolons and ";" or ",")
+						.. (reprSettings.pretty and ("\n" .. INDENT .. tabs) or " ")
 				end
 				depth = depth + 1
 				str = str .. repr(v[i], reprSettings)
@@ -126,11 +165,15 @@ local function repr(value, reprSettings)
 				keyValueStrings[kStr] = vStr
 				depth = depth - 1
 			end
-			if reprSettings.sortKeys then table.sort(keyOrder) end
+			if reprSettings.sortKeys then
+				table.sort(keyOrder)
+			end
 			local first = true
 			for _, kStr in pairs(keyOrder) do
 				if not first then
-					str = str .. (reprSettings.semicolons and ";" or ",") .. (reprSettings.pretty and ("\n" .. INDENT .. tabs) or " ")
+					str = str
+						.. (reprSettings.semicolons and ";" or ",")
+						.. (reprSettings.pretty and ("\n" .. INDENT .. tabs) or " ")
 				end
 				str = str .. ("%s = %s"):format(kStr, keyValueStrings[kStr])
 				first = false
@@ -145,19 +188,25 @@ local function repr(value, reprSettings)
 	elseif typeof then
 		-- Check Roblox types
 		if typeof(v) == "Instance" then
-			return  (reprSettings.robloxClassName and "\"" or "") .. (reprSettings.robloxFullName
-				and (reprSettings.robloxProperFullName and properFullName(v) or v:GetFullName())
-				or v.Name) .. (reprSettings.robloxClassName and ((" (%s)\""):format(v.ClassName)) or "")
+			return (reprSettings.robloxClassName and '"' or "")
+				.. (reprSettings.robloxFullName and (reprSettings.robloxProperFullName and properFullName(v) or v:GetFullName()) or v.Name)
+				.. (reprSettings.robloxClassName and ((' (%s)"'):format(v.ClassName)) or "")
 		elseif typeof(v) == "Axes" then
 			local s = {}
-			if v.X then table.insert(s, repr(Enum.Axis.X, reprSettings)) end
-			if v.Y then table.insert(s, repr(Enum.Axis.Y, reprSettings)) end
-			if v.Z then table.insert(s, repr(Enum.Axis.Z, reprSettings)) end
+			if v.X then
+				table.insert(s, repr(Enum.Axis.X, reprSettings))
+			end
+			if v.Y then
+				table.insert(s, repr(Enum.Axis.Y, reprSettings))
+			end
+			if v.Z then
+				table.insert(s, repr(Enum.Axis.Z, reprSettings))
+			end
 			return ("Axes.new(%s)"):format(table.concat(s, ", "))
 		elseif typeof(v) == "BrickColor" then
 			return ("BrickColor.new(%q)"):format(v.Name)
 		elseif typeof(v) == "CFrame" then
-			return ("CFrame.new(%s)"):format(table.concat({v:GetComponents()}, ", "))
+			return ("CFrame.new(%s)"):format(table.concat({ v:GetComponents() }, ", "))
 		elseif typeof(v) == "Color3" then
 			return ("Color3.new(%d, %d, %d)"):format(v.r, v.g, v.b)
 		elseif typeof(v) == "ColorSequence" then
@@ -168,8 +217,8 @@ local function repr(value, reprSettings)
 					return ("ColorSequence.new(%s)"):format(repr(v.Keypoints[1].Value, reprSettings))
 				else
 					return ("ColorSequence.new(%s, %s)"):format(
-					repr(v.Keypoints[1].Value, reprSettings),
-					repr(v.Keypoints[2].Value, reprSettings)
+						repr(v.Keypoints[1].Value, reprSettings),
+						repr(v.Keypoints[2].Value, reprSettings)
 					)
 				end
 			end
@@ -177,13 +226,13 @@ local function repr(value, reprSettings)
 			return ("ColorSequenceKeypoint.new(%d, %s)"):format(v.Time, repr(v.Value, reprSettings))
 		elseif typeof(v) == "DockWidgetPluginGuiInfo" then
 			return ("DockWidgetPluginGuiInfo.new(%s, %s, %s, %s, %s, %s, %s)"):format(
-			repr(v.InitialDockState, reprSettings),
-			repr(v.InitialEnabled, reprSettings),
-			repr(v.InitialEnabledShouldOverrideRestore, reprSettings),
-			repr(v.FloatingXSize, reprSettings),
-			repr(v.FloatingYSize, reprSettings),
-			repr(v.MinWidth, reprSettings),
-			repr(v.MinHeight, reprSettings)
+				repr(v.InitialDockState, reprSettings),
+				repr(v.InitialEnabled, reprSettings),
+				repr(v.InitialEnabledShouldOverrideRestore, reprSettings),
+				repr(v.FloatingXSize, reprSettings),
+				repr(v.FloatingYSize, reprSettings),
+				repr(v.MinWidth, reprSettings),
+				repr(v.MinHeight, reprSettings)
 			)
 		elseif typeof(v) == "Enums" then
 			return "Enums"
@@ -222,54 +271,44 @@ local function repr(value, reprSettings)
 				return ("NumberSequenceKeypoint.new(%d, %d)"):format(v.Time, v.Value)
 			end
 		elseif typeof(v) == "PathWaypoint" then
-			return ("PathWaypoint.new(%s, %s)"):format(
-			repr(v.Position, reprSettings),
-			repr(v.Action, reprSettings)
-			)
+			return ("PathWaypoint.new(%s, %s)"):format(repr(v.Position, reprSettings), repr(v.Action, reprSettings))
 		elseif typeof(v) == "PhysicalProperties" then
 			return ("PhysicalProperties.new(%d, %d, %d, %d, %d)"):format(
-			v.Density, v.Friction, v.Elasticity, v.FrictionWeight, v.ElasticityWeight
+				v.Density,
+				v.Friction,
+				v.Elasticity,
+				v.FrictionWeight,
+				v.ElasticityWeight
 			)
 		elseif typeof(v) == "Random" then
-			return "\"<Random>\""
+			return '"<Random>"'
 		elseif typeof(v) == "Ray" then
-			return ("Ray.new(%s, %s)"):format(
-			repr(v.Origin, reprSettings),
-			repr(v.Direction, reprSettings)
-			)
+			return ("Ray.new(%s, %s)"):format(repr(v.Origin, reprSettings), repr(v.Direction, reprSettings))
 		elseif typeof(v) == "RBXScriptConnection" then
-			return "\"<RBXScriptConnection>\""
+			return '"<RBXScriptConnection>"'
 		elseif typeof(v) == "RBXScriptSignal" then
-			return "\"<RBXScriptSignal>\""
+			return '"<RBXScriptSignal>"'
 		elseif typeof(v) == "Rect" then
-			return ("Rect.new(%d, %d, %d, %d)"):format(
-			v.Min.X, v.Min.Y, v.Max.X, v.Max.Y
-			)
+			return ("Rect.new(%d, %d, %d, %d)"):format(v.Min.X, v.Min.Y, v.Max.X, v.Max.Y)
 		elseif typeof(v) == "Region3" then
-			local min = v.CFrame.p + v.Size * -.5
-			local max = v.CFrame.p + v.Size * .5
-			return ("Region3.new(%s, %s)"):format(
-			repr(min, reprSettings),
-			repr(max, reprSettings)
-			)
+			local min = v.CFrame.p + v.Size * -0.5
+			local max = v.CFrame.p + v.Size * 0.5
+			return ("Region3.new(%s, %s)"):format(repr(min, reprSettings), repr(max, reprSettings))
 		elseif typeof(v) == "Region3int16" then
-			return ("Region3int16.new(%s, %s)"):format(
-			repr(v.Min, reprSettings),
-			repr(v.Max, reprSettings)
-			)
+			return ("Region3int16.new(%s, %s)"):format(repr(v.Min, reprSettings), repr(v.Max, reprSettings))
 		elseif typeof(v) == "TweenInfo" then
 			return ("TweenInfo.new(%d, %s, %s, %d, %s, %d)"):format(
-			v.Time, repr(v.EasingStyle, reprSettings), repr(v.EasingDirection, reprSettings),
-			v.RepeatCount, repr(v.Reverses, reprSettings), v.DelayTime
+				v.Time,
+				repr(v.EasingStyle, reprSettings),
+				repr(v.EasingDirection, reprSettings),
+				v.RepeatCount,
+				repr(v.Reverses, reprSettings),
+				v.DelayTime
 			)
 		elseif typeof(v) == "UDim" then
-			return ("UDim.new(%d, %d)"):format(
-			v.Scale, v.Offset
-			)
+			return ("UDim.new(%d, %d)"):format(v.Scale, v.Offset)
 		elseif typeof(v) == "UDim2" then
-			return ("UDim2.new(%d, %d, %d, %d)"):format(
-			v.X.Scale, v.X.Offset, v.Y.Scale, v.Y.Offset
-			)
+			return ("UDim2.new(%d, %d, %d, %d)"):format(v.X.Scale, v.X.Offset, v.Y.Scale, v.Y.Offset)
 		elseif typeof(v) == "Vector2" then
 			return ("Vector2.new(%d, %d)"):format(v.X, v.Y)
 		elseif typeof(v) == "Vector2int16" then
@@ -279,10 +318,10 @@ local function repr(value, reprSettings)
 		elseif typeof(v) == "Vector3int16" then
 			return ("Vector3int16.new(%d, %d, %d)"):format(v.X, v.Y, v.Z)
 		else
-			return "\"<Roblox:" .. typeof(v) .. ">\""
+			return '"<Roblox:' .. typeof(v) .. '>"'
 		end
 	else
-		return "\"<" .. type(v) .. ">\""
+		return '"<' .. type(v) .. '>"'
 	end
 end
 ------------------------------------------------------------------------------------------------------------------------------
@@ -291,7 +330,7 @@ local format = string.format
 
 local EnumTable = {
 	["PoseEasingDirection"] = "EasingDirection",
-	["PoseEasingStyle"] = "EasingStyle"
+	["PoseEasingStyle"] = "EasingStyle",
 }
 
 function convertEnum(enum)
@@ -321,13 +360,15 @@ function getBones(Character, IgnoreList)
 	end
 
 	local BoneList = {}
-	local Descendants = Character:GetDescendants() 
+	local Descendants = Character:GetDescendants()
 
-	for count=1, #Descendants do
+	for count = 1, #Descendants do
 		local i = Descendants[count]
-		if not i:IsA("Bone") then continue end
+		if not i:IsA("Bone") then
+			continue
+		end
 		local IsTained = false
-		for count2=1, #IgnoreList do
+		for count2 = 1, #IgnoreList do
 			local i2 = IgnoreList[count2]
 			if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
 				IsTained = true
@@ -353,13 +394,15 @@ function getMotors(Character, IgnoreList)
 	end
 
 	local MotorList = {}
-	local Descendants = Character:GetDescendants() 
+	local Descendants = Character:GetDescendants()
 
-	for count=1, #Descendants do
+	for count = 1, #Descendants do
 		local i = Descendants[count]
-		if not i:IsA("Motor6D") or i.Part0 == nil or i.Part1 == nil then continue end
+		if not i:IsA("Motor6D") or i.Part0 == nil or i.Part1 == nil then
+			continue
+		end
 		local IsTained = false
-		for count2=1, #IgnoreList do
+		for count2 = 1, #IgnoreList do
 			local i2 = IgnoreList[count2]
 			if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
 				IsTained = true
@@ -377,13 +420,21 @@ function parsePoseData(pose)
 	if not pose:IsA("Pose") then
 		error(format("invalid argument 1 to 'parsePoseData' (Pose expected, got %s)", pose.ClassName))
 	end
-	local poseData = {Name = pose.Name, CFrame = pose.CFrame, EasingDirection = convertEnum(pose.EasingDirection), EasingStyle = convertEnum(pose.EasingStyle), Weight = pose.Weight}
+	local poseData = {
+		Name = pose.Name,
+		CFrame = pose.CFrame,
+		EasingDirection = convertEnum(pose.EasingDirection),
+		EasingStyle = convertEnum(pose.EasingStyle),
+		Weight = pose.Weight,
+	}
 	if #pose:GetChildren() > 0 then
 		poseData.Subpose = {}
 		local Children = pose:GetChildren()
-		for count=1, #Children do
+		for count = 1, #Children do
 			local p = Children[count]
-			if not p:IsA("Pose") then continue end
+			if not p:IsA("Pose") then
+				continue
+			end
 			table.insert(poseData.Subpose, parsePoseData(p))
 		end
 	end
@@ -394,9 +445,9 @@ function parseKeyframeData(keyframe)
 	if not keyframe:IsA("Keyframe") then
 		error(format("invalid argument 1 to 'parseKeyframeData' (Keyframe expected, got %s)", keyframe.ClassName))
 	end
-	local keyframeData = {Name = keyframe.Name, Time = keyframe.Time, Pose = {}}
+	local keyframeData = { Name = keyframe.Name, Time = keyframe.Time, Pose = {} }
 	local Children = keyframe:GetChildren()
-	for count=1, #Children do
+	for count = 1, #Children do
 		local p = Children[count]
 		if p:IsA("Pose") then
 			table.insert(keyframeData.Pose, parsePoseData(p))
@@ -407,7 +458,7 @@ function parseKeyframeData(keyframe)
 			if not keyframeData.Marker[p.Name] then
 				keyframeData.Marker[p.Name] = {}
 			end
-			table.insert(keyframeData.Marker, p.Name)
+			table.insert(keyframeData.Marker[p.Name], p.Value)
 		end
 	end
 	return keyframeData
@@ -415,13 +466,20 @@ end
 
 function parseAnimationData(keyframeSequence)
 	if not keyframeSequence:IsA("KeyframeSequence") then
-		error(format("invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)", keyframeSequence.ClassName))
+		error(
+			format(
+				"invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)",
+				keyframeSequence.ClassName
+			)
+		)
 	end
-	local animationData = {Loop = keyframeSequence.Loop, Priority = keyframeSequence.Priority, Frames = {}}
+	local animationData = { Loop = keyframeSequence.Loop, Priority = keyframeSequence.Priority, Frames = {} }
 	local Children = keyframeSequence:GetChildren()
-	for count=1, #Children do
+	for count = 1, #Children do
 		local f = Children[count]
-		if not f:IsA("Keyframe") then continue end
+		if not f:IsA("Keyframe") then
+			continue
+		end
 		table.insert(animationData.Frames, parseKeyframeData(f))
 	end
 

@@ -4,19 +4,19 @@ local format = string.format
 
 function Utility:sendNotif(Text, Icon, Duration, Button1, Button2, Callback)
 	game:GetService("StarterGui"):SetCore("SendNotification", {
-		Title = "Animator";
-		Text = (Text .. "\nBy hayper#0001") or nil;
-		Icon = Icon or nil;
-		Duration = Duration or nil;
-		Button1 = Button1 or nil;
-		Button2 = Button2 or nil;
-		Callback = Callback or nil;
+		Title = "Animator",
+		Text = (Text .. "\nBy hayper#0001") or nil,
+		Icon = Icon or nil,
+		Duration = Duration or nil,
+		Button1 = Button1 or nil,
+		Button2 = Button2 or nil,
+		Callback = Callback or nil,
 	})
 end
 
 local EnumTable = {
 	["PoseEasingDirection"] = "EasingDirection",
-	["PoseEasingStyle"] = "EasingStyle"
+	["PoseEasingStyle"] = "EasingStyle",
 }
 
 function Utility:convertEnum(enum)
@@ -36,25 +36,27 @@ function Utility:convertEnum(enum)
 end
 
 function Utility:getBones(Character, IgnoreList)
-	IgnoreList = IgnoreList or {}
+	IgnoreList = IgnoreList or {
+		IgnoreIn = {},
+		IgnoreList = {},
+	}
+
 	if typeof(Character) ~= "Instance" then
 		error(format("invalid argument 1 to 'getBones' (Instance expected, got %s)", typeof(Character)))
 	end
 
-	if typeof(IgnoreList) ~= "table" then
-		error(format("invalid argument 1 to 'getBones' (Table expected, got %s)", typeof(IgnoreList)))
-	end
-
 	local BoneList = {}
-	local Descendants = Character:GetDescendants() 
+	local Descendants = Character:GetDescendants()
 
-	for count=1, #Descendants do
+	for count = 1, #Descendants do
 		local i = Descendants[count]
-		if not i:IsA("Bone") then continue end
+		if not i:IsA("Bone") then
+			continue
+		end
 		local IsTained = false
-		for count2=1, #IgnoreList do
-			local i2 = IgnoreList[count2]
-			if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+		for count2 = 1, #IgnoreList.IgnoreList do
+			local i2 = IgnoreList.IgnoreIn[count2]
+			if typeof(i2) == "Instance" and (table.find(IgnoreList.IgnoreList, i) or i:IsDescendantOf(i2)) then
 				IsTained = true
 				break
 			end
@@ -68,25 +70,26 @@ function Utility:getBones(Character, IgnoreList)
 end
 
 function Utility:getMotors(Character, IgnoreList)
-	IgnoreList = IgnoreList or {}
+	IgnoreList = IgnoreList or {
+		IgnoreIn = {},
+		IgnoreList = {},
+	}
+
 	if typeof(Character) ~= "Instance" then
 		error(format("invalid argument 1 to 'getMotors' (Instance expected, got %s)", typeof(Character)))
 	end
 
-	if typeof(IgnoreList) ~= "table" then
-		error(format("invalid argument 1 to 'getMotors' (Table expected, got %s)", typeof(IgnoreList)))
-	end
-
 	local MotorList = {}
-	local Descendants = Character:GetDescendants() 
-
-	for count=1, #Descendants do
+	local Descendants = Character:GetDescendants()
+	for count = 1, #Descendants do
 		local i = Descendants[count]
-		if not i:IsA("Motor6D") or i.Part0 == nil or i.Part1 == nil then continue end
+		if not i:IsA("Motor6D") then
+			continue
+		end
 		local IsTained = false
-		for count2=1, #IgnoreList do
-			local i2 = IgnoreList[count2]
-			if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+		for count2 = 1, #IgnoreList.IgnoreList do
+			local i2 = IgnoreList.IgnoreIn[count2]
+			if typeof(i2) == "Instance" and (table.find(IgnoreList.IgnoreList, i) or i:IsDescendantOf(i2)) then
 				IsTained = true
 				break
 			end

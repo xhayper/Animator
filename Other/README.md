@@ -7,12 +7,5 @@
 * HttpRequire isn't included in this version
 * AnimatorRequire isn't included in this version
 
-## Animator
-* Roblox Module
-* Doesn't support Animation ID, Animation Instance, Support Raw Animation Data and KeyframeSequence
-* Doesn't support Hooking
-* HttpRequire isn't included in this version
-* AnimatorRequire isn't included in this version
-
 ## Minified
 * Minified Version of AIO

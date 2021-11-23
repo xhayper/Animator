@@ -1,4 +1,4 @@
----------------------------------------------------------------------------------------------------------------------------
+--------------------- NEVERMORE ---------------------------
 
 ---	Manages the cleaning of events and other things.
 -- Useful for encapsulating state and make deconstructors easy
@@ -13,7 +13,7 @@ Maid.ClassName = "Maid"
 -- @treturn Maid
 function Maid.new()
 	return setmetatable({
-		_tasks = {}
+		_tasks = {},
 	}, Maid)
 end
 
@@ -73,10 +73,10 @@ function Maid:GiveTask(task)
 		error("Task cannot be false or nil", 2)
 	end
 
-	local taskId = #self._tasks+1
+	local taskId = #self._tasks + 1
 	self[taskId] = task
 
-	if type(task) == "table" and (not task.Destroy) then
+	if type(task) == "table" and not task.Destroy then
 		warn("[Maid.GiveTask] - Gave table task without .Destroy\n\n" .. debug.traceback())
 	end
 
@@ -165,7 +165,7 @@ function Signal.new()
 		-- We've been destroyed here and there's nothing left in flight.
 		-- Let's remove the argmap too.
 		-- This code may be slower than leaving this table allocated.
-		if (not self._bindableEvent) and (not next(self._argMap)) then
+		if not self._bindableEvent and (not next(self._argMap)) then
 			self._argMap = nil
 		end
 	end)
@@ -243,31 +243,35 @@ function Signal:Destroy()
 	setmetatable(self, nil)
 end
 
----------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------
+
+local Utility = {}
 
 local format = string.format
 
-function sendNotif(Text, Icon, Duration, Button1, Button2, Callback)
+function Utility:sendNotif(Text, Icon, Duration, Button1, Button2, Callback)
 	game:GetService("StarterGui"):SetCore("SendNotification", {
-		Title = "Animator";
-		Text = (Text .. "\nBy hayper#0001") or nil;
-		Icon = Icon or nil;
-		Duration = Duration or nil;
-		Button1 = Button1 or nil;
-		Button2 = Button2 or nil;
-		Callback = Callback or nil;
+		Title = "Animator",
+		Text = (Text .. "\nBy hayper#0001") or nil,
+		Icon = Icon or nil,
+		Duration = Duration or nil,
+		Button1 = Button1 or nil,
+		Button2 = Button2 or nil,
+		Callback = Callback or nil,
 	})
 end
 
-function convertEnum(enum)
+local EnumTable = {
+	["PoseEasingDirection"] = "EasingDirection",
+	["PoseEasingStyle"] = "EasingStyle",
+}
+
+function Utility:convertEnum(enum)
 	local a = tostring(enum):split(".")
 	if a[1] == "Enum" then
 		local p = a[2]
 		local v = a[3]
-		local EnumTable = {
-			["PoseEasingDirection"] = "EasingDirection",
-			["PoseEasingStyle"] = "EasingStyle"
-		}
+		v = v == "Constant" and "Linear" or v
 		if EnumTable[p] then
 			return Enum[EnumTable[p]][v]
 		else
@@ -278,26 +282,28 @@ function convertEnum(enum)
 	end
 end
 
-function getBones(Character, IgnoreList)
-	IgnoreList = IgnoreList or {}
+function Utility:getBones(Character, IgnoreList)
+	IgnoreList = IgnoreList or {
+		IgnoreIn = {},
+		IgnoreList = {},
+	}
+
 	if typeof(Character) ~= "Instance" then
 		error(format("invalid argument 1 to 'getBones' (Instance expected, got %s)", typeof(Character)))
 	end
 
-	if typeof(IgnoreList) ~= "table" then
-		error(format("invalid argument 1 to 'getBones' (Table expected, got %s)", typeof(IgnoreList)))
-	end
-
 	local BoneList = {}
-	local Descendants = Character:GetDescendants() 
+	local Descendants = Character:GetDescendants()
 
-	for count=1, #Descendants do
+	for count = 1, #Descendants do
 		local i = Descendants[count]
-		if not i:IsA("Bone") then continue end
+		if not i:IsA("Bone") then
+			continue
+		end
 		local IsTained = false
-		for count2=1, #IgnoreList do
-			local i2 = IgnoreList[count2]
-			if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+		for count2 = 1, #IgnoreList.IgnoreList do
+			local i2 = IgnoreList.IgnoreIn[count2]
+			if typeof(i2) == "Instance" and (table.find(IgnoreList.IgnoreList, i) or i:IsDescendantOf(i2)) then
 				IsTained = true
 				break
 			end
@@ -310,26 +316,27 @@ function getBones(Character, IgnoreList)
 	return BoneList
 end
 
-function getMotors(Character, IgnoreList)
-	IgnoreList = IgnoreList or {}
+function Utility:getMotors(Character, IgnoreList)
+	IgnoreList = IgnoreList or {
+		IgnoreIn = {},
+		IgnoreList = {},
+	}
+
 	if typeof(Character) ~= "Instance" then
 		error(format("invalid argument 1 to 'getMotors' (Instance expected, got %s)", typeof(Character)))
 	end
 
-	if typeof(IgnoreList) ~= "table" then
-		error(format("invalid argument 1 to 'getMotors' (Table expected, got %s)", typeof(IgnoreList)))
-	end
-
 	local MotorList = {}
-	local Descendants = Character:GetDescendants() 
-
-	for count=1, #Descendants do
+	local Descendants = Character:GetDescendants()
+	for count = 1, #Descendants do
 		local i = Descendants[count]
-		if not i:IsA("Motor6D") or i.Part0 == nil or i.Part1 == nil then continue end
+		if not i:IsA("Motor6D") then
+			continue
+		end
 		local IsTained = false
-		for count2=1, #IgnoreList do
-			local i2 = IgnoreList[count2]
-			if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+		for count2 = 1, #IgnoreList.IgnoreList do
+			local i2 = IgnoreList.IgnoreIn[count2]
+			if typeof(i2) == "Instance" and (table.find(IgnoreList.IgnoreList, i) or i:IsDescendantOf(i2)) then
 				IsTained = true
 				break
 			end
@@ -341,35 +348,43 @@ function getMotors(Character, IgnoreList)
 	return MotorList
 end
 
----------------------------------------------------------------------------------------------------------------------------
+local Parser = {}
 
-function parsePoseData(pose)
+function Parser:parsePoseData(pose)
 	if not pose:IsA("Pose") then
 		error(format("invalid argument 1 to 'parsePoseData' (Pose expected, got %s)", pose.ClassName))
 	end
-	local poseData = {Name = pose.Name, CFrame = pose.CFrame, EasingDirection = convertEnum(pose.EasingDirection), EasingStyle = convertEnum(pose.EasingStyle), Weight = pose.Weight}
+	local poseData = {
+		Name = pose.Name,
+		CFrame = pose.CFrame,
+		EasingDirection = Utility:convertEnum(pose.EasingDirection),
+		EasingStyle = Utility:convertEnum(pose.EasingStyle),
+		Weight = pose.Weight,
+	}
 	if #pose:GetChildren() > 0 then
 		poseData.Subpose = {}
 		local Children = pose:GetChildren()
-		for count=1, #Children do
+		for count = 1, #Children do
 			local p = Children[count]
-			if not p:IsA("Pose") then continue end
-			table.insert(poseData.Subpose, parsePoseData(p))
+			if not p:IsA("Pose") then
+				continue
+			end
+			table.insert(poseData.Subpose, Parser:parsePoseData(p))
 		end
 	end
 	return poseData
 end
 
-function parseKeyframeData(keyframe)
+function Parser:parseKeyframeData(keyframe)
 	if not keyframe:IsA("Keyframe") then
 		error(format("invalid argument 1 to 'parseKeyframeData' (Keyframe expected, got %s)", keyframe.ClassName))
 	end
-	local keyframeData = {Name = keyframe.Name, Time = keyframe.Time, Pose = {}}
+	local keyframeData = { Name = keyframe.Name, Time = keyframe.Time, Pose = {} }
 	local Children = keyframe:GetChildren()
-	for count=1, #Children do
+	for count = 1, #Children do
 		local p = Children[count]
 		if p:IsA("Pose") then
-			table.insert(keyframeData.Pose, parsePoseData(p))
+			table.insert(keyframeData.Pose, Parser:parsePoseData(p))
 		elseif p:IsA("KeyframeMarker") then
 			if not keyframeData["Marker"] then
 				keyframeData.Marker = {}
@@ -377,22 +392,29 @@ function parseKeyframeData(keyframe)
 			if not keyframeData.Marker[p.Name] then
 				keyframeData.Marker[p.Name] = {}
 			end
-			table.insert(keyframeData.Marker, p.Name)
+			table.insert(keyframeData.Marker[p.Name], p.Value)
 		end
 	end
 	return keyframeData
 end
 
-function parseAnimationData(keyframeSequence)
+function Parser:parseAnimationData(keyframeSequence)
 	if not keyframeSequence:IsA("KeyframeSequence") then
-		error(format("invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)", keyframeSequence.ClassName))
+		error(
+			format(
+				"invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)",
+				keyframeSequence.ClassName
+			)
+		)
 	end
-	local animationData = {Loop = keyframeSequence.Loop, Priority = keyframeSequence.Priority, Frames = {}}
+	local animationData = { Loop = keyframeSequence.Loop, Priority = keyframeSequence.Priority, Frames = {} }
 	local Children = keyframeSequence:GetChildren()
-	for count=1, #Children do
+	for count = 1, #Children do
 		local f = Children[count]
-		if not f:IsA("Keyframe") then continue end
-		table.insert(animationData.Frames, parseKeyframeData(f))
+		if not f:IsA("Keyframe") then
+			continue
+		end
+		table.insert(animationData.Frames, Parser:parseKeyframeData(f))
 	end
 
 	table.sort(animationData.Frames, function(l, r)
@@ -402,34 +424,34 @@ function parseAnimationData(keyframeSequence)
 	return animationData
 end
 
----------------------------------------------------------------------------------------------------------------------------
-
 local TweenService = game:GetService("TweenService")
 
 local Animator = {
 	AnimationData = {},
+	BoneIgnoreInList = {},
+	MotorIgnoreInList = {},
+	BoneIgnoreList = {},
+	MotorIgnoreList = {},
 	handleVanillaAnimator = true,
 	Character = nil,
-	Looped = false, 
+	Looped = false,
 	Length = 0,
 	Speed = 1,
 	IsPlaying = false,
-	_motorIgnoreList = {},
 	_stopFadeTime = 0.100000001,
 	_playing = false,
 	_stopped = false,
 	_isLooping = false,
 	_markerSignal = {},
-	_boneIgnoreList = {}
 }
 
-local CF,Angles = CFrame.new, CFrame.Angles
+local CF, Angles = CFrame.new, CFrame.Angles
 local deg = math.deg
 local clock = os.clock
 local format = string.format
 
 local DefaultMotorCF = CF()
-local DefaultBoneCF = DefaultMotorCF*Angles(deg(0),deg(0),deg(0))
+local DefaultBoneCF = DefaultMotorCF * Angles(deg(0), deg(0), deg(0))
 
 Animator.__index = Animator
 
@@ -441,8 +463,10 @@ function Animator.new(Character, AnimationResolvable)
 	local self = setmetatable({}, Animator)
 
 	if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then
-		local animationInstance = game:GetObjects("rbxassetid://"..tostring(AnimationResolvable))[1]
-		if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID expected)") end
+		local animationInstance = game:GetObjects("rbxassetid://" .. tostring(AnimationResolvable))[1]
+		if not animationInstance:IsA("KeyframeSequence") then
+			error("invalid argument 1 to 'new' (AnimationID expected)")
+		end
 		self.AnimationData = Parser:parseAnimationData(animationInstance)
 	elseif typeof(AnimationResolvable) == "table" then
 		self.AnimationData = AnimationResolvable
@@ -451,11 +475,18 @@ function Animator.new(Character, AnimationResolvable)
 			self.AnimationData = Parser:parseAnimationData(AnimationResolvable)
 		elseif AnimationResolvable:IsA("Animation") then
 			local animationInstance = game:GetObjects(AnimationResolvable.AnimationId)[1]
-			if not animationInstance:IsA("KeyframeSequence") then error("invalid argument 1 to 'new' (AnimationID inside Animation expected)") end
+			if not animationInstance:IsA("KeyframeSequence") then
+				error("invalid argument 1 to 'new' (AnimationID inside Animation expected)")
+			end
 			self.AnimationData = Parser:parseAnimationData(animationInstance)
 		end
 	else
-		error(format("invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)", typeof(AnimationResolvable)))
+		error(
+			format(
+				"invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)",
+				typeof(AnimationResolvable)
+			)
+		)
 	end
 
 	self.Character = Character
@@ -468,66 +499,94 @@ function Animator.new(Character, AnimationResolvable)
 	self.DidLoop = Signal.new()
 	self.Stopped = Signal.new()
 	self.KeyframeReached = Signal.new()
-	
-	self._maid.DidLoop = self.DidLoop 
+
+	self._maid.DidLoop = self.DidLoop
 	self._maid.Stopped = self.Stopped
 	self._maid.KeyframeReached = self.KeyframeReached
 	return self
 end
 
-function Animator:IgnoreMotorIn(ignoreList)
-	if typeof(ignoreList) ~= "table" then
-		error(format("invalid argument 1 to 'IgnoreMotorIn' (Table expected, got %s)", typeof(ignoreList)))
+function Animator:IgnoreMotor(inst)
+	if typeof(inst) ~= "Instance" then
+		error(format("invalid argument 1 to 'IgnoreMotor' (Instance expected, got %s)", typeof(inst)))
 	end
-	self._motorIgnoreList = ignoreList
-end
-
-function Animator:GetMotorIgnoreList()
-	return self._motorIgnoreList
-end
-
-function Animator:IgnoreBoneIn(ignoreList)
-	if typeof(ignoreList) ~= "table" then
-		error(format("invalid argument 1 to 'IgnoreBoneIn' (Table expected, got %s)", typeof(ignoreList)))
+	if inst.ClassName ~= "Motor6D" then
+		error(format("invalid argument 1 to 'IgnoreMotor' (Motor6D expected, got %s)", inst.ClassName))
 	end
-	self._boneIgnoreList = ignoreList
+	table.insert(self.MotorIgnoreList, inst)
 end
 
-function Animator:GetBoneIgnoreList()
-	return self._boneIgnoreList
+function Animator:IgnoreBone(inst)
+	if typeof(inst) ~= "Instance" then
+		error(format("invalid argument 1 to 'IgnoreBone' (Instance expected, got %s)", typeof(inst)))
+	end
+	if inst.ClassName ~= "Bone" then
+		error(format("invalid argument 1 to 'IgnoreBone' (Bone expected, got %s)", inst.ClassName))
+	end
+	table.insert(self.BoneIgnoreList, inst)
+end
+
+function Animator:IgnoreMotorIn(inst)
+	if typeof(inst) ~= "Instance" then
+		error(format("invalid argument 1 to 'IgnoreMotorIn' (Instance expected, got %s)", typeof(inst)))
+	end
+	table.insert(self.MotorIgnoreInList, inst)
+end
+
+function Animator:IgnoreBoneIn(inst)
+	if typeof(inst) ~= "Instance" then
+		error(format("invalid argument 1 to 'IgnoreBoneIn' (Instance expected, got %s)", typeof(inst)))
+	end
+	table.insert(self.BoneIgnoreInList, inst)
 end
 
 function Animator:_playPose(pose, parent, fade)
-	local MotorList = Utility:getMotors(self.Character, self._motorIgnoreList)
-	local BoneList = Utility:getBones(self.Character, self._boneIgnoreList)
+	local MotorList = Utility:getMotors(self.Character, {
+		IgnoreIn = self.MotorIgnoreInList,
+		IgnoreList = self.MotorIgnoreList,
+	})
+	local BoneList = Utility:getBones(self.Character, {
+		IgnoreIn = self.BoneIgnoreInList,
+		IgnoreList = self.BoneIgnoreList,
+	})
 	if pose.Subpose then
 		local SubPose = pose.Subpose
-		for count=1, #SubPose do
+		for count = 1, #SubPose do
 			local sp = SubPose[count]
 			self:_playPose(sp, pose, fade)
 		end
 	end
-	if not parent then return end
+	if not parent then
+		return
+	end
 	local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
 	task.spawn(function()
-		for count=1, #MotorList do
+		for count = 1, #MotorList do
 			local motor = MotorList[count]
-			if motor.Part0.Name ~= parent.Name or motor.Part1.Name ~= pose.Name then continue end
-			if self == nil or self._stopped then break end
+			if motor.Part0.Name ~= parent.Name or motor.Part1.Name ~= pose.Name then
+				continue
+			end
+			if not self or self._stopped then
+				break
+			end
 			if fade > 0 then
-				TweenService:Create(motor, TI, {Transform = pose.CFrame}):Play()
+				TweenService:Create(motor, TI, { Transform = pose.CFrame }):Play()
 			else
 				motor.Transform = pose.CFrame
 			end
 		end
 	end)
 	task.spawn(function()
-		for count=1, #BoneList do
+		for count = 1, #BoneList do
 			local bone = BoneList[count]
-			if parent.Name ~= bone.Parent.Name or bone.Name ~= pose.Name then continue end
-			if self == nil or self._stopped then break end
+			if parent.Name ~= bone.Parent.Name or bone.Name ~= pose.Name then
+				continue
+			end
+			if not self or self._stopped then
+				break
+			end
 			if fade > 0 then
-				TweenService:Create(bone, TI, {Transform = pose.CFrame}):Play()
+				TweenService:Create(bone, TI, { Transform = pose.CFrame }):Play()
 			else
 				bone.Transform = pose.CFrame
 			end
@@ -537,7 +596,9 @@ end
 
 function Animator:Play(fadeTime, weight, speed)
 	fadeTime = fadeTime or 0.100000001
-	if not self.Character or self.Character.Parent == nil or self._playing and not self._isLooping then return end
+	if not self.Character or self.Character.Parent == nil or self._playing and not self._isLooping then
+		return
+	end
 	self._playing = true
 	self._isLooping = false
 	self.IsPlaying = true
@@ -553,38 +614,48 @@ function Animator:Play(fadeTime, weight, speed)
 		end
 	end
 	con2 = self.Character:GetPropertyChangedSignal("Parent"):Connect(function()
-		if self ~= nil and self.Character.Parent ~= nil then return end
+		if self ~= nil and self.Character.Parent ~= nil then
+			return
+		end
 		self:Destroy()
 		con2:Disconnect()
 	end)
 	local start = clock()
 	task.spawn(function()
-		for i=1, #self.AnimationData.Frames do
-			if self._stopped then break end
+		for i = 1, #self.AnimationData.Frames do
+			if self._stopped then
+				break
+			end
 			local f = self.AnimationData.Frames[i]
 			local t = f.Time / (speed or self.Speed)
 			if f.Name ~= "Keyframe" then
 				self.KeyframeReached:Fire(f.Name)
 			end
 			if f["Marker"] then
-				for k,v in next, f.Marker do
-					if not self._markerSignal[k] then continue end
-					self._markerSignal[k]:Fire(v)
+				for k, v in next, f.Marker do
+					if not self._markerSignal[k] then
+						continue
+					end
+					for _, v2 in next, v do
+						self._markerSignal[k]:Fire(v2)
+					end
 				end
 			end
 			if f.Pose then
 				local Pose = f.Pose
-				for count=1, #Pose do
+				for count = 1, #Pose do
 					local p = Pose[count]
 					local ft = fadeTime
 					if i ~= 1 then
-						ft = (t*(speed or self.Speed)-self.AnimationData.Frames[i-1].Time)/(speed or self.Speed)
+						ft = (t * (speed or self.Speed) - self.AnimationData.Frames[i - 1].Time) / (speed or self.Speed)
 					end
 					self:_playPose(p, nil, ft)
 				end
 			end
-			if t > clock()-start then
-				repeat task.wait() until self._stopped or clock()-start >= t
+			if t > clock() - start then
+				repeat
+					task.wait()
+				until self._stopped or clock() - start >= t
 			end
 		end
 		if con then
@@ -601,29 +672,41 @@ function Animator:Play(fadeTime, weight, speed)
 		task.wait()
 		local TI = TweenInfo.new(self._stopFadeTime or fadeTime, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 		if self.Character then
-			local MotorList = Utility:getMotors(self.Character, self._motorIgnoreList)
-			local BoneList = Utility:getBones(self.Character, self._boneIgnoreList)
-			for count=1, #MotorList do
+			local MotorList = Utility:getMotors(self.Character, {
+				IgnoreIn = self.MotorIgnoreInList,
+				IgnoreList = self.MotorIgnoreList,
+			})
+			local BoneList = Utility:getBones(self.Character, {
+				IgnoreIn = self.BoneIgnoreInList,
+				IgnoreList = self.BoneIgnoreList,
+			})
+			for count = 1, #MotorList do
 				local r = MotorList[count]
 				if (self._stopFadeTime or fadeTime) > 0 then
-					TweenService:Create(r, TI, {
-						Transform = DefaultMotorCF,
-						CurrentAngle = 0
-					}):Play()
+					TweenService
+						:Create(r, TI, {
+							Transform = DefaultMotorCF,
+							CurrentAngle = 0,
+						})
+						:Play()
 				else
 					r.CurrentAngle = 0
 					r.Transform = DefaultMotorCF
 				end
 			end
-			for count=1, #BoneList do
+			for count = 1, #BoneList do
 				local b = BoneList[count]
 				if (self._stopFadeTime or fadeTime) > 0 then
-					TweenService:Create(b, TI, {Transform = DefaultBoneCF}):Play()
+					TweenService:Create(b, TI, { Transform = DefaultBoneCF }):Play()
 				else
 					b.Transform = DefaultBoneCF
 				end
 			end
-			if self.handleVanillaAnimator and self.Character:FindFirstChild("Humanoid") and not self.Character.Humanoid:FindFirstChildOfClass("Animator") then
+			if
+				self.handleVanillaAnimator
+				and self.Character:FindFirstChild("Humanoid")
+				and not self.Character.Humanoid:FindFirstChildOfClass("Animator")
+			then
 				Instance.new("Animator").Parent = self.Character.Humanoid
 			end
 		end
@@ -635,9 +718,11 @@ function Animator:Play(fadeTime, weight, speed)
 end
 
 function Animator:GetTimeOfKeyframe(keyframeName)
-	for count=1, #self.AnimationData.Frames do
+	for count = 1, #self.AnimationData.Frames do
 		local f = self.AnimationData.Frames[count]
-		if f.Name ~= keyframeName then continue end
+		if f.Name ~= keyframeName then
+			continue
+		end
 		return f.Time
 	end
 	return 0
@@ -646,7 +731,7 @@ end
 function Animator:GetMarkerReachedSignal(name)
 	if not self._markerSignal[name] then
 		self._markerSignal[name] = Signal.new()
-		self._maid["Marker_"..name] = self._markerSignal[name]
+		self._maid["Marker_" .. name] = self._markerSignal[name]
 	end
 	return self._markerSignal[name]
 end
@@ -666,20 +751,24 @@ function Animator:Destroy()
 	self._maid:DoCleaning()
 end
 
----------------------------------------------------------------------------------------------------------------------------
-
 getgenv().Animator = Animator
 
 getgenv().hookAnimatorFunction = function()
 	local OldFunc
 	OldFunc = hookmetamethod(game, "__namecall", function(Object, ...)
 		local NamecallMethod = getnamecallmethod()
-		if not checkcaller() or Object.ClassName ~= "Humanoid" or NamecallMethod ~= "LoadAnimation" then return OldFunc(Object, ...) end
-		local args = {...}
-		if not args[2] or args[2] == true then return OldFunc(Object, ...) end
+		if not checkcaller() or Object.ClassName ~= "Humanoid" or NamecallMethod ~= "LoadAnimation" then
+			return OldFunc(Object, ...)
+		end
+		local args = { ... }
+		if not args[2] or args[2] == true then
+			return OldFunc(Object, ...)
+		end
 		return Animator.new(Object.Parent, ...)
 	end)
-	sendNotif("Hook Loaded\nby whited#4382", nil, 5)
+	Utility:sendNotif("Hook Loaded\nby whited#4382", nil, 5)
 end
 
-sendNotif("API Loaded", nil, 5)
+Utility:sendNotif("API Loaded", nil, 5)
+
+return "Nullware my beloved <3"

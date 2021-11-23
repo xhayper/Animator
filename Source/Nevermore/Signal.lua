@@ -32,7 +32,7 @@ function Signal.new()
 		-- We've been destroyed here and there's nothing left in flight.
 		-- Let's remove the argmap too.
 		-- This code may be slower than leaving this table allocated.
-		if (not self._bindableEvent) and (not next(self._argMap)) then
+		if not self._bindableEvent and (not next(self._argMap)) then
 			self._argMap = nil
 		end
 	end)
