@@ -39,10 +39,11 @@ end
 
 ## Documentation
 
+# Reference
+
 [Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua)
 
 ```lua
-
 -- Types --
 
 PoseData = {
