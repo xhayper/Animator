@@ -9,42 +9,27 @@ Contains useful script that will help you
 
 ```lua
 
--- Pose Data
-
-{
+PoseData = {
 	Name: string,
 	CFrame: CFrame,
 	EasingDirection: Enum.EasingDirection,
 	EasingStyle: Enum.EasingStyle,
 	Weight: number,
-	Subpose?: {} -- Array of Pose Data
+	Subpose?: PoseData[]
 }
 
--- Marker Data
-
-[string] = {
-	Value: any
-}
-
--- Frame Data
-
-{
+FrameData = {
 	Name:string,
 	Time:number,
-	Pose: {}, -- Array of Pose data
-	Marker?: {} -- Array of Marker Data
+	Pose:PoseData[],
+	Marker?:{[string]: string[]}
 }
 
--- Animation Data
-
-{
+AnimationData = {
 	Loop:bool,
 	Priority:Enum.AnimationPriority,
-	Frames: {} -- Array of Frame Data
+	Frames:FrameData[]
 }
-
--- Example
-
 
 -- Modified Roblox R6 Idle
 {
@@ -289,9 +274,7 @@ Contains useful script that will help you
         {
             Marker = {
                 ThisIs = {
-                    {
-                        Value = "AnExample"
-                    }
+                    "AnExample"
                 }
             },
             Pose = {

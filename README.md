@@ -6,20 +6,15 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 
 * Easy To Use
 * Can play Trusted/Non-Trusted Animation (AnimationID, KeyframeSequence Instance and Animation Instance) / Raw Animation Data (Use [KeyframeSequence-To-AnimationData](https://github.com/xhayper/Animator/tree/main/Utility))
-* R6, R15, Custom Rig/Animation Support
+* R6, R15, Custom Rig Support
 * Mesh Deformation Support
-* Simillar to Roblox's AnimationTrack Instance
+* Simillar to Roblox's [AnimationTrack](https://developer.roblox.com/en-us/api-reference/class/AnimationTrack) API
 
 ## Note
-
-* I gonna be real with you, this code is not that optimized
-* This will lag a lot in some game, Until heavy optimization can be made, don't play that game if it lag
+* If you gonna obfuscate your script, it's highly recommended to obfuscate the animator's script as it can broke the script
 * This doesn't replicate, you will need to re-animate with nullware
 
 ## Planned Feature
-
-* Priority Support (Idk how)
-* Weight System (Idk how)
 * Seeking froward, Backward (Idk how)
 * Heavy Optimization
 
@@ -27,9 +22,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 * Whited - Metatable Hook
 
 ## Limitation
-* Part need to be linked with Motor6D
-* Can only do up to n (Usually 2) Character, more than that, it will lag like hell
-* If your obfuscator do metatable stuff, it have a high chance of crashing the AIO verson, if that's the case, do not obfuscate the animator, obfuscate your code and put animator code at the top
+* Can only be used on 1 character at the time
 
 ## Resources
 
@@ -47,72 +40,100 @@ end
 ## Documentation
 
 ```lua
+
+-- Types --
+
+PoseData = {
+	Name: string,
+	CFrame: CFrame,
+	EasingDirection: Enum.EasingDirection,
+	EasingStyle: Enum.EasingStyle,
+	Weight: number,
+	Subpose?: PoseData[]
+}
+
+FrameData = {
+	Name:string,
+	Time:number,
+	Pose:PoseData[],
+	Marker?:{[string]: string[]}
+}
+
+AnimationData = {
+	Loop:bool,
+	Priority:Enum.AnimationPriority,
+	Frames:FrameData[]
+}
+
+AnimationResolvable = string | number | AnimationData | KeyframeSequence | Animation
+
 -- Constructor --
 
-Animator.new(Character, AnimationResolvable) -- AnimationResolvable Should Be AnimationID as String/Number or KeyframeSequnce or Raw Animation Data or Animation Instance
+Animator.new(Character:Instance, AnimationResolvable:AnimationResolvable): Animator
 
 -- Functions --
 
-Animator:Play(fadeTime, weight, speed) -- Play the Animation with spefic fadeTime and speed, (Deault - fadeTime = 0.100000001, weight = 1, speed = 1)
-Animator:Stop(fadeTime) -- Stop the Animation with spefic fadeTime, (Default - fadeTime = 0.100000001)
-Animator:Destroy() -- Stop current animation and destroy the instance
-Animator:GetMarkerReachedSignal(name) -- Return a signal that will fire when an marker with same name has been reached, (Args - Value)
-Animator:GetTimeOfKeyframe(keyframeName) -- Get time position of the given frame name (first one)
-Animator:AdjustSpeed(speed) -- Set playback Speed
-Animator:IgnoreMotorIn(tableOfInstance) -- Ignore motor that's a descendant of instance inside the table (must be table of Instance)
-Animator:GetMotorIgnoreList() -- Return Table of Instance that the animator will use as Ignore list for Motor
-Animator:IgnoreBoneIn(tableOfInstance) -- Ignore Bone that's a descendant of instance inside the table (must be table of Instance)
-Animator:GetBoneIgnoreList() -- Return Table of Instance that the animator will use as Ignore list for Bone
+Animator:Play(FadeTime:number = 0.100000001, Weight:number?, Speed:number?): void -- Play the Animation with spefic FadeTime and Speed
+Animator:Stop(FadeTime:number = 0.100000001): void -- Stop the Animation with spefic FadeTime
+Animator:Destroy(): void -- Stop current animation and destroy the instance
+Animator:GetMarkerReachedSignal(Name:string): [Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua) -- Return a signal that will fire when an marker with same name has been reached
+Animator:GetTimeOfKeyframe(KeyframeName:string): number -- Get time position of the first frame with given frame name
+Animator:AdjustSpeed(Speed:number): void -- Set playback Speed
+Animator:IgnoreMotorIn(Instance:Instance): void -- Ignore all Motor6D in the instance
+Animator:IgnoreBoneIn(Instance:Instance): void -- Ignore all Bone in the instance
+Animator:IgnoreMotor(Motor6D:Motor6D): void -- Ignore a Motor6D instance
+Animator:IgnoreBone(Bone:Bone): void -- Ignore a Bone instance
 
 -- Properties --
 
-Animator.handleVanillaAnimator -- Should the animator delete humanoid's animator on play and add it back on stop
-Animator.Looped -- Do you want the animation to Loop?
-Animator.IsPlaying -- Is the animation playing?
-Animator.Length -- Animation Length
-Animator.Speed -- Playback Speed
-Animator.Character -- The Character that the animator is assigned to
+Animator.BoneIgnoreInList: {[number]: Instance} -- Table of instance, If a motor is a descendant of instace in the table, It will be ignored
+Animator.MotorIgnoreInList: {[number]: Instance} -- Table of instance, If a bone is a descendant of instace in the table, It will be ignored
+Animator.BoneIgnoreList: {[number]: Instance} -- Table of instance, If a motor is in the table, It will be ignored
+Animator.MotorIgnoreList: {[number]: Instance} -- Table of instance, If a bone is in the table, It will be ignored
+Animator.handleVanillaAnimator: boolean -- Should the animator delete humanoid's animator on play and add it back on stop
+Animator.Looped: boolean -- Do you want the animation to Loop?
+Animator.IsPlaying: boolean -- Is the animation playing?
+Animator.Length: number -- Animation Length
+Animator.Speed: number -- Playback Speed
+Animator.Character: Instance -- The Character that the animator is assigned to
 
 -- Signals --
 
-Animator.Stopped:Connect() -- Run when the animation ended
-Animator.DidLooped:Connect() -- Run when the animation loop
-Animator.KeyframeReached:Connect(keyframeName) -- On keyframe reached (Only trigger if the keyframe name isn't Keyframe
+Animator.Stopped:Connect(): [Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua) -- Run when the animation ended
+Animator.DidLooped:Connect(): [Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua) -- Run when the animation loop
+Animator.KeyframeReached:Connect(KeyframeName:string): [Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua) -- On keyframe reached (Only trigger if the keyframe name isn't Keyframe
 
--- Globals --
+-- Global --
 
-HttpRequire("HttpLink", noCache) -- Require the module using GET Request, Must start with 'http://' or 'https://', Second arguement meant if the function should pull from cache if it exist
-animatorRequire("Path") -- Used by Animator, Same as HttpRequire but with this repo link as the prefix
-hookAnimatorFunction() -- Hook animator to Humanoid:LoadAnimation()
+HttpRequire(HttpLink:string, noCache:boolean?): any -- Require the module using GET Request, Must start with 'http://' or 'https://', if noCache is true, cache the respond for future use
+animatorRequire(Path:string): any -- Used by Animator, Same as HttpRequire but with this repo link as the prefix
+hookAnimatorFunction(): void -- Hook animator to Humanoid:LoadAnimation()
 
-httpRequireCache -- Table, Used by HttpRequire to cache the loadstring(response)()
--- [URL Path] = loadstring(response)()
+httpRequireCache: {[string]: any} -- Cache table for HttpRequire
 
 -- Hooks --
--- This will only work if you call hookAnimatorFunction()
+-- This will only work if you call hookAnimatorFunction() before
 
-Humanoid:LoadAnimation(AnimationResolvable, UseDefaultLoadAnimation) -- AnimationResolvable - Should Be AnimationID as String/Number or KeyframeSequnce or Raw Animation Data or Animation Instance, UseDefaultLoadAnimation - Boolean
+Humanoid:LoadAnimation(AnimationResolvable:AnimationResolvable, UseDefaultLoadAnimation:boolean?): Animator
 ```
 
 ## Example
 
 ```lua
-if getgenv()["Animator"] == nil then
+if not getgenv()["Animator"] then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 end
 
 local Player = game:GetService("Players").LocalPlayer
 
-local AnimationData = 123456789 -- Can also be KeyframeSequnce Instance, Table of data or ID as string
-
-local Anim = Animator.new(Player.Character, AnimationData)
+local Anim = Animator.new(Player.Character, 123456789)
 Anim:Play()
 Anim.Stopped:Wait()
 print("Done!")
 ```
 
 ```lua
-if getgenv()["Animator"] == nil then
+if not getgenv()["Animator"] then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 	hookAnimatorFunction() -- Hook animator to Humanoid:LoadAnimation()
 end
@@ -120,9 +141,7 @@ end
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 
-local AnimationData = 123456789 -- Can also be KeyframeSequnce Instance, Table of data or ID as string
-
-local Anim = Player.Character.Humanoid:LoadAnimation(AnimationData)
+local Anim = ((Player.Character) or (Player.CharacterAdded:Wait()).Humanoid:LoadAnimation(123456789)
 Anim:Play()
 Anim.Stopped:Wait()
 print("Done!")
@@ -133,7 +152,7 @@ print("Done!")
 * Note: UI Only support Animation ID
 
 ```lua
-if getgenv()["Animator"] == nil then
+if not getgenv()["Animator"] then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 end
 
@@ -178,14 +197,14 @@ local Play = Main.Button({
 			currentAnim.Stopped:Wait()
 			task.wait()
 		end
-		currentAnim = Animator.new(Player.Character, Animation:GetText())
+		currentAnim = Animator.new(Player.Character or Player.CharacterAdded:Wait(), Animation:GetText())
 		if getgenv()["NullwareAPI"] then -- Nullware Complatible
-			currentAnim:IgnoreMotorIn({NullwareAPI:GetCharacter("MainChar")})
-			currentAnim:IgnoreBoneIn({NullwareAPI:GetCharacter("MainChar")})
+			currentAnim:IgnoreMotorIn(NullwareAPI:GetCharacter("MainChar"))
+			currentAnim:IgnoreBoneIn(NullwareAPI:GetCharacter("MainChar"))
 		end
 		currentAnim.Looped = Loop:GetState()
 		currentAnim:Play()
-		spawn(function()
+		task.spawn(function()
 			currentAnim.Stopped:Wait()
 			currentAnim:Destroy()
 		end)
@@ -195,7 +214,7 @@ local Play = Main.Button({
 local Stop = Main.Button({
 	Text = "Stop",
 	Callback = function()
-		if currentAnim ~= nil and currentAnim.IsPlaying == true then
+		if currentAnim and currentAnim.IsPlaying then
 			currentAnim:Stop()
 		end
 	end
@@ -215,22 +234,22 @@ local NullwareLink = Nullware.TextField({
 local ReanimateConfiguration = Nullware.ChipSet({
 	Text = "ReanimateConfiguration",
 	Options = {
-		["Anti-Fling"] = false,
-		["R15 To R6"] = true,
-		["Godmode"] = false,
-		["Disable Torso Collisions"] = false,
-		["Enable Limb Collisions"] = false
+			["Anti-Fling"] = true,
+			["Head Movement Without Godmode"] = true,
+			["Enable Limb Collisions"] = true,
+			["Disable Torso Collisions"] = false,
+			["R15 To R6"] = true,
+			["Godmode"] = false
 	}
 })
 
 Nullware.Button({
 	Text = "Reanimate",
 	Callback = function()
-		if getgenv()["NullwareAPI"] == nil then
+		if not getgenv()["NullwareAPI"] then
 			local options = ReanimateConfiguration:GetOptions()
 			options["Hats To Align"] = {"All"}
 			options["Netless"] = true
-			options["Head Movement Without Godmode"] = true
 			getgenv().Nullware_ReanimateConfiguration = options
 			HttpRequire(NullwareLink:GetText())
 		end
