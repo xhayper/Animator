@@ -39,6 +39,8 @@ end
 
 ## Documentation
 
+[Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua)
+
 ```lua
 
 -- Types --
@@ -76,7 +78,7 @@ Animator.new(Character:Instance, AnimationResolvable:AnimationResolvable): Anima
 Animator:Play(FadeTime:number = 0.100000001, Weight:number?, Speed:number?): void -- Play the Animation with spefic FadeTime and Speed
 Animator:Stop(FadeTime:number = 0.100000001): void -- Stop the Animation with spefic FadeTime
 Animator:Destroy(): void -- Stop current animation and destroy the instance
-Animator:GetMarkerReachedSignal(Name:string): [Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua) -- Return a signal that will fire when an marker with same name has been reached
+Animator:GetMarkerReachedSignal(Name:string): Signal -- Return a signal that will fire when an marker with same name has been reached
 Animator:GetTimeOfKeyframe(KeyframeName:string): number -- Get time position of the first frame with given frame name
 Animator:AdjustSpeed(Speed:number): void -- Set playback Speed
 Animator:IgnoreMotorIn(Instance:Instance): void -- Ignore all Motor6D in the instance
@@ -99,9 +101,9 @@ Animator.Character: Instance -- The Character that the animator is assigned to
 
 -- Signals --
 
-Animator.Stopped:Connect(): [Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua) -- Run when the animation ended
-Animator.DidLooped:Connect(): [Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua) -- Run when the animation loop
-Animator.KeyframeReached:Connect(KeyframeName:string): [Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua) -- On keyframe reached (Only trigger if the keyframe name isn't Keyframe
+Animator.Stopped:Connect(): Signal -- Run when the animation ended
+Animator.DidLooped:Connect(): Signal -- Run when the animation loop
+Animator.KeyframeReached:Connect(KeyframeName:string): Signal -- On keyframe reached (Only trigger if the keyframe name isn't Keyframe
 
 -- Global --
 
