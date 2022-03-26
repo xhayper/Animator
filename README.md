@@ -24,11 +24,6 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 ## Limitation
 * Can only be used on 1 character at the time
 
-## Resources
-
-* AIO - [Here](https://github.com/xhayper/Animator/blob/main/Other/AIO.lua)
-* Minified - [Here](https://github.com/xhayper/Animator/blob/main/Other/Minified.lua)
-
 ## Installation
 
 ```lua
