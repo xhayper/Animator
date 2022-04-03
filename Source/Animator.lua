@@ -6,6 +6,21 @@ local Utility = animatorRequire("Utility.lua")
 local Signal = animatorRequire("Nevermore/Signal.lua")
 local Maid = animatorRequire("Nevermore/Maid.lua")
 
+function merge(t1, t2)
+	for k, v in pairs(t2) do
+		if type(v) == "table" then
+			if type(t1[k] or false) == "table" then
+				merge(t1[k] or {}, t2[k] or {})
+			else
+				t1[k] = v
+			end
+		else
+			t1[k] = v
+		end
+	end
+	return t1
+end
+
 local Animator = {
 	AnimationData = {},
 	BoneIgnoreInList = {},
@@ -26,9 +41,11 @@ local Animator = {
 }
 
 local CF, Angles = CFrame.new, CFrame.Angles
-local deg = math.deg
-local clock = os.clock
 local format = string.format
+local spawn = task.spawn
+local wait = task.wait
+local clock = os.clock
+local deg = math.deg
 
 local DefaultMotorCF = CF()
 local DefaultBoneCF = DefaultMotorCF * Angles(deg(0), deg(0), deg(0))
@@ -41,32 +58,29 @@ function Animator.new(Character, AnimationResolvable)
 	end
 
 	local self = setmetatable({}, Animator)
+	local type = typeof(AnimationResolvable)
 
-	if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then
-		local animationInstance = game:GetObjects("rbxassetid://" .. tostring(AnimationResolvable))[1]
-		if not animationInstance:IsA("KeyframeSequence") then
-			error("invalid argument 1 to 'new' (AnimationID expected)")
+	-- TODO: Optimize this by merging `AnimationResolvable.ClassName == "Animation"` with `type == "string" or type == "number"`
+	if type == "string" or type == "number" then
+		local keyframeSequence = game:GetObjects("rbxassetid://" .. tostring(AnimationResolvable))[1]
+		if keyframeSequence.ClassName ~= "KeyframeSequence" then
+			error("invalid argument 2 to 'new' (string,number expected)")
 		end
-		self.AnimationData = Parser:parseAnimationData(animationInstance)
-	elseif typeof(AnimationResolvable) == "table" then
+		self.AnimationData = Parser:parseAnimationData(keyframeSequence)
+	elseif type == "table" then
 		self.AnimationData = AnimationResolvable
-	elseif typeof(AnimationResolvable) == "Instance" then
-		if AnimationResolvable:IsA("KeyframeSequence") then
+	elseif type == "Instance" then
+		if AnimationResolvable.ClassName == "KeyframeSequence" then
 			self.AnimationData = Parser:parseAnimationData(AnimationResolvable)
-		elseif AnimationResolvable:IsA("Animation") then
-			local animationInstance = game:GetObjects(AnimationResolvable.AnimationId)[1]
-			if not animationInstance:IsA("KeyframeSequence") then
-				error("invalid argument 1 to 'new' (AnimationID inside Animation expected)")
+		elseif AnimationResolvable.ClassName == "Animation" then
+			local keyframeSequence = game:GetObjects(AnimationResolvable.AnimationId)[1]
+			if keyframeSequence.ClassName ~= "KeyframeSequence" then
+				error("invalid argument 2 to 'new' (Content inside Animation expected)")
 			end
-			self.AnimationData = Parser:parseAnimationData(animationInstance)
+			self.AnimationData = Parser:parseAnimationData(keyframeSequence)
 		end
 	else
-		error(
-			format(
-				"invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)",
-				typeof(AnimationResolvable)
-			)
-		)
+		error(format("invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)", type))
 	end
 
 	self.Character = Character
@@ -121,14 +135,6 @@ function Animator:IgnoreBoneIn(inst)
 end
 
 function Animator:_playPose(pose, parent, fade)
-	local MotorList = Utility:getMotors(self.Character, {
-		IgnoreIn = self.MotorIgnoreInList,
-		IgnoreList = self.MotorIgnoreList,
-	})
-	local BoneList = Utility:getBones(self.Character, {
-		IgnoreIn = self.BoneIgnoreInList,
-		IgnoreList = self.BoneIgnoreList,
-	})
 	if pose.Subpose then
 		local SubPose = pose.Subpose
 		for count = 1, #SubPose do
@@ -139,39 +145,38 @@ function Animator:_playPose(pose, parent, fade)
 	if not parent then
 		return
 	end
+	local MotorMap = Utility:getMotorMap(self.Character, {
+		IgnoreIn = self.MotorIgnoreInList,
+		IgnoreList = self.MotorIgnoreList,
+	})
+	local BoneMap = Utility:getBoneMap(self.Character, {
+		IgnoreIn = self.BoneIgnoreInList,
+		IgnoreList = self.BoneIgnoreList,
+	})
 	local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
-	task.spawn(function()
-		for count = 1, #MotorList do
-			local motor = MotorList[count]
-			if motor.Part0.Name ~= parent.Name or motor.Part1.Name ~= pose.Name then
-				continue
-			end
-			if self == nil or self._stopped then
-				break
-			end
-			if fade > 0 then
-				TweenService:Create(motor, TI, { Transform = pose.CFrame }):Play()
-			else
-				motor.Transform = pose.CFrame
-			end
+	local Target = { Transform = pose.CFrame }
+	local M = MotorMap[parent.Name]
+	local B = BoneMap[parent.Name]
+	local C = {}
+	if M then
+		local MM = M[pose.Name] or {}
+		C = merge(C, MM)
+	end
+	if B then
+		local BB = B[pose.Name] or {}
+		C = merge(C, BB)
+	end
+	for count = 1, #C do
+		local obj = C[count]
+		if self == nil or self._stopped then
+			break
 		end
-	end)
-	task.spawn(function()
-		for count = 1, #BoneList do
-			local bone = BoneList[count]
-			if parent.Name ~= bone.Parent.Name or bone.Name ~= pose.Name then
-				continue
-			end
-			if self == nil or self._stopped then
-				break
-			end
-			if fade > 0 then
-				TweenService:Create(bone, TI, { Transform = pose.CFrame }):Play()
-			else
-				bone.Transform = pose.CFrame
-			end
+		if fade > 0 then
+			TweenService:Create(obj, TI, Target):Play()
+		else
+			obj.Transform = pose.CFrame
 		end
-	end)
+	end
 end
 
 function Animator:Play(fadeTime, weight, speed)
@@ -201,7 +206,7 @@ function Animator:Play(fadeTime, weight, speed)
 		con2:Disconnect()
 	end)
 	local start = clock()
-	task.spawn(function()
+	spawn(function()
 		for i = 1, #self.AnimationData.Frames do
 			if self._stopped then
 				break
@@ -234,7 +239,7 @@ function Animator:Play(fadeTime, weight, speed)
 			end
 			if t > clock() - start then
 				repeat
-					task.wait()
+					wait()
 				until self._stopped or clock() - start >= t
 			end
 		end
@@ -249,37 +254,47 @@ function Animator:Play(fadeTime, weight, speed)
 			self._isLooping = true
 			return self:Play(fadeTime, weight, speed)
 		end
-		task.wait()
-		local TI = TweenInfo.new(self._stopFadeTime or fadeTime, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
+		wait()
 		if self.Character then
-			local MotorList = Utility:getMotors(self.Character, {
+			local TI = TweenInfo.new(self._stopFadeTime or fadeTime, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
+			local MotorMap = Utility:getMotorMap(self.Character, {
 				IgnoreIn = self.MotorIgnoreInList,
 				IgnoreList = self.MotorIgnoreList,
 			})
-			local BoneList = Utility:getBones(self.Character, {
+			local BoneMap = Utility:getBoneMap(self.Character, {
 				IgnoreIn = self.BoneIgnoreInList,
 				IgnoreList = self.BoneIgnoreList,
 			})
-			for count = 1, #MotorList do
-				local r = MotorList[count]
-				if (self._stopFadeTime or fadeTime) > 0 then
-					TweenService
-						:Create(r, TI, {
-							Transform = DefaultMotorCF,
-							CurrentAngle = 0,
-						})
-						:Play()
-				else
-					r.CurrentAngle = 0
-					r.Transform = DefaultMotorCF
+			for _, motors in pairs(MotorMap) do
+				for _, motors in pairs(motors) do
+					for _, motor in pairs(motors) do
+						if (self._stopFadeTime or fadeTime) > 0 then
+							TweenService
+								:Create(motor, TI, {
+									Transform = DefaultMotorCF,
+									CurrentAngle = 0,
+								})
+								:Play()
+						else
+							motor.CurrentAngle = 0
+							motor.Transform = DefaultMotorCF
+						end
+					end
 				end
 			end
-			for count = 1, #BoneList do
-				local b = BoneList[count]
-				if (self._stopFadeTime or fadeTime) > 0 then
-					TweenService:Create(b, TI, { Transform = DefaultBoneCF }):Play()
-				else
-					b.Transform = DefaultBoneCF
+			for _, bones in pairs(BoneMap) do
+				for _, bones in pairs(bones) do
+					for _, bone in pairs(bones) do
+						if (self._stopFadeTime or fadeTime) > 0 then
+							TweenService
+								:Create(bone, TI, {
+									Transform = DefaultBoneCF,
+								})
+								:Play()
+						else
+							bone.Transform = DefaultBoneCF
+						end
+					end
 				end
 			end
 			if

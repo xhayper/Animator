@@ -16,13 +16,9 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 
 ## Planned Feature
 * Seeking froward, Backward (Idk how)
-* Heavy Optimization
 
-## Credits
-* Whited - Metatable Hook
+## Contributor
 
-## Limitation
-* Can only be used on 1 character at the time
 
 ## Installation
 
