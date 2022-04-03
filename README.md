@@ -18,7 +18,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 * Seeking froward, Backward (Idk how)
 
 ## Contributor
-Whited
+- Whited: Emotional Support, Coding Support
 
 ## Installation
 
