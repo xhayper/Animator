@@ -67,12 +67,7 @@ function Animator.new(Character, AnimationResolvable)
 			self.AnimationData = Parser:parseAnimationData(keyframeSequence)
 		end
 	else
-		error(
-			format(
-				"invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)",
-				type
-			)
-		)
+		error(format("invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)", type))
 	end
 
 	self.Character = Character
@@ -159,16 +154,17 @@ function Animator:_playPose(pose, parent, fade)
 		move(BB, 1, #BB, #C + 1, C)
 	end
 	for count = 1, #C do
-		local motor = C[count]
+		local obj = C[count]
 		if self == nil or self._stopped then
 			break
 		end
 		if fade > 0 then
-			TweenService:Create(motor, TI, Target):Play()
+			TweenService:Create(obj, TI, Target):Play()
 		else
-			motor.Transform = pose.CFrame
+			obj.Transform = pose.CFrame
 		end
 	end
+	print("A")
 end
 
 function Animator:Play(fadeTime, weight, speed)
