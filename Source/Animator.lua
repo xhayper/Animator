@@ -143,13 +143,15 @@ function Animator:_playPose(pose, parent, fade)
 	local Target = { Transform = pose.CFrame }
 	local M = MotorMap[parent.Name]
 	local B = BoneMap[parent.Name]
+	print(M)
 	local C = {}
 	if M then
-		local MM = M[pose.Name]
+		local MM = M[pose.Name] or {}
+		print(#MM)
 		move(MM, 1, #MM, 1, C)
 	end
 	if B then
-		local BB = B[pose.Name]
+		local BB = B[pose.Name] or {}
 		move(BB, 1, #BB, #C + 1, C)
 	end
 	for count = 1, #C do
