@@ -1,6 +1,5 @@
 local Utility = animatorRequire("Utility.lua")
 
-local insert, sort = table.insert, table.sort
 local format = string.format
 
 local Parser = {}
@@ -24,7 +23,7 @@ function Parser:parsePoseData(pose)
 			if p.ClassName ~= "Pose" then
 				continue
 			end
-			insert(poseData.Subpose, Parser:parsePoseData(p))
+			table.insert(poseData.Subpose, Parser:parsePoseData(p))
 		end
 	end
 	return poseData
@@ -39,7 +38,7 @@ function Parser:parseKeyframeData(keyframe)
 	for count = 1, #Children do
 		local p = Children[count]
 		if p.ClassName == "Pose" then
-			insert(keyframeData.Pose, Parser:parsePoseData(p))
+			table.insert(keyframeData.Pose, Parser:parsePoseData(p))
 		elseif p.ClassName == "KeyframeMarker" then
 			if not keyframeData["Marker"] then
 				keyframeData.Marker = {}
@@ -47,7 +46,7 @@ function Parser:parseKeyframeData(keyframe)
 			if not keyframeData.Marker[p.Name] then
 				keyframeData.Marker[p.Name] = {}
 			end
-			insert(keyframeData.Marker[p.Name], p.Value)
+			table.insert(keyframeData.Marker[p.Name], p.Value)
 		end
 	end
 	return keyframeData
@@ -69,10 +68,10 @@ function Parser:parseAnimationData(keyframeSequence)
 		if f.ClassName ~= "Keyframe" then
 			continue
 		end
-		insert(animationData.Frames, Parser:parseKeyframeData(f))
+		table.insert(animationData.Frames, Parser:parseKeyframeData(f))
 	end
 
-	sort(animationData.Frames, function(l, r)
+	table.sort(animationData.Frames, function(l, r)
 		return l.Time < r.Time
 	end)
 
