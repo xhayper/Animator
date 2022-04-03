@@ -45,17 +45,19 @@ function Animator.new(Character, AnimationResolvable)
 	end
 
 	local self = setmetatable({}, Animator)
-
-	if typeof(AnimationResolvable) == "number" then
-		local keyframeSequence = KeyframeSequenceProvider:GetKeyframeSequenceAsync(AnimationResolvable)
+	local type = typeof(AnimationResolvable)
+	if type == "string" or type == "number" then
+		local keyframeSequence = KeyframeSequenceProvider:GetKeyframeSequenceAsync(tostring(AnimationResolvable))
 		self.AnimationData = Parser:parseAnimationData(keyframeSequence)
-	elseif typeof(AnimationResolvable) == "table" then
+	elseif type == "table" then
 		self.AnimationData = AnimationResolvable
-	elseif typeof(AnimationResolvable) == "Instance" then
+	elseif type == "Instance" then
 		if AnimationResolvable.ClassName == "KeyframeSequence" then
 			self.AnimationData = Parser:parseAnimationData(AnimationResolvable)
 		elseif AnimationResolvable.ClassName == "Animation" then
-			local keyframeSequence = KeyframeSequenceProvider:GetKeyframeSequenceAsync(AnimationResolvable.AnimationId)
+			local keyframeSequence = KeyframeSequenceProvider:GetKeyframeSequenceAsync(
+				tostring(AnimationResolvable.AnimationId)
+			)
 			self.AnimationData = Parser:parseAnimationData(keyframeSequence)
 		end
 	else
