@@ -42,7 +42,6 @@ local Animator = {
 
 local CF, Angles = CFrame.new, CFrame.Angles
 local format = string.format
-local insert = table.insert
 local spawn = task.spawn
 local wait = task.wait
 local clock = os.clock
@@ -108,7 +107,7 @@ function Animator:IgnoreMotor(inst)
 	if inst.ClassName ~= "Motor6D" then
 		error(format("invalid argument 1 to 'IgnoreMotor' (Motor6D expected, got %s)", inst.ClassName))
 	end
-	insert(self.MotorIgnoreList, inst)
+	table.insert(self.MotorIgnoreList, inst)
 end
 
 function Animator:IgnoreBone(inst)
@@ -118,21 +117,21 @@ function Animator:IgnoreBone(inst)
 	if inst.ClassName ~= "Bone" then
 		error(format("invalid argument 1 to 'IgnoreBone' (Bone expected, got %s)", inst.ClassName))
 	end
-	insert(self.BoneIgnoreList, inst)
+	table.insert(self.BoneIgnoreList, inst)
 end
 
 function Animator:IgnoreMotorIn(inst)
 	if typeof(inst) ~= "Instance" then
 		error(format("invalid argument 1 to 'IgnoreMotorIn' (Instance expected, got %s)", typeof(inst)))
 	end
-	insert(self.MotorIgnoreInList, inst)
+	table.insert(self.MotorIgnoreInList, inst)
 end
 
 function Animator:IgnoreBoneIn(inst)
 	if typeof(inst) ~= "Instance" then
 		error(format("invalid argument 1 to 'IgnoreBoneIn' (Instance expected, got %s)", typeof(inst)))
 	end
-	insert(self.BoneIgnoreInList, inst)
+	table.insert(self.BoneIgnoreInList, inst)
 end
 
 function Animator:_playPose(pose, parent, fade)
