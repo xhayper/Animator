@@ -257,34 +257,40 @@ function Animator:Play(fadeTime, weight, speed)
 		wait()
 		local TI = TweenInfo.new(self._stopFadeTime or fadeTime, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 		if self.Character then
-			local MotorList = Utility:getMotors(self.Character, {
+			local MotorMap = Utility:getMotorMap(self.Character, {
 				IgnoreIn = self.MotorIgnoreInList,
 				IgnoreList = self.MotorIgnoreList,
 			})
-			local BoneList = Utility:getBones(self.Character, {
+			local BoneMap = Utility:getBoneMap(self.Character, {
 				IgnoreIn = self.BoneIgnoreInList,
 				IgnoreList = self.BoneIgnoreList,
 			})
-			for count = 1, #MotorList do
-				local r = MotorList[count]
-				if (self._stopFadeTime or fadeTime) > 0 then
-					TweenService
-						:Create(r, TI, {
-							Transform = DefaultMotorCF,
-							CurrentAngle = 0,
-						})
-						:Play()
-				else
-					r.CurrentAngle = 0
-					r.Transform = DefaultMotorCF
+			for _, motors in pairs(MotorMap) do
+				for i in #motors do
+					local motor = motors[i]
+					if (self._stopFadeTime or fadeTime) > 0 then
+						TweenService
+							:Create(motor, TI, {
+								Transform = DefaultMotorCF,
+							})
+							:Play()
+					else
+						motor.Transform = DefaultMotorCF
+					end
 				end
 			end
-			for count = 1, #BoneList do
-				local b = BoneList[count]
-				if (self._stopFadeTime or fadeTime) > 0 then
-					TweenService:Create(b, TI, { Transform = DefaultBoneCF }):Play()
-				else
-					b.Transform = DefaultBoneCF
+			for _, bones in pairs(BoneMap) do
+				for i in #bones do
+					local motor = bones[i]
+					if (self._stopFadeTime or fadeTime) > 0 then
+						TweenService
+							:Create(motor, TI, {
+								Transform = DefaultBoneCF,
+							})
+							:Play()
+					else
+						motor.Transform = DefaultBoneCF
+					end
 				end
 			end
 			if
