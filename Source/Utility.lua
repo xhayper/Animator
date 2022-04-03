@@ -1,6 +1,7 @@
 local Utility = {}
 
 local format = string.format
+local find = table.find
 
 function Utility:sendNotif(Text, Icon, Duration, Button1, Button2, Callback)
 	game:GetService("StarterGui"):SetCore("SendNotification", {
@@ -35,72 +36,89 @@ function Utility:convertEnum(enum)
 	end
 end
 
-function Utility:getBones(Character, IgnoreList)
-	IgnoreList = IgnoreList or {
-		IgnoreIn = {},
-		IgnoreList = {},
-	}
-
+function Utility:getBoneMap(Character, IgnoreObject)
 	if typeof(Character) ~= "Instance" then
-		error(format("invalid argument 1 to 'getBones' (Instance expected, got %s)", typeof(Character)))
+		error(format("invalid argument 1 to 'getBoneMap' (Instance expected, got %s)", typeof(Character)))
 	end
 
-	local BoneList = {}
+	local BoneMap = {}
 	local Descendants = Character:GetDescendants()
 
 	for count = 1, #Descendants do
 		local i = Descendants[count]
-		if not i:IsA("Bone") then
+		local parent = i.Parent
+		if
+			parent == nil
+			or i.ClassName ~= "Bone"
+			or (IgnoreObject and IgnoreObject.IgnoreList and find(IgnoreObject.IgnoreList, i))
+		then
 			continue
 		end
-		if table.find(IgnoreList.IgnoreList, i) then continue end
-		local IsTained = false
-		for count2 = 1, #IgnoreList.IgnoreIn do
-			local i2 = IgnoreList.IgnoreIn[count2]
-			if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
-				IsTained = true
-				break
+		if IgnoreObject and IgnoreObject.IgnoreIn and #IgnoreObject.IgnoreIn > 0 then
+			local IsTained = false
+			for count2 = 1, #IgnoreObject.IgnoreIn do
+				local i2 = IgnoreObject.IgnoreIn[count2]
+				if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+					IsTained = true
+					break
+				end
+			end
+			if IsTained then
+				continue
 			end
 		end
-		if IsTained then continue end
-		table.insert(BoneList, i)
+		local T = BoneMap[parent.Name]
+		if not T then
+			T = {}
+		end
+		T[i.Name] = i
 	end
 
-	return BoneList
+	return BoneMap
 end
 
-function Utility:getMotors(Character, IgnoreList)
-	IgnoreList = IgnoreList or {
-		IgnoreIn = {},
-		IgnoreList = {},
-	}
-
+function Utility:getMotorMap(Character, IgnoreObject)
 	if typeof(Character) ~= "Instance" then
-		error(format("invalid argument 1 to 'getMotors' (Instance expected, got %s)", typeof(Character)))
+		error(format("invalid argument 1 to 'getMotorMap' (Instance expected, got %s)", typeof(Character)))
 	end
 
-	local MotorList = {}
+	local MotorMap = {}
 	local Descendants = Character:GetDescendants()
 
 	for count = 1, #Descendants do
 		local i = Descendants[count]
-		if not i:IsA("Motor6D") then
+		if
+			i.ClassName ~= "Motor6D"
+			or (i.Part0 == nil or i.Part1 == nil)
+			or (IgnoreObject and IgnoreObject.IgnoreList and find(IgnoreObject.IgnoreList, i))
+		then
 			continue
 		end
-		if table.find(IgnoreList.IgnoreList, i) then continue end
-		local IsTained = false
-		for count2 = 1, #IgnoreList.IgnoreIn do
-			local i2 = IgnoreList.IgnoreIn[count2]
-			if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
-				IsTained = true
-				break
+		if IgnoreObject and IgnoreObject.IgnoreIn and #IgnoreObject.IgnoreIn > 0 then
+			local IsTained = false
+			for count2 = 1, #IgnoreObject.IgnoreIn do
+				local i2 = IgnoreObject.IgnoreIn[count2]
+				if typeof(i2) == "Instance" and i:IsDescendantOf(i2) then
+					IsTained = true
+					break
+				end
+			end
+			if IsTained then
+				continue
 			end
 		end
-		if IsTained then continue end
-		table.insert(MotorList, i)
+		local T = MotorMap[i.Part0.Name]
+		if not T then
+			T = {}
+		end
+		local TT = T[i.Part1.Name]
+		if not TT then
+			TT = {}
+		end
+		TT[#TT + 1] = i
 	end
 
-	return MotorList
+	return MotorMap
 end
 
 return Utility

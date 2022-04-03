@@ -5,7 +5,7 @@ local format = string.format
 local Parser = {}
 
 function Parser:parsePoseData(pose)
-	if not pose:IsA("Pose") then
+	if pose.ClassName ~= "Pose" then
 		error(format("invalid argument 1 to 'parsePoseData' (Pose expected, got %s)", pose.ClassName))
 	end
 	local poseData = {
@@ -20,40 +20,41 @@ function Parser:parsePoseData(pose)
 		local Children = pose:GetChildren()
 		for count = 1, #Children do
 			local p = Children[count]
-			if not p:IsA("Pose") then
+			if p.ClassName ~= "Pose" then
 				continue
 			end
-			table.insert(poseData.Subpose, Parser:parsePoseData(p))
+			poseData.Subpose[#poseData.Subpose + 1] = Parser:parsePoseData(p)
 		end
 	end
 	return poseData
 end
 
 function Parser:parseKeyframeData(keyframe)
-	if not keyframe:IsA("Keyframe") then
+	if keyframe.ClassName ~= "Keyframe" then
 		error(format("invalid argument 1 to 'parseKeyframeData' (Keyframe expected, got %s)", keyframe.ClassName))
 	end
 	local keyframeData = { Name = keyframe.Name, Time = keyframe.Time, Pose = {} }
 	local Children = keyframe:GetChildren()
 	for count = 1, #Children do
 		local p = Children[count]
-		if p:IsA("Pose") then
-			table.insert(keyframeData.Pose, Parser:parsePoseData(p))
-		elseif p:IsA("KeyframeMarker") then
+		if p.ClassName == "Pose" then
+			keyframeData.Pose[#keyframeData.Pose + 1] = Parser:parsePoseData(p)
+		elseif p.ClassName == "KeyframeMarker" then
 			if not keyframeData["Marker"] then
 				keyframeData.Marker = {}
 			end
-			if not keyframeData.Marker[p.Name] then
-				keyframeData.Marker[p.Name] = {}
+			local T = keyframeData.Marker[p.Name]
+			if not T then
+				T = {}
 			end
-			table.insert(keyframeData.Marker[p.Name], p.Value)
+			T[#T + 1] = p.Value
 		end
 	end
 	return keyframeData
 end
 
 function Parser:parseAnimationData(keyframeSequence)
-	if not keyframeSequence:IsA("KeyframeSequence") then
+	if keyframeSequence.ClassName ~= "KeyframeSequence" then
 		error(
 			format(
 				"invalid argument 1 to 'parseAnimationData' (KeyframeSequence expected, got %s)",
@@ -65,10 +66,10 @@ function Parser:parseAnimationData(keyframeSequence)
 	local Children = keyframeSequence:GetChildren()
 	for count = 1, #Children do
 		local f = Children[count]
-		if not f:IsA("Keyframe") then
+		if f.ClassName ~= "Keyframe" then
 			continue
 		end
-		table.insert(animationData.Frames, Parser:parseKeyframeData(f))
+		animationData.Frames[#animationData.Frames + 1] = Parser:parseKeyframeData(f)
 	end
 
 	table.sort(animationData.Frames, function(l, r)

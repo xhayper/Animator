@@ -1,3 +1,4 @@
+local KeyframeSequenceProvider = game:GetService("KeyframeSequenceProvider")
 local TweenService = game:GetService("TweenService")
 
 local Parser = animatorRequire("Parser.lua")
@@ -26,9 +27,12 @@ local Animator = {
 }
 
 local CF, Angles = CFrame.new, CFrame.Angles
-local deg = math.deg
-local clock = os.clock
 local format = string.format
+local spawn = task.spawn
+local move = table.move
+local wait = task.wait
+local clock = os.clock
+local deg = math.deg
 
 local DefaultMotorCF = CF()
 local DefaultBoneCF = DefaultMotorCF * Angles(deg(0), deg(0), deg(0))
@@ -42,23 +46,17 @@ function Animator.new(Character, AnimationResolvable)
 
 	local self = setmetatable({}, Animator)
 
-	if typeof(AnimationResolvable) == "string" or typeof(AnimationResolvable) == "number" then
-		local animationInstance = game:GetObjects("rbxassetid://" .. tostring(AnimationResolvable))[1]
-		if not animationInstance:IsA("KeyframeSequence") then
-			error("invalid argument 1 to 'new' (AnimationID expected)")
-		end
-		self.AnimationData = Parser:parseAnimationData(animationInstance)
+	if typeof(AnimationResolvable) == "number" then
+		local keyframeSequence = KeyframeSequenceProvider:GetKeyframeSequenceAsync(AnimationResolvable)
+		self.AnimationData = Parser:parseAnimationData(keyframeSequence)
 	elseif typeof(AnimationResolvable) == "table" then
 		self.AnimationData = AnimationResolvable
 	elseif typeof(AnimationResolvable) == "Instance" then
-		if AnimationResolvable:IsA("KeyframeSequence") then
+		if AnimationResolvable.ClassName == "KeyframeSequence" then
 			self.AnimationData = Parser:parseAnimationData(AnimationResolvable)
-		elseif AnimationResolvable:IsA("Animation") then
-			local animationInstance = game:GetObjects(AnimationResolvable.AnimationId)[1]
-			if not animationInstance:IsA("KeyframeSequence") then
-				error("invalid argument 1 to 'new' (AnimationID inside Animation expected)")
-			end
-			self.AnimationData = Parser:parseAnimationData(animationInstance)
+		elseif AnimationResolvable.ClassName == "Animation" then
+			local keyframeSequence = KeyframeSequenceProvider:GetKeyframeSequenceAsync(AnimationResolvable.AnimationId)
+			self.AnimationData = Parser:parseAnimationData(keyframeSequence)
 		end
 	else
 		error(
@@ -93,7 +91,7 @@ function Animator:IgnoreMotor(inst)
 	if inst.ClassName ~= "Motor6D" then
 		error(format("invalid argument 1 to 'IgnoreMotor' (Motor6D expected, got %s)", inst.ClassName))
 	end
-	table.insert(self.MotorIgnoreList, inst)
+	self.MotorIgnoreList[#self.MotorIgnoreList + 1] = inst
 end
 
 function Animator:IgnoreBone(inst)
@@ -103,29 +101,29 @@ function Animator:IgnoreBone(inst)
 	if inst.ClassName ~= "Bone" then
 		error(format("invalid argument 1 to 'IgnoreBone' (Bone expected, got %s)", inst.ClassName))
 	end
-	table.insert(self.BoneIgnoreList, inst)
+	self.BoneIgnoreList[#self.BoneIgnoreList + 1] = inst
 end
 
 function Animator:IgnoreMotorIn(inst)
 	if typeof(inst) ~= "Instance" then
 		error(format("invalid argument 1 to 'IgnoreMotorIn' (Instance expected, got %s)", typeof(inst)))
 	end
-	table.insert(self.MotorIgnoreInList, inst)
+	self.MotorIgnoreInList[#self.MotorIgnoreInList + 1] = inst
 end
 
 function Animator:IgnoreBoneIn(inst)
 	if typeof(inst) ~= "Instance" then
 		error(format("invalid argument 1 to 'IgnoreBoneIn' (Instance expected, got %s)", typeof(inst)))
 	end
-	table.insert(self.BoneIgnoreInList, inst)
+	self.BoneIgnoreInList[#self.BoneIgnoreInList + 1] = inst
 end
 
 function Animator:_playPose(pose, parent, fade)
-	local MotorList = Utility:getMotors(self.Character, {
+	local MotorMap = Utility:getMotorMap(self.Character, {
 		IgnoreIn = self.MotorIgnoreInList,
 		IgnoreList = self.MotorIgnoreList,
 	})
-	local BoneList = Utility:getBones(self.Character, {
+	local BoneMap = Utility:getBoneMap(self.Character, {
 		IgnoreIn = self.BoneIgnoreInList,
 		IgnoreList = self.BoneIgnoreList,
 	})
@@ -140,38 +138,29 @@ function Animator:_playPose(pose, parent, fade)
 		return
 	end
 	local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
-	task.spawn(function()
-		for count = 1, #MotorList do
-			local motor = MotorList[count]
-			if motor.Part0.Name ~= parent.Name or motor.Part1.Name ~= pose.Name then
-				continue
-			end
-			if self == nil or self._stopped then
-				break
-			end
-			if fade > 0 then
-				TweenService:Create(motor, TI, { Transform = pose.CFrame }):Play()
-			else
-				motor.Transform = pose.CFrame
-			end
+	local Target = { Transform = pose.CFrame }
+	local M = MotorMap[parent.Name]
+	local B = BoneMap[parent.Name]
+	local C = {}
+	if M then
+		local MM = M[pose.Name]
+		move(MM, 1, #MM, 1, C)
+	end
+	if B then
+		local BB = B[pose.Name]
+		move(BB, 1, #BB, #C + 1, C)
+	end
+	for count = 1, #C do
+		local motor = C[count]
+		if self == nil or self._stopped then
+			break
 		end
-	end)
-	task.spawn(function()
-		for count = 1, #BoneList do
-			local bone = BoneList[count]
-			if parent.Name ~= bone.Parent.Name or bone.Name ~= pose.Name then
-				continue
-			end
-			if self == nil or self._stopped then
-				break
-			end
-			if fade > 0 then
-				TweenService:Create(bone, TI, { Transform = pose.CFrame }):Play()
-			else
-				bone.Transform = pose.CFrame
-			end
+		if fade > 0 then
+			TweenService:Create(motor, TI, Target):Play()
+		else
+			motor.Transform = pose.CFrame
 		end
-	end)
+	end
 end
 
 function Animator:Play(fadeTime, weight, speed)
@@ -201,7 +190,7 @@ function Animator:Play(fadeTime, weight, speed)
 		con2:Disconnect()
 	end)
 	local start = clock()
-	task.spawn(function()
+	spawn(function()
 		for i = 1, #self.AnimationData.Frames do
 			if self._stopped then
 				break
@@ -234,7 +223,7 @@ function Animator:Play(fadeTime, weight, speed)
 			end
 			if t > clock() - start then
 				repeat
-					task.wait()
+					wait()
 				until self._stopped or clock() - start >= t
 			end
 		end
@@ -249,7 +238,7 @@ function Animator:Play(fadeTime, weight, speed)
 			self._isLooping = true
 			return self:Play(fadeTime, weight, speed)
 		end
-		task.wait()
+		wait()
 		local TI = TweenInfo.new(self._stopFadeTime or fadeTime, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
 		if self.Character then
 			local MotorList = Utility:getMotors(self.Character, {

@@ -1,4 +1,4 @@
-local pathToGithub = "https://raw.githubusercontent.com/xhayper/Animator/main/Source/"
+local pathToGithub = "https://raw.githubusercontent.com/xhayper/Animator/rewrite/Source/"
 
 getgenv().httpRequireCache = getgenv().httpRequireCache or {}
 
