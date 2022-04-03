@@ -47,7 +47,9 @@ function Animator.new(Character, AnimationResolvable)
 	local self = setmetatable({}, Animator)
 	local type = typeof(AnimationResolvable)
 	if type == "string" or type == "number" then
-		local keyframeSequence = KeyframeSequenceProvider:GetKeyframeSequenceAsync(tostring(AnimationResolvable))
+		local keyframeSequence = KeyframeSequenceProvider:GetKeyframeSequenceAsync(
+			"rbxassetid://" .. tostring(AnimationResolvable)
+		)
 		self.AnimationData = Parser:parseAnimationData(keyframeSequence)
 	elseif type == "table" then
 		self.AnimationData = AnimationResolvable
@@ -55,9 +57,7 @@ function Animator.new(Character, AnimationResolvable)
 		if AnimationResolvable.ClassName == "KeyframeSequence" then
 			self.AnimationData = Parser:parseAnimationData(AnimationResolvable)
 		elseif AnimationResolvable.ClassName == "Animation" then
-			local keyframeSequence = KeyframeSequenceProvider:GetKeyframeSequenceAsync(
-				tostring(AnimationResolvable.AnimationId)
-			)
+			local keyframeSequence = KeyframeSequenceProvider:GetKeyframeSequenceAsync(AnimationResolvable.AnimationId)
 			self.AnimationData = Parser:parseAnimationData(keyframeSequence)
 		end
 	else
