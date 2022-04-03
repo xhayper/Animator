@@ -18,7 +18,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 * Seeking froward, Backward (Idk how)
 
 ## Contributor
-- Whited: Emotional Support, Coding Support
+- [Whited](https://github.com/M6HqVBcddw2qaN4s): Emotional Support and Coding Support
 
 ## Installation
 
@@ -32,7 +32,9 @@ end
 
 # Reference
 
-[Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua)
+- [Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua)
+
+# Acutal Docs
 
 ```lua
 -- Types --
