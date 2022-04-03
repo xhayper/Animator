@@ -1,6 +1,5 @@
 local Utility = {}
 
-local insert, find = table.insert, table.find
 local format = string.format
 
 function Utility:sendNotif(Text, Icon, Duration, Button1, Button2, Callback)
@@ -50,7 +49,7 @@ function Utility:getBoneMap(Character, IgnoreObject)
 		if
 			parent == nil
 			or i.ClassName ~= "Bone"
-			or (IgnoreObject and IgnoreObject.IgnoreList and find(IgnoreObject.IgnoreList, i))
+			or (IgnoreObject and IgnoreObject.IgnoreList and table.find(IgnoreObject.IgnoreList, i))
 		then
 			continue
 		end
@@ -75,7 +74,7 @@ function Utility:getBoneMap(Character, IgnoreObject)
 		if not BoneMap[parentName][iName] then
 			BoneMap[parentName][iName] = {}
 		end
-		insert(BoneMap[parentName][iName], i)
+		table.insert(BoneMap[parentName][iName], i)
 	end
 
 	return BoneMap
@@ -94,7 +93,7 @@ function Utility:getMotorMap(Character, IgnoreObject)
 		if
 			i.ClassName ~= "Motor6D"
 			or (i.Part0 == nil or i.Part1 == nil)
-			or (IgnoreObject and IgnoreObject.IgnoreList and find(IgnoreObject.IgnoreList, i))
+			or (IgnoreObject and IgnoreObject.IgnoreList and table.find(IgnoreObject.IgnoreList, i))
 		then
 			continue
 		end
@@ -119,7 +118,7 @@ function Utility:getMotorMap(Character, IgnoreObject)
 		if not MotorMap[part0Name][part1Name] then
 			MotorMap[part0Name][part1Name] = {}
 		end
-		insert(MotorMap[part0Name][part1Name], i)
+		table.insert(MotorMap[part0Name][part1Name], i)
 	end
 
 	return MotorMap
