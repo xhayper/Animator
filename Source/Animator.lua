@@ -283,15 +283,15 @@ function Animator:Play(fadeTime, weight, speed)
 			end
 			for _, bones in pairs(BoneMap) do
 				for count = 1, #bones do
-					local motor = bones[count]
+					local bone = bones[count]
 					if (self._stopFadeTime or fadeTime) > 0 then
 						TweenService
-							:Create(motor, TI, {
+							:Create(bone, TI, {
 								Transform = DefaultBoneCF,
 							})
 							:Play()
 					else
-						motor.Transform = DefaultBoneCF
+						bone.Transform = DefaultBoneCF
 					end
 				end
 			end
