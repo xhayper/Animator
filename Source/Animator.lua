@@ -276,8 +276,8 @@ function Animator:Play(fadeTime, weight, speed)
 							})
 							:Play()
 					else
-						motor.Transform = DefaultMotorCF
 						motor.CurrentAngle = 0
+						motor.Transform = DefaultMotorCF
 					end
 				end
 			end
