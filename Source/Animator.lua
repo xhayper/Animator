@@ -122,14 +122,6 @@ function Animator:IgnoreBoneIn(inst)
 end
 
 function Animator:_playPose(pose, parent, fade)
-	local MotorMap = Utility:getMotorMap(self.Character, {
-		IgnoreIn = self.MotorIgnoreInList,
-		IgnoreList = self.MotorIgnoreList,
-	})
-	local BoneMap = Utility:getBoneMap(self.Character, {
-		IgnoreIn = self.BoneIgnoreInList,
-		IgnoreList = self.BoneIgnoreList,
-	})
 	if pose.Subpose then
 		local SubPose = pose.Subpose
 		for count = 1, #SubPose do
@@ -140,6 +132,14 @@ function Animator:_playPose(pose, parent, fade)
 	if not parent then
 		return
 	end
+	local MotorMap = Utility:getMotorMap(self.Character, {
+		IgnoreIn = self.MotorIgnoreInList,
+		IgnoreList = self.MotorIgnoreList,
+	})
+	local BoneMap = Utility:getBoneMap(self.Character, {
+		IgnoreIn = self.BoneIgnoreInList,
+		IgnoreList = self.BoneIgnoreList,
+	})
 	local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
 	local Target = { Transform = pose.CFrame }
 	local M = MotorMap[parent.Name]
