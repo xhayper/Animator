@@ -266,31 +266,34 @@ function Animator:Play(fadeTime, weight, speed)
 				IgnoreList = self.BoneIgnoreList,
 			})
 			for _, motors in pairs(MotorMap) do
-				for k, motor in pairs(motors) do
-					print(k, motor)
-					if (self._stopFadeTime or fadeTime) > 0 then
-						TweenService
-							:Create(motor, TI, {
-								Transform = DefaultMotorCF,
-								CurrentAngle = 0,
-							})
-							:Play()
-					else
-						motor.CurrentAngle = 0
-						motor.Transform = DefaultMotorCF
+				for _, motors in pairs(motors) do
+					for _, motor in pairs(motors) do
+						if (self._stopFadeTime or fadeTime) > 0 then
+							TweenService
+								:Create(motor, TI, {
+									Transform = DefaultMotorCF,
+									CurrentAngle = 0,
+								})
+								:Play()
+						else
+							motor.CurrentAngle = 0
+							motor.Transform = DefaultMotorCF
+						end
 					end
 				end
 			end
 			for _, bones in pairs(BoneMap) do
-				for _, bone in pairs(bones) do
-					if (self._stopFadeTime or fadeTime) > 0 then
-						TweenService
-							:Create(bone, TI, {
-								Transform = DefaultBoneCF,
-							})
-							:Play()
-					else
-						bone.Transform = DefaultBoneCF
+				for _, bones in pairs(bones) do
+					for _, bone in pairs(bones) do
+						if (self._stopFadeTime or fadeTime) > 0 then
+							TweenService
+								:Create(bone, TI, {
+									Transform = DefaultBoneCF,
+								})
+								:Play()
+						else
+							bone.Transform = DefaultBoneCF
+						end
 					end
 				end
 			end
