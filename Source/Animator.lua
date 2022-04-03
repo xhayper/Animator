@@ -1,4 +1,3 @@
-local KeyframeSequenceProvider = game:GetService("KeyframeSequenceProvider")
 local TweenService = game:GetService("TweenService")
 
 local Parser = animatorRequire("Parser.lua")
