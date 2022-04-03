@@ -66,7 +66,7 @@ function Parser:parseAnimationData(keyframeSequence)
 	local Children = keyframeSequence:GetChildren()
 	for count = 1, #Children do
 		local f = Children[count]
-		if f ~= "Keyframe" then
+		if f.ClassName ~= "Keyframe" then
 			continue
 		end
 		insert(animationData.Frames, Parser:parseKeyframeData(f))
