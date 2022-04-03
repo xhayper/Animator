@@ -18,13 +18,13 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 * Seeking froward, Backward (Idk how)
 
 ## Contributor
-* Whited
+
 
 ## Installation
 
 ```lua
 if getgenv()["Animator"] == nil then
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/rewrite/Source/Main.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 end
 ```
 
@@ -115,7 +115,7 @@ Humanoid:LoadAnimation(AnimationResolvable:AnimationResolvable, UseDefaultLoadAn
 
 ```lua
 if not getgenv()["Animator"] then
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/rewrite/Source/Main.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 end
 
 local Player = game:GetService("Players").LocalPlayer
@@ -128,7 +128,7 @@ print("Done!")
 
 ```lua
 if not getgenv()["Animator"] then
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/rewrite/Source/Main.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 	hookAnimatorFunction() -- Hook animator to Humanoid:LoadAnimation()
 end
 
@@ -147,7 +147,7 @@ print("Done!")
 
 ```lua
 if not getgenv()["Animator"] then
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/rewrite/Source/Main.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 end
 
 -- Main --
