@@ -1,11 +1,12 @@
 local Utility = animatorRequire("Utility.lua")
 
+local insert, sort = table.insert, table.sort
 local format = string.format
 
 local Parser = {}
 
 function Parser:parsePoseData(pose)
-	if pose.ClassName ~= "Pose" then
+	if not pose:IsA("Pose") then
 		error(format("invalid argument 1 to 'parsePoseData' (Pose expected, got %s)", pose.ClassName))
 	end
 	local poseData = {
@@ -23,14 +24,14 @@ function Parser:parsePoseData(pose)
 			if p.ClassName ~= "Pose" then
 				continue
 			end
-			poseData.Subpose[#poseData.Subpose + 1] = Parser:parsePoseData(p)
+			insert(poseData.Subpose, Parser:parsePoseData(p))
 		end
 	end
 	return poseData
 end
 
 function Parser:parseKeyframeData(keyframe)
-	if keyframe.ClassName ~= "Keyframe" then
+	if not keyframe:IsA("Keyframe") then
 		error(format("invalid argument 1 to 'parseKeyframeData' (Keyframe expected, got %s)", keyframe.ClassName))
 	end
 	local keyframeData = { Name = keyframe.Name, Time = keyframe.Time, Pose = {} }
@@ -38,16 +39,15 @@ function Parser:parseKeyframeData(keyframe)
 	for count = 1, #Children do
 		local p = Children[count]
 		if p.ClassName == "Pose" then
-			keyframeData.Pose[#keyframeData.Pose + 1] = Parser:parsePoseData(p)
+			insert(keyframeData.Pose, Parser:parsePoseData(p))
 		elseif p.ClassName == "KeyframeMarker" then
 			if not keyframeData["Marker"] then
 				keyframeData.Marker = {}
 			end
-			local T = keyframeData.Marker[p.Name]
-			if not T then
-				T = {}
+			if not keyframeData.Marker[p.Name] then
+				keyframeData.Marker[p.Name] = {}
 			end
-			T[#T + 1] = p.Value
+			insert(keyframeData.Marker[p.Name], p.Value)
 		end
 	end
 	return keyframeData
@@ -66,13 +66,13 @@ function Parser:parseAnimationData(keyframeSequence)
 	local Children = keyframeSequence:GetChildren()
 	for count = 1, #Children do
 		local f = Children[count]
-		if f.ClassName ~= "Keyframe" then
+		if f ~= "Keyframe" then
 			continue
 		end
-		animationData.Frames[#animationData.Frames + 1] = Parser:parseKeyframeData(f)
+		insert(animationData.Frames, Parser:parseKeyframeData(f))
 	end
 
-	table.sort(animationData.Frames, function(l, r)
+	sort(animationData.Frames, function(l, r)
 		return l.Time < r.Time
 	end)
 
