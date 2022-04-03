@@ -6,7 +6,7 @@ local format = string.format
 local Parser = {}
 
 function Parser:parsePoseData(pose)
-	if not pose:IsA("Pose") then
+	if pose.ClassName ~= "Pose" then
 		error(format("invalid argument 1 to 'parsePoseData' (Pose expected, got %s)", pose.ClassName))
 	end
 	local poseData = {
@@ -31,7 +31,7 @@ function Parser:parsePoseData(pose)
 end
 
 function Parser:parseKeyframeData(keyframe)
-	if not keyframe:IsA("Keyframe") then
+	if keyframe.ClassName ~= "Keyframe" then
 		error(format("invalid argument 1 to 'parseKeyframeData' (Keyframe expected, got %s)", keyframe.ClassName))
 	end
 	local keyframeData = { Name = keyframe.Name, Time = keyframe.Time, Pose = {} }
