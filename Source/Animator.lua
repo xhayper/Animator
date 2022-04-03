@@ -265,7 +265,8 @@ function Animator:Play(fadeTime, weight, speed)
 				IgnoreIn = self.BoneIgnoreInList,
 				IgnoreList = self.BoneIgnoreList,
 			})
-			for _, motors in pairs(MotorMap) do
+			for k, motors in pairs(MotorMap) do
+				print(k, motors)
 				for count = 1, #motors do
 					local motor = motors[count]
 					if (self._stopFadeTime or fadeTime) > 0 then
