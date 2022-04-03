@@ -266,9 +266,9 @@ function Animator:Play(fadeTime, weight, speed)
 				IgnoreList = self.BoneIgnoreList,
 			})
 			for _, motors in pairs(MotorMap) do
+				print(#motors)
 				for count = 1, #motors do
 					local motor = motors[count]
-					print(motor.ClassName)
 					if (self._stopFadeTime or fadeTime) > 0 then
 						TweenService
 							:Create(motor, TI, {
