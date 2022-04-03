@@ -267,8 +267,7 @@ function Animator:Play(fadeTime, weight, speed)
 			})
 			for _, motors in pairs(MotorMap) do
 				print(motors)
-				for count = 1, #motors do
-					local motor = motors[count]
+				for _, motor in pairs(motors) do
 					if (self._stopFadeTime or fadeTime) > 0 then
 						TweenService
 							:Create(motor, TI, {
@@ -283,8 +282,7 @@ function Animator:Play(fadeTime, weight, speed)
 				end
 			end
 			for _, bones in pairs(BoneMap) do
-				for count = 1, #bones do
-					local bone = bones[count]
+				for _, bone in pairs(bones) do
 					if (self._stopFadeTime or fadeTime) > 0 then
 						TweenService
 							:Create(bone, TI, {
