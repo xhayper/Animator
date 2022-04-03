@@ -1,7 +1,7 @@
 local Utility = {}
 
+local insert, find = table.insert, table.find
 local format = string.format
-local find = table.find
 
 function Utility:sendNotif(Text, Icon, Duration, Button1, Button2, Callback)
 	game:GetService("StarterGui"):SetCore("SendNotification", {
@@ -67,11 +67,15 @@ function Utility:getBoneMap(Character, IgnoreObject)
 				continue
 			end
 		end
-		local T = BoneMap[parent.Name]
-		if not T then
-			T = {}
+		local parentName = parent.Name
+		local iName = i.Name
+		if not BoneMap[parentName] then
+			BoneMap[parentName] = {}
 		end
-		T[i.Name] = i
+		if not BoneMap[parentName][iName] then
+			BoneMap[parentName][iName] = {}
+		end
+		insert(BoneMap[parentName][iName], i)
 	end
 
 	return BoneMap
@@ -107,15 +111,15 @@ function Utility:getMotorMap(Character, IgnoreObject)
 				continue
 			end
 		end
-		local T = MotorMap[i.Part0.Name]
-		if not T then
-			T = {}
+		local part0Name = i.Part0.Name
+		local part1Name = i.Part1.Name
+		if not MotorMap[part0Name] then
+			MotorMap[part0Name] = {}
 		end
-		local TT = T[i.Part1.Name]
-		if not TT then
-			TT = {}
+		if not MotorMap[part0Name][part1Name] then
+			MotorMap[part0Name][part1Name] = {}
 		end
-		TT[#TT + 1] = i
+		insert(MotorMap[part0Name][part1Name], i)
 	end
 
 	return MotorMap

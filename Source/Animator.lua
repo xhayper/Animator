@@ -6,6 +6,21 @@ local Utility = animatorRequire("Utility.lua")
 local Signal = animatorRequire("Nevermore/Signal.lua")
 local Maid = animatorRequire("Nevermore/Maid.lua")
 
+function merge(t1, t2)
+	for k, v in pairs(t2) do
+		if type(v) == "table" then
+			if type(t1[k] or false) == "table" then
+				merge(t1[k] or {}, t2[k] or {})
+			else
+				t1[k] = v
+			end
+		else
+			t1[k] = v
+		end
+	end
+	return t1
+end
+
 local Animator = {
 	AnimationData = {},
 	BoneIgnoreInList = {},
@@ -143,16 +158,14 @@ function Animator:_playPose(pose, parent, fade)
 	local Target = { Transform = pose.CFrame }
 	local M = MotorMap[parent.Name]
 	local B = BoneMap[parent.Name]
-	print(M)
 	local C = {}
 	if M then
 		local MM = M[pose.Name] or {}
-		print(#MM)
-		move(MM, 1, #MM, 1, C)
+		C = merge(C, MM)
 	end
 	if B then
 		local BB = B[pose.Name] or {}
-		move(BB, 1, #BB, #C + 1, C)
+		C = merge(C, BB)
 	end
 	for count = 1, #C do
 		local obj = C[count]
