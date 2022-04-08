@@ -40,15 +40,10 @@ local Animator = {
 	_markerSignal = {},
 }
 
-local CF, Angles = CFrame.new, CFrame.Angles
 local format = string.format
 local spawn = task.spawn
 local wait = task.wait
 local clock = os.clock
-local deg = math.deg
-
-local DefaultMotorCF = CF()
-local DefaultBoneCF = DefaultMotorCF * Angles(deg(0), deg(0), deg(0))
 
 Animator.__index = Animator
 
