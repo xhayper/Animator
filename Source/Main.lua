@@ -34,7 +34,7 @@ getgenv().hookAnimatorFunction = function()
 			return OldFunc(Object, ...)
 		end
 		local args = { ... }
-		if not args[2] or args[2] == true then
+		if args[2] then
 			return OldFunc(Object, ...)
 		end
 		return Animator.new(Object.Parent, ...)
