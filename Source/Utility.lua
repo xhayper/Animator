@@ -1,5 +1,6 @@
 local Utility = {}
 
+local tinsert = table.insert
 local format = string.format
 
 function Utility:sendNotif(Text, Icon, Duration, Button1, Button2, Callback)
@@ -74,7 +75,7 @@ function Utility:getBoneMap(Character, IgnoreObject)
 		if not BoneMap[parentName][iName] then
 			BoneMap[parentName][iName] = {}
 		end
-		table.insert(BoneMap[parentName][iName], i)
+		tinsert(BoneMap[parentName][iName], i)
 	end
 
 	return BoneMap
@@ -118,7 +119,7 @@ function Utility:getMotorMap(Character, IgnoreObject)
 		if not MotorMap[part0Name][part1Name] then
 			MotorMap[part0Name][part1Name] = {}
 		end
-		table.insert(MotorMap[part0Name][part1Name], i)
+		tinsert(MotorMap[part0Name][part1Name], i)
 	end
 
 	return MotorMap

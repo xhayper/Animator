@@ -187,24 +187,42 @@ function Animator:Play(fadeTime, weight, speed)
 	self._playing = true
 	self._isLooping = false
 	self.IsPlaying = true
-	local con
-	local con2
-	if self.Character:FindFirstChild("Humanoid") then
-		con = self.Character.Humanoid.Died:Connect(function()
+	local deathConnection
+	local noParentConnection
+	do
+		local Humanoid = self.Character:FindFirstChild("Humanoid")
+		if Humanoid then
+			deathConnection = Humanoid.Died:Connect(function()
+				self:Destroy()
+				deathConnection:Disconnect()
+			end)
+		end
+		if self.handleVanillaAnimator then
+			local AnimateScript = self.Character:FindFirstChild("Animate")
+			if AnimateScript then
+				AnimateScript.Disabled = true
+			end
+			if Humanoid then
+				local characterAnimator = Humanoid:FindFirstChild("Animator")
+				if characterAnimator then
+					do
+						local animationTrack = characterAnimator:GetPlayingAnimationTracks()
+						for i = 1, #animationTrack do
+							animationTrack[i]:Stop()
+						end
+					end
+					characterAnimator:Destroy()
+				end
+			end
+		end
+		noParentConnection = self.Character:GetPropertyChangedSignal("Parent"):Connect(function()
+			if self ~= nil and self.Character.Parent ~= nil then
+				return
+			end
 			self:Destroy()
-			con:Disconnect()
+			noParentConnection:Disconnect()
 		end)
-		if self.handleVanillaAnimator and self.Character.Humanoid:FindFirstChild("Animator") then
-			self.Character.Humanoid.Animator:Destroy()
-		end
 	end
-	con2 = self.Character:GetPropertyChangedSignal("Parent"):Connect(function()
-		if self ~= nil and self.Character.Parent ~= nil then
-			return
-		end
-		self:Destroy()
-		con2:Disconnect()
-	end)
 	local start = clock()
 	spawn(function()
 		for i = 1, #self.AnimationData.Frames do
@@ -243,11 +261,13 @@ function Animator:Play(fadeTime, weight, speed)
 				until self._stopped or clock() - start >= t
 			end
 		end
-		if con then
-			con:Disconnect()
+		if deathConnection then
+			deathConnection:Disconnect()
+			deathConnection = nil
 		end
-		if con2 then
-			con2:Disconnect()
+		if noParentConnection then
+			noParentConnection:Disconnect()
+			noParentConnection = nil
 		end
 		if self.Looped and not self._stopped then
 			self.DidLoop:Fire()
@@ -297,12 +317,15 @@ function Animator:Play(fadeTime, weight, speed)
 					end
 				end
 			end
-			if
-				self.handleVanillaAnimator
-				and self.Character:FindFirstChild("Humanoid")
-				and not self.Character.Humanoid:FindFirstChildOfClass("Animator")
-			then
-				Instance.new("Animator").Parent = self.Character.Humanoid
+			if self.handleVanillaAnimator then
+				local Humanoid = self.Character:FindFirstChild("Humanoid")
+				if Humanoid and not Humanoid:FindFirstChildOfClass("Animator") then
+					Instance.new("Animator").Parent = Humanoid
+				end
+				local AnimateScript = self.Character:FindFirstChild("Animate")
+				if AnimateScript and AnimateScript.Disabled then
+					AnimateScript.Disabled = false
+				end
 			end
 		end
 		self._stopped = false
@@ -326,7 +349,7 @@ end
 function Animator:GetMarkerReachedSignal(name)
 	if not self._markerSignal[name] then
 		self._markerSignal[name] = Signal.new()
-		self._maid["Marker_" .. name] = self._markerSignal[name]
+		self._maid["M_" .. name] = self._markerSignal[name]
 	end
 	return self._markerSignal[name]
 end
