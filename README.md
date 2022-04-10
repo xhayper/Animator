@@ -4,20 +4,23 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 
 ## Features
 
-* Easy To Use
-* Can play Trusted/Non-Trusted Animation (AnimationID, KeyframeSequence Instance and Animation Instance) / Raw Animation Data (Use [KeyframeSequence-To-AnimationData](https://github.com/xhayper/Animator/tree/main/Utility))
-* R6, R15, Custom Rig Support
-* Mesh Deformation Support
-* Simillar to Roblox's [AnimationTrack](https://developer.roblox.com/en-us/api-reference/class/AnimationTrack) API
+- Easy To Use
+- Can play Trusted/Non-Trusted Animation (AnimationID, KeyframeSequence and Animation Instance) / Raw Animation Data (Use [KeyframeSequence-To-AnimationData](https://github.com/xhayper/Animator/tree/main/Utility))
+- R6, R15, Custom Rig Support
+- Mesh Deformation Support
+- Simillar to Roblox's [AnimationTrack](https://developer.roblox.com/en-us/api-reference/class/AnimationTrack) API
 
 ## Note
-* If you gonna obfuscate your script, it's highly recommended to obfuscate the animator's script as it can broke the script
-* This doesn't replicate, you will need to re-animate with nullware
+
+- If you gonna obfuscate your script, it's highly recommended to not obfuscate the animator's script as it can broke the script
+- This doesn't re-animate out of the box, You will need a re-animate script, Nullware is the best one so far
 
 ## Planned Feature
-* Seeking froward, Backward (Idk how)
+
+- Seeking froward, Backward (Idk how)
 
 ## Contributor
+
 - [Whited](https://github.com/M6HqVBcddw2qaN4s): Emotional Support and Coding Support
 
 ## Installation
@@ -145,7 +148,7 @@ print("Done!")
 
 ## Animator with UI
 
-* Note: UI Only support Animation ID
+- Note: UI Only support Animation ID
 
 ```lua
 if not getgenv()["Animator"] then

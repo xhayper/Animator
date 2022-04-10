@@ -44,6 +44,6 @@ getgenv().hookAnimatorFunction = function()
 	Utility:sendNotif("Hook Loaded\nby whited#4382", nil, 5)
 end
 
-Utility:sendNotif("API Loaded", nil, 5)
+Utility:sendNotif("Animator API Loaded", nil, 5)
 
 return "Nullware my beloved <3"

@@ -21,24 +21,7 @@ function merge(t1, t2)
 	return t1
 end
 
-local Animator = {
-	AnimationData = {},
-	BoneIgnoreInList = {},
-	MotorIgnoreInList = {},
-	BoneIgnoreList = {},
-	MotorIgnoreList = {},
-	handleVanillaAnimator = true,
-	Character = nil,
-	Looped = false,
-	Length = 0,
-	Speed = 1,
-	IsPlaying = false,
-	_stopFadeTime = 0.100000001,
-	_playing = false,
-	_stopped = false,
-	_isLooping = false,
-	_markerSignal = {},
-}
+local Animator = {}
 
 local tinsert = table.insert
 local format = string.format
@@ -47,13 +30,36 @@ local wait = task.wait
 local clock = os.clock
 
 Animator.__index = Animator
+Animator.ClassName = "Animator"
+
+function Animator.isAnimator(value)
+	return type(value) == "table" and getmetatable(value) == Animator
+end
 
 function Animator.new(Character, AnimationResolvable)
 	if typeof(Character) ~= "Instance" then
 		error(format("invalid argument 1 to 'new' (Instace expected, got %s)", typeof(Character)))
 	end
 
-	local self = setmetatable({}, Animator)
+	local self = setmetatable({
+		AnimationData = {},
+		BoneIgnoreInList = {},
+		MotorIgnoreInList = {},
+		BoneIgnoreList = {},
+		MotorIgnoreList = {},
+		handleVanillaAnimator = true,
+		Character = nil,
+		Looped = false,
+		Length = 0,
+		Speed = 1,
+		IsPlaying = false,
+		_stopFadeTime = 0.100000001,
+		_playing = false,
+		_stopped = false,
+		_isLooping = false,
+		_markerSignal = {},
+	}, Animator)
+
 	local type = typeof(AnimationResolvable)
 
 	local IsInstance = type == "Instance"
