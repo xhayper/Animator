@@ -325,6 +325,7 @@ function Animator:Destroy()
 		self.Stopped:Wait()
 	end
 	self._maid:DoCleaning()
+	setmetatable(self, nil)
 end
 
 return Animator
