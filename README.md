@@ -12,8 +12,8 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 
 ## Note
 
-- If you gonna obfuscate your script, it's highly recommended to not obfuscate the animator's script as it can broke the script
-- This doesn't re-animate out of the box, You will need a re-animate script, Nullware is the best one so far
+- Obfuscation and Animator doesn't play nicely, It's recommended to not obfuscated
+- This doesn't replicate out of the box, You will need a re-animate script, Nullware is the best one so far
 
 ## Planned Feature
 
