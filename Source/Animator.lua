@@ -64,7 +64,7 @@ function Animator.new(Character, AnimationResolvable)
 		)[1]
 		if keyframeSequence.ClassName ~= "KeyframeSequence" then
 			error(
-				IsAnimation and "invalid argument 2 to 'new' (Content inside Animation expected)"
+				IsAnimation and "invalid argument 2 to 'new' (Content inside AnimationId expected)"
 					or "invalid argument 2 to 'new' (string,number expected)"
 			)
 		end
