@@ -36,7 +36,7 @@ end
 
 # Reference
 
-- [Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua)
+- [Signal](https://quenty.github.io/NevermoreEngine/api/Signal)
 
 # API Docs
 
