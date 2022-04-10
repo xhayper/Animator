@@ -1,7 +1,7 @@
 local AccessoryList = {}
 
 for _, i in next, path.to.Character:GetChildren() do
-	if not i:IsA("Accessory") or 0 >= table.getn(AccessoryList) and not table.find(AccessoryList, i.Name) then
+	if not i:IsA("Accessory") or 0 >= #AccessoryList and not table.find(AccessoryList, i.Name) then
 		continue
 	end
 	i.Handle.Name = i.Name

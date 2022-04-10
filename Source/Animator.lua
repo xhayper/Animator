@@ -40,6 +40,7 @@ local Animator = {
 	_markerSignal = {},
 }
 
+local tinsert = table.insert
 local format = string.format
 local spawn = task.spawn
 local wait = task.wait
@@ -103,7 +104,7 @@ function Animator:IgnoreMotor(inst)
 	if inst.ClassName ~= "Motor6D" then
 		error(format("invalid argument 1 to 'IgnoreMotor' (Motor6D expected, got %s)", inst.ClassName))
 	end
-	table.insert(self.MotorIgnoreList, inst)
+	tinsert(self.MotorIgnoreList, inst)
 end
 
 function Animator:IgnoreBone(inst)
@@ -113,21 +114,21 @@ function Animator:IgnoreBone(inst)
 	if inst.ClassName ~= "Bone" then
 		error(format("invalid argument 1 to 'IgnoreBone' (Bone expected, got %s)", inst.ClassName))
 	end
-	table.insert(self.BoneIgnoreList, inst)
+	tinsert(self.BoneIgnoreList, inst)
 end
 
 function Animator:IgnoreMotorIn(inst)
 	if typeof(inst) ~= "Instance" then
 		error(format("invalid argument 1 to 'IgnoreMotorIn' (Instance expected, got %s)", typeof(inst)))
 	end
-	table.insert(self.MotorIgnoreInList, inst)
+	tinsert(self.MotorIgnoreInList, inst)
 end
 
 function Animator:IgnoreBoneIn(inst)
 	if typeof(inst) ~= "Instance" then
 		error(format("invalid argument 1 to 'IgnoreBoneIn' (Instance expected, got %s)", typeof(inst)))
 	end
-	table.insert(self.BoneIgnoreInList, inst)
+	tinsert(self.BoneIgnoreInList, inst)
 end
 
 function Animator:_playPose(pose, parent, fade)
@@ -300,11 +301,13 @@ function Animator:GetTimeOfKeyframe(keyframeName)
 end
 
 function Animator:GetMarkerReachedSignal(name)
-	if not self._markerSignal[name] then
-		self._markerSignal[name] = Signal.new()
-		self._maid["M_" .. name] = self._markerSignal[name]
+	local signal = self._markerSignal[name]
+	if not signal then
+		signal = Signal.new()
+		self._markerSignal[name] = signal
+		self._maid["M_" .. name] = signal
 	end
-	return self._markerSignal[name]
+	return signal
 end
 
 function Animator:AdjustSpeed(speed)
@@ -317,8 +320,10 @@ function Animator:Stop(fadeTime)
 end
 
 function Animator:Destroy()
-	self:Stop(0)
-	self.Stopped:Wait()
+	if not self._stopped then
+		self:Stop(0)
+		self.Stopped:Wait()
+	end
 	self._maid:DoCleaning()
 end
 

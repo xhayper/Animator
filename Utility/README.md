@@ -1,9 +1,11 @@
 # Animator/Utility
+
 Contains useful script that will help you
 
 ## Tools
-* KeyframeSequence-To-AnimationData - Turn KeyframeSequence into AnimationData
-* AccessoryWeld-To-Motor6D - Turn AccessoryWeld into Motor6D
+
+- KeyframeSequence-To-AnimationData - Turn KeyframeSequence into AnimationData
+- AccessoryWeld-To-Motor6D - Turn AccessoryWeld into Motor6D
 
 ## Data Structure
 
