@@ -12,7 +12,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 
 ## Note
 
-- Obfuscation and Animator doesn't play nicely, It's recommended to not obfuscated
+- Obfuscation and Animator doesn't play nicely, It's recommended to not obfuscate Animator
 - This doesn't replicate out of the box, You will need a re-animate script, Nullware is the best one so far
 
 ## Planned Feature
