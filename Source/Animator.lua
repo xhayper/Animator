@@ -55,24 +55,25 @@ function Animator.new(Character, AnimationResolvable)
 	local self = setmetatable({}, Animator)
 	local type = typeof(AnimationResolvable)
 
-	-- TODO: Optimize this by merging `AnimationResolvable.ClassName == "Animation"` with `type == "string" or type == "number"`
-	if type == "string" or type == "number" then
-		local keyframeSequence = game:GetObjects("rbxassetid://" .. tostring(AnimationResolvable))[1]
+	local IsInstance = type == "Instance"
+	local IsAnimation = IsInstance and AnimationResolvable.ClassName == "Animation"
+
+	if IsAnimation or type == "string" or type == "number" then
+		local keyframeSequence = game:GetObjects(
+			"rbxassetid://" .. tostring(IsAnimation and AnimationResolvable.AnimationId or AnimationResolvable)
+		)[1]
 		if keyframeSequence.ClassName ~= "KeyframeSequence" then
-			error("invalid argument 2 to 'new' (string,number expected)")
+			error(
+				IsAnimation and "invalid argument 2 to 'new' (Content inside Animation expected)"
+					or "invalid argument 2 to 'new' (string,number expected)"
+			)
 		end
 		self.AnimationData = Parser:parseAnimationData(keyframeSequence)
 	elseif type == "table" then
 		self.AnimationData = AnimationResolvable
-	elseif type == "Instance" then
+	elseif IsInstance then
 		if AnimationResolvable.ClassName == "KeyframeSequence" then
 			self.AnimationData = Parser:parseAnimationData(AnimationResolvable)
-		elseif AnimationResolvable.ClassName == "Animation" then
-			local keyframeSequence = game:GetObjects(AnimationResolvable.AnimationId)[1]
-			if keyframeSequence.ClassName ~= "KeyframeSequence" then
-				error("invalid argument 2 to 'new' (Content inside Animation expected)")
-			end
-			self.AnimationData = Parser:parseAnimationData(keyframeSequence)
 		end
 	else
 		error(format("invalid argument 2 to 'new' (number,string,table,Instance expected, got %s)", type))
