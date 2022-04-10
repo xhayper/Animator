@@ -18,6 +18,7 @@ Alternative Roblox animation player to fit your "Animating/Whatever" need
 ## Planned Feature
 
 - Seeking froward, Backward (Idk how)
+- Support [Constant Easing Style](https://developer.roblox.com/en-us/api-reference/property/Pose/EasingStyle)
 
 ## Contributor
 
@@ -37,7 +38,7 @@ end
 
 - [Signal](https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Events/Signal.lua)
 
-# Acutal Docs
+# API Docs
 
 ```lua
 -- Types --
