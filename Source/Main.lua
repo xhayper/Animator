@@ -1,9 +1,11 @@
 local pathToGithub = "https://raw.githubusercontent.com/xhayper/Animator/main/Source/"
 
+local sub = string.sub
+
 getgenv().httpRequireCache = getgenv().httpRequireCache or {}
 
 getgenv().HttpRequire = function(path, noCache)
-	if string.sub(path, 1, 8) == "https://" or string.sub(path, 1, 7) == "http://" then
+	if sub(path, 1, 8) == "https://" or sub(path, 1, 7) == "http://" then
 		if not noCache and httpRequireCache[path] then
 			return httpRequireCache[path]
 		end
