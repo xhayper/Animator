@@ -178,8 +178,26 @@ AnimationTrackDefaults.WeightCurrent = 1
 AnimationTrackDefaults.WeightTarget = 1
 
 --- @ignore
-function AnimationTrack.new()
-    return setmetatable(AnimationTrackDefaults, AnimationTrack)
+type Array<V> = {[number]: V}
+--- @ignore
+type Map<K, V> = {[K]: V}
+--- @ignore
+type AnimationTrackOptions = {
+    KeyframeSequence: KeyframeSequence
+}
+
+--- @ignore
+--- Internal use only
+function AnimationTrack.new(options: AnimationTrackOptions)
+    local self = setmetatable(AnimationTrackDefaults, AnimationTrack)
+
+    for k,v in next, options do
+        self[k] = v
+    end
+
+    self.__internal = {} -- Will use this for Maid and Signal
+
+    return self
 end
 
 --[=[
