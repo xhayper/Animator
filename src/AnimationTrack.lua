@@ -82,10 +82,48 @@ AnimationTrackDefaults.TimePosition = 0
     @within AnimationTrack
     @readonly
     When weight is set in an [AnimationTrack] it does not change instantaneously but moves from WeightCurrent to [AnimationTrack.WeightTarget]. The time it takes to do this is determined by the fadeTime parameter given when the animation is played, or the weight is adjusted.
-    WeightCurrent can be checked against [AnimationTrack.WeightTarget] to see if the desired weight has been reached. Note that these values should not be checked for equality with the == operator, as both of these values are floats. To see if WeightCurrent has reached the target weight, it is recommended to see if the distance between those values is sufficiently small.
+    WeightCurrent can be checked against [AnimationTrack.WeightTarget] to see if the desired weight has been reached. Note that these values should not be checked for equality with the == operator, as both of these values are floats. To see if WeightCurrent has reached the target weight, it is recommended to see if the distance between those values is sufficiently small (see code sample below)..
     The animation weighting system is used to determine how [AnimationTrack]s playing at the same priority are blended together. The default weight is one, and no movement will be visible on an [AnimationTrack] with a weight of zero. The pose that is shown at any point in time is determined by the weighted average of all the [Pose]s and the WeightCurrent of each [AnimationTrack]. See below for an example of animation blending in practice.
 
     In most cases blending animations is not required and using [AnimationTrack.Priority] is more suitable.
+
+    ### Code Samples
+
+    #### WeightCurrent and WeightTarget
+
+    This code sample loads two animations onto the local player’s Humanoid and demonstrates how the fadeTime paramater in AnimationTrack.Play determines how long it takes for an AnimationTrack’s WeightCurrent to reach it’s WeightTarget.
+
+    As WeightCurrent and WeightTarget are floats the == operator cannot be used to compare, instead it is more appropriate to check that the difference between them is sufficiently small to assume the weight fade has completed.
+
+    ```lua title="WeightCurrent and WeightTarget"
+    local Players = game:GetService("Players")
+    local localPlayer = Players.LocalPlayer
+    while not localPlayer.Character do wait() end
+    local character = localPlayer.Character
+    local humanoid = character:WaitForChild("Humanoid")
+        
+    local animation1 = Instance.new("Animation")
+    animation1.AnimationId = "rbxassetid://507770453"
+        
+    local animation2 = Instance.new("Animation")
+    animation2.AnimationId = "rbxassetid://507771019"
+        
+    wait(3) -- arbitrary wait time to allow the character to fall into place
+        
+    local animationTrack1 = humanoid:LoadAnimation(animation1)
+    local animationTrack2 = humanoid:LoadAnimation(animation2)
+    animationTrack1.Priority = Enum.AnimationPriority.Movement
+    animationTrack2.Priority = Enum.AnimationPriority.Action
+    animationTrack1:Play(0.1, 5, 1)
+    animationTrack2:Play(10, 3, 1)
+    local done = false
+    while not done and wait(0.1) do
+    	if math.abs(animationTrack2.WeightCurrent - animationTrack2.WeightTarget) < 0.001 then
+    		print("got there")
+    		done = true
+    	end
+    end
+    ```
 ]=]
 AnimationTrackDefaults.WeightCurrent = 1
 
@@ -94,10 +132,48 @@ AnimationTrackDefaults.WeightCurrent = 1
     @within AnimationTrack
     @readonly
     When weight is set in an [AnimationTrack] it does not change instantaneously but moves from WeightCurrent to [AnimationTrack.WeightTarget]. The time it takes to do this is determined by the fadeTime parameter given when the animation is played, or the weight is adjusted.
-    WeightCurrent can be checked against [AnimationTrack.WeightTarget] to see if the desired weight has been reached. Note that these values should not be checked for equality with the == operator, as both of these values are floats. To see if WeightCurrent has reached the target weight, it is recommended to see if the distance between those values is sufficiently small.
+    WeightCurrent can be checked against [AnimationTrack.WeightTarget] to see if the desired weight has been reached. Note that these values should not be checked for equality with the == operator, as both of these values are floats. To see if WeightCurrent has reached the target weight, it is recommended to see if the distance between those values is sufficiently small (see code sample below)..
     The animation weighting system is used to determine how [AnimationTrack]s playing at the same priority are blended together. The default weight is one, and no movement will be visible on an [AnimationTrack] with a weight of zero. The pose that is shown at any point in time is determined by the weighted average of all the [Pose]s and the WeightCurrent of each [AnimationTrack]. See below for an example of animation blending in practice.
 
     In most cases blending animations is not required and using [AnimationTrack.Priority] is more suitable.
+
+    ### Code Samples
+
+    #### WeightCurrent and WeightTarget
+
+    This code sample loads two animations onto the local player’s Humanoid and demonstrates how the fadeTime paramater in AnimationTrack.Play determines how long it takes for an AnimationTrack’s WeightCurrent to reach it’s WeightTarget.
+
+    As WeightCurrent and WeightTarget are floats the == operator cannot be used to compare, instead it is more appropriate to check that the difference between them is sufficiently small to assume the weight fade has completed.
+
+    ```lua title="WeightCurrent and WeightTarget"
+    local Players = game:GetService("Players")
+    local localPlayer = Players.LocalPlayer
+    while not localPlayer.Character do wait() end
+    local character = localPlayer.Character
+    local humanoid = character:WaitForChild("Humanoid")
+        
+    local animation1 = Instance.new("Animation")
+    animation1.AnimationId = "rbxassetid://507770453"
+        
+    local animation2 = Instance.new("Animation")
+    animation2.AnimationId = "rbxassetid://507771019"
+        
+    wait(3) -- arbitrary wait time to allow the character to fall into place
+        
+    local animationTrack1 = humanoid:LoadAnimation(animation1)
+    local animationTrack2 = humanoid:LoadAnimation(animation2)
+    animationTrack1.Priority = Enum.AnimationPriority.Movement
+    animationTrack2.Priority = Enum.AnimationPriority.Action
+    animationTrack1:Play(0.1, 5, 1)
+    animationTrack2:Play(10, 3, 1)
+    local done = false
+    while not done and wait(0.1) do
+    	if math.abs(animationTrack2.WeightCurrent - animationTrack2.WeightTarget) < 0.001 then
+    		print("got there")
+    		done = true
+    	end
+    end
+    ```
 ]=]
 AnimationTrackDefaults.WeightTarget = 1
 
