@@ -72,7 +72,7 @@ function Animator:GetPlayingAnimationTracks(): Array<AnimationTrack>
 end
 
 --[=[
-    @params keyframeSequence KeyframeSequence -- The [KeyframeSequence] to be used.
+    @param keyframeSequence KeyframeSequence -- The [KeyframeSequence] to be used.
 
     LoadAnimation will load the given [KeyframeSequence] onto an [Animator], returning a playable [AnimationTrack]. When called on Animators within models that the client has network ownership of, ie. the local player’s character or from [BasePart:SetNetworkOwner], this function also loads the animation for the server as well.
     You should use this function directly instead of the similarly-named [Humanoid:LoadAnimation] and [AnimationController:LoadAnimation] functions. These are deprecated proxies of this function which also create an Animator if one does not exist; this can cause replication issues if you are not careful. For more information, see this [announcement post](https://devforum.roblox.com/t/deprecating-loadanimation-on-humanoid-and-animationcontroller/857129)
@@ -84,7 +84,7 @@ function Animator:LoadAnimation(keyframeSequence: KeyframeSequence): AnimationTr
 end
 
 --[=[
-    @params deltaTime float -- The [KeyframeSequence] to be used.
+    @param deltaTime float -- The amount of time in seconds animation playback is to be incremented by.
 
     Increments the [AnimationTrack.TimePosition] of all playing [AnimationTrack]s that are loaded onto the [Animator], applying the offsets to the model associated with the [Animator]. For use in the command bar or by plugins only.
     The deltaTime paramater determines the number of seconds to increment on the animation’s progress. Typically this function will be called in a loop to preview the length of an animation (see example).
