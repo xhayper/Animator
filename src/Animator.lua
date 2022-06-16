@@ -1,4 +1,5 @@
 local Janitor = AnimatorUtility.httpRequire(AnimatorUtility.formatUrl("external/Janitor/init.lua"), true)
+local FastSignal = AnimatorUtility.httpRequire(AnimatorUtility.formatUrl("external/FastSignal/init.lua"), true)
 
 local HttpService = game:GetService("HttpService")
 
@@ -14,6 +15,11 @@ local HttpService = game:GetService("HttpService")
 local Animator = {}
 Animator.ClassName = "Animator"
 Animator.__index = Animator
+
+--[=[
+    @prop AnimationPlayed RBXScriptSignal
+    @within Animator
+]=]
 
 type Animator = typeof(Animator.new())
 
@@ -47,7 +53,10 @@ function Animator.new()
         janitor = janitor
     }
 
+    self.AnimationPlayed = FastSignal.new()
+
     janitor.Add(self, "Destroy")
+    janitor.Add(self.AnimationPlayed, "DisconnectAll")
     janitor.Add(ghostInstance, "Destroy")
     janitor:LinkToInstance(ghostInstance)
 
