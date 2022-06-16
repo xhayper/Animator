@@ -78,7 +78,7 @@ end
     You should use this function directly instead of the similarly-named [Humanoid:LoadAnimation] and [AnimationController:LoadAnimation] functions. These are deprecated proxies of this function which also create an Animator if one does not exist; this can cause replication issues if you are not careful. For more information, see this [announcement post](https://devforum.roblox.com/t/deprecating-loadanimation-on-humanoid-and-animationcontroller/857129)
 ]=]
 function Animator:LoadAnimation(keyframeSequence: KeyframeSequence): AnimationTrack
-    local animationTrack = AnimationTrack.new(self, keyframeSequence)
+    local animationTrack = AnimationTrack.new(keyframeSequence)
     self.__internal.animationTracks:push(animationTrack)
     return animationTrack
 end
