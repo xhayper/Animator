@@ -1,0 +1,16 @@
+title = "Animator"
+gitRepoUrl = "https://github.com/xhayper/Animator"
+
+gitSourceBranch = "dev"
+changelog = true
+classOrder = []
+
+[docusaurus]
+onBrokenLinks = "throw"
+onBrokenMarkdownLinks = "warn"
+organizationName = "xhayper"
+projectName = "xhayper"
+
+[footer]
+style = "dark"
+copyright = "Copyright © 2022 xhayper. Built with Moonwave and Docusaurus"
