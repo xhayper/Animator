@@ -177,11 +177,8 @@ AnimationTrackDefaults.WeightCurrent = 1
 ]=]
 AnimationTrackDefaults.WeightTarget = 1
 
---- @ignore
 type Array<V> = {[number]: V}
---- @ignore
 type Map<K, V> = {[K]: V}
---- @ignore
 type AnimationTrackOptions = {
     KeyframeSequence: KeyframeSequence
 }
