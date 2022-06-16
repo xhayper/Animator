@@ -39,4 +39,15 @@ function AnimatorUtility.httpRequire(url: string, useCache: boolean?): RequireRe
     return result
 end
 
+--[=[
+    Format a url to be used in a require call.
+
+    @param path string -- Path to module file
+
+    @return string -- The formatted url
+]=]
+function AnimatorUtility.formatUrl(path: string): string
+    return "https://raw.githubusercontent.com/xhayper/Animator/dev/" .. path 
+end
+
 return AnimatorUtility

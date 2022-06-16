@@ -1,13 +1,12 @@
-local function formatUrl(path: string): string
-    return "https://raw.githubusercontent.com/xhayper/Animator/dev/" .. path
-end
+local AnimatorUtility = loadstring((game :: any):HttpGet("https://raw.githubusercontent.com/xhayper/Animator/dev/src/AnimationUtility.lua", true))()
 
-local AnimatorUtility = loadstring((game :: any):HttpGet(formatUrl("src/AnimationTrack.lua"), true))()
-local AnimationTrack = AnimatorUtility.httpRequire(formatUrl("src/AnimationTrack.lua"), true)
-local Animator = AnimatorUtility.httpRequire(formatUrl("src/AnimationTrack.lua"), true)
+-- selene: allow(unscoped_variables)
+getgenv().AnimatorUtility = AnimatorUtility
 
-local getgenv: () -> {[string]: any} = getgenv or nil
+local AnimationTrack = AnimatorUtility.httpRequire(AnimatorUtility.formatUrl("src/AnimationTrack.lua"), true)
+local Animator = AnimatorUtility.httpRequire(AnimatorUtility.formatUrl("src/AnimationTrack.lua"), true)
 
-getgenv().Animator = Animator;
-getgenv().AnimatorUtility = AnimatorUtility;
-getgenv().AnimationTrack = AnimationTrack;
+-- selene: allow(unscoped_variables)
+getgenv().AnimationTrack = AnimationTrack
+-- selene: allow(unscoped_variables)
+getgenv().Animator = Animator

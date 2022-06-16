@@ -179,20 +179,14 @@ AnimationTrackDefaults.WeightTarget = 1
 
 type Array<V> = {[number]: V}
 type Map<K, V> = {[K]: V}
-type AnimationTrackOptions = {
-    KeyframeSequence: KeyframeSequence
-}
 
 --- @ignore
 --- Internal use only
-function AnimationTrack.new(options: AnimationTrackOptions)
+function AnimationTrack.new(keyframeSequence: KeyframeSequence)
     local self = setmetatable(AnimationTrackDefaults, AnimationTrack)
 
-    for k,v in next, options do
-        self[k] = v
-    end
-
-    self.__internal = {} -- Will use this for Maid and Signal
+    self.__internal = {} -- Will use this for Janitor and Signal
+    self.KeyframeSequence = keyframeSequence
 
     return self
 end
