@@ -5,6 +5,11 @@ gitSourceBranch = "dev"
 changelog = true
 classOrder = []
 
+[[navbar.items]]
+href = "https://discord.gg/xTAR8nUs2g"
+label = "Discord"
+position = "right"
+
 [docusaurus]
 onBrokenLinks = "throw"
 onBrokenMarkdownLinks = "warn"
