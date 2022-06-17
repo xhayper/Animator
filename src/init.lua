@@ -1,3 +1,5 @@
+local RunService = game:GetService("RunService")
+
 local AnimatorUtility = loadstring((game :: any):HttpGet("https://raw.githubusercontent.com/xhayper/Animator/dev/src/AnimationUtility.lua", true))()
 
 -- selene: allow(unscoped_variables)
@@ -10,3 +12,7 @@ local Animator = AnimatorUtility.httpRequire(AnimatorUtility.formatUrl("src/Anim
 getgenv().AnimationTrack = AnimationTrack
 -- selene: allow(unscoped_variables)
 getgenv().Animator = Animator
+
+RunService.RenderStepped:Connect(function(deltaTime)
+    
+end)
