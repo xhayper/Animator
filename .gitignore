@@ -1,43 +1,22 @@
-# Compiled Lua sources
-luac.out
+# Test places and builds
+**/*.rbx[lm]*
 
-# luarocks build files
-*.src.rock
-*.zip
-*.tar.gz
+# LuaCov output location
+**/luacov.*
 
-# Object files
-*.o
-*.os
-*.ko
-*.obj
-*.elf
+# MkDocs build output
+/site/
 
-# Precompiled Headers
-*.gch
-*.pch
+# Rotriever
+rotriever.lock
+Packages
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-*.def
-*.exp
+# Selene
+roblox.toml
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+# Darklua
+**/darklua*
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# IDE
-.vscode
+# Analysis artifacts
+sourcemap.json
+globalTypes.d.lua
