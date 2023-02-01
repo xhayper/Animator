@@ -68,6 +68,7 @@ function AnimationTrack:Play(fadeTime: number?, weight: number?, speed: number?)
 	self.Weight = weight or 1
 	self.Speed = speed or 1
 
+	self._needToPlay = false
 	self.IsPlaying = true
 end
 
