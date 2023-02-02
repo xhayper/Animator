@@ -20,3 +20,8 @@ roblox.toml
 # Analysis artifacts
 sourcemap.json
 globalTypes.d.lua
+
+# macOS
+.DS_Store
+
+!test/AnimationPlayer/Test.rbxm

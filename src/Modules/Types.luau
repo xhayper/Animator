@@ -1,14 +1,15 @@
 --!strict
 
 export type PoseData = {
-	Time: number,
 	CFrame: CFrame,
 	EasingStyle: Enum.PoseEasingStyle,
 	EasingDirection: Enum.PoseEasingDirection,
 }
 
 export type KeyframeData = {
-	Pose: { PoseData },
+	Name: string,
+	Time: number,
+	Pose: { [string]: { [string]: PoseData } },
 	Marker: { string },
 }
 
@@ -16,7 +17,7 @@ export type AnimationData = {
 	Priority: number,
 	Length: number,
 	Loop: boolean,
-	Keyframes: { [string]: KeyframeData },
+	Keyframes: { KeyframeData },
 }
 
 export type AnimationParser = {
@@ -59,6 +60,7 @@ export type AnimationTrackImpl = {
 	-- TODO: KeyframeReached: (self: AnimationTrack, keyframeName: string) -> RBXScriptSignal,
 
 	AdjustSpeed: (self: AnimationTrack, speed: number?) -> (),
+	GetTimeOfKeyframe: (self: AnimationTrack, name: string) -> number,
 	Play: (self: AnimationTrack, fadeTime: number?, weight: number?, speed: number?) -> (),
 	Stop: (self: AnimationTrack, fadeTime: number?) -> (),
 }
@@ -82,7 +84,8 @@ export type AnimatorProto = {
 
 	_loadedAnimationTrack: { AnimationTrack },
 	_tempCF: CFrame,
-	_transforms: { [string]: AnimatorTransform },
+	_transforms: { [string]: { [string]: AnimatorTransform } },
+    _prevIndex: number?
 }
 
 export type AnimatorImpl = {

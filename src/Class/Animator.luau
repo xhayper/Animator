@@ -98,8 +98,7 @@ function Animator:Update()
 		if track.TimePosition > track.Animation.Length then
 			if track.Looped then
 				track.TimePosition %= track.Animation.Length
-
-				-- TODO: Invoke track's loop event
+				-- track._didLoop:Invoke()
 			else
 				self:Stop(track, track._fadeOut and track._fadeOut.Duration or nil)
 				continue
@@ -115,9 +114,13 @@ function Animator:Update()
 		end
 	end
 
-	local transforms = {} :: { [string]: Types.AnimatorTransform }
+	local transforms = {} :: { [string]: { [string]: Types.AnimatorTransform } }
 
 	for _, track: Types.AnimationTrack in ipairs(self._loadedAnimationTrack) do
+		if track._needToPlay then
+			continue
+		end
+
 		local weight = max(0, min(1, track.Weight))
 			* (track._fadeIn and (track._fadeIn.Elapsed / track._fadeIn.Duration) or 1)
 			* (track._fadeOut and (1 - track._fadeOut.Elapsed / track._fadeOut.Duration) or 1)
@@ -126,114 +129,136 @@ function Animator:Update()
 			continue
 		end
 
-		for name, keyframes in pairs(track.Animation.Keyframes) do
-			local transform = transforms[name] :: Types.AnimatorTransform?
+		local index = findIndex(track.Animation.Keyframes, function(x)
+			return x.Time > track.TimePosition
+		end)
 
-			if
-				transform
-				and (
-					transform.Weight >= 1
-					or (transform.Working.Weight >= 1 and transform.Working.Priority ~= track.Priority)
-				)
-			then
-				continue
-			end
+		local prevFrame = (
+			index >= #track.Animation.Keyframes and track.Animation.Keyframes[#track.Animation.Keyframes]
+			or track.Animation.Keyframes[index - 1]
+		) :: Types.KeyframeData
 
-			local index = findIndex(keyframes.Pose, function(x)
-				return x.Time > track.TimePosition
-			end)
+		for parentPoseName, childrenPoses in pairs(prevFrame.Pose) do
+			for childrenPoseName, prevPose in pairs(childrenPoses) do
+				local transform = transforms[parentPoseName] and transforms[parentPoseName][childrenPoseName]
+					or nil :: Types.AnimatorTransform?
 
-			if index == 1 then
-				continue
-			end
+				if
+					transform
+					and (
+						transform.Weight >= 1
+						or (transform.Working.Weight >= 1 and transform.Working.Priority ~= track.Priority)
+					)
+				then
+					continue
+				end
 
-			if not transform then
-				transform = self._transforms[name] :: Types.AnimatorTransform?
+				if index == 1 then
+					continue
+				end
 
-				if transform then
-					transform.CFrame = CFrame.new()
-					transform.Weight = 0
-				else
-					transform = {
-						CFrame = CFrame.new(),
-						Weight = 0,
-						Working = {
+				if not transform then
+					transform = self._transforms[parentPoseName] and self._transforms[parentPoseName][childrenPoseName]
+						or nil :: Types.AnimatorTransform?
+
+					if transform then
+						transform.CFrame = CFrame.new()
+						transform.Weight = 0
+					else
+						transform = {
 							CFrame = CFrame.new(),
 							Weight = 0,
-							Priority = -1,
-						},
-					}
+							Working = {
+								CFrame = CFrame.new(),
+								Weight = 0,
+								Priority = -1,
+							},
+						}
+					end
+
+					if not transforms[parentPoseName] then
+						transforms[parentPoseName] = {}
+					end
+
+					transforms[parentPoseName][childrenPoseName] = transform
 				end
 
-				transforms[name] = transform
-			end
+				if transform.Working.Priority ~= track.Priority then
+					if transform.Working.Weight > 0 then
+						local newWeight = 1 - (1 - transform.Weight) * (1 - min(1, transform.Working.Weight))
+						local theta = (newWeight - transform.Weight) / newWeight
 
-			if transform.Working.Priority ~= track.Priority then
-				if transform.Working.Weight > 0 then
-					local newWeight = 1 - (1 - transform.Weight) * (1 - min(1, transform.Working.Weight))
-					local theta = (newWeight - transform.Weight) / newWeight
+						transform.CFrame = transform.CFrame:Lerp(transform.Working.CFrame, theta)
+						transform.Weight = newWeight
 
-					transform.CFrame = transform.CFrame:Lerp(transform.Working.CFrame, theta)
-					transform.Weight = newWeight
+						transform.Working.CFrame = CFrame.new()
+						transform.Working.Weight = 0
+					end
 
-					transform.Working.CFrame = CFrame.new()
-					transform.Working.Weight = 0
+					transform.Working.Priority = track.Priority
 				end
 
-				transform.Working.Priority = track.Priority
+				local nextFrameIndex = findIndex(track.Animation.Keyframes, function(x)
+					return x.Pose[parentPoseName]
+						and x.Pose[parentPoseName][childrenPoseName]
+						and x.Time > track.TimePosition
+				end)
+
+				local nextFrame: Types.KeyframeData?
+				local nextPose: Types.PoseData?
+
+				if nextFrameIndex == 1 then
+					nextFrame = nil
+					nextPose = nil
+				else
+					nextFrame = track.Animation.Keyframes[nextFrameIndex]
+					nextPose = nextFrame
+							and nextFrame.Pose[parentPoseName]
+							and nextFrame.Pose[parentPoseName][childrenPoseName]
+						or nil :: Types.PoseData?
+				end
+
+				if not nextFrame or not nextPose or track.TimePosition == prevFrame.Time then
+					self._tempCF = prevPose.CFrame
+				else
+					local theta = AnimationEasing[prevPose.EasingStyle][prevPose.EasingDirection](
+						(track.TimePosition - prevFrame.Time) / (nextFrame.Time - prevFrame.Time)
+					)
+
+					self._tempCF = prevPose.CFrame:Lerp(nextPose.CFrame, theta)
+				end
+
+				local newWeight = transform.Working.Weight + weight
+				local theta = (newWeight - transform.Working.Weight) / newWeight
+
+				transform.Working.CFrame = transform.Working.CFrame:Lerp(self._tempCF, theta)
+				transform.Working.Weight = newWeight
 			end
-
-			local prev = (
-				index == -1 and keyframes.Pose[#keyframes.Pose] or keyframes.Pose[index - 1]
-			) :: Types.PoseData
-
-			local next: Types.PoseData?
-
-			if index == 1 then
-				next = nil
-			else
-				next = keyframes.Pose[index]
-			end
-
-			print(index, prev, next)
-
-			if not next or track.TimePosition == prev.Time then
-				self._tempCF = prev.CFrame
-			else
-				local theta = AnimationEasing[prev.EasingStyle][prev.EasingDirection](
-					(track.TimePosition - prev.Time) / (next.Time - prev.Time)
-				)
-
-				self._tempCF = prev.CFrame:Lerp(next.CFrame, theta)
-			end
-
-			local newWeight = transform.Working.Weight + weight
-			local theta = (newWeight - transform.Working.Weight) / newWeight
-
-			transform.Working.CFrame = transform.Working.CFrame:Lerp(self._tempCF, theta)
-			transform.Working.Weight = newWeight
 		end
 	end
 
 	self._transforms = {}
 
-	for name, transform in pairs(transforms) do
-		if transform.Working.Weight > 0 then
-			local newWeight = 1 - (1 - transform.Weight) * (1 - min(1, transform.Working.Weight))
-			local theta = (newWeight - transform.Weight) / newWeight
+	for parentName, childrenData in pairs(transforms) do
+		for childrenName, transform in pairs(childrenData) do
+			if transform.Working.Weight > 0 then
+				local newWeight = 1 - (1 - transform.Weight) * (1 - min(1, transform.Working.Weight))
+				local theta = (newWeight - transform.Weight) / newWeight
 
-			transform.CFrame = transform.CFrame:Lerp(transform.Working.CFrame, theta)
-			transform.Weight = newWeight
+				transform.CFrame = transform.CFrame:Lerp(transform.Working.CFrame, theta)
+				transform.Weight = newWeight
 
-			transform.Working.CFrame = CFrame.new()
-			transform.Working.Weight = 0
-			transform.Working.Priority = -1
+				transform.Working.CFrame = CFrame.new()
+				transform.Working.Weight = 0
+				transform.Working.Priority = -1
+			end
+
+			self._tempCF = CFrame.new()
+			transform.CFrame = transform.CFrame:Lerp(self._tempCF, 1 - transform.Weight)
+
+			self._transforms[parentName] = self._transforms[parentName] or {}
+			self._transforms[parentName][childrenName] = transform
 		end
-
-		self._tempCF = CFrame.new()
-		transform.CFrame = transform.CFrame:Lerp(self._tempCF, 1 - transform.Weight)
-
-		self._transforms[name] = transform
 	end
 end
 
