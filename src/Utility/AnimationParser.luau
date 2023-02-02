@@ -22,14 +22,18 @@ function AnimationParser.parse(sequence: KeyframeSequence): Types.AnimationData
 	}
 
 	for _, keyframe in ipairs(keyframes) do
-		for _, rootPose in ipairs(keyframe:GetChildren()) do
-			if rootPose.ClassName ~= "Pose" then
-				continue
-			end
-			for _, pose in ipairs(rootPose:GetChildren()) do
-				AnimationParser.parsePose(animationData, pose, keyframe)
-			end
+		local keyframeData: Types.KeyframeData = {
+			Name = keyframe.Name,
+			Time = keyframe.Time,
+			Pose = {},
+			Marker = {},
+		}
+
+		for _, pose in ipairs(keyframe:GetChildren()) do
+			AnimationParser.parsePose(keyframeData, nil, pose)
 		end
+
+		table.insert(animationData.Keyframes, keyframeData)
 	end
 
 	return animationData
@@ -39,30 +43,32 @@ end
     THIS MUTATE `keyframeData`
 ]]
 --
-function AnimationParser.parsePose(animationData: Types.AnimationData, pose: Pose, keyframe: Keyframe)
+function AnimationParser.parsePose(keyframe: Types.KeyframeData, parent: Pose, pose: Pose)
 	if pose.ClassName == "Pose" then
-		if pose.Weight > 0 then
-			local name = pose.Name
-			local cf = pose.CFrame
+		if parent then
+			if pose.Weight > 0 then
+				local parentName = parent.Name
+				local name = pose.Name
+				local cf = pose.CFrame
 
-			if not animationData.Keyframes[name] then
-				animationData.Keyframes[name] = {
-					Pose = {},
-					Marker = {},
+				if not keyframe.Pose[parentName] then
+					keyframe.Pose[parentName] = {}
+				end
+
+				keyframe.Pose[parentName][name] = {
+					CFrame = cf,
+					EasingDirection = pose.EasingDirection,
+					EasingStyle = pose.EasingStyle,
 				}
 			end
-
-			table.insert(animationData.Keyframes[name].Pose, {
-				Time = keyframe.Time,
-				CFrame = cf,
-				EasingDirection = pose.EasingDirection,
-				EasingStyle = pose.EasingStyle,
-			})
 		end
 
 		for _, child in ipairs(pose:GetChildren()) do
-			AnimationParser.parsePose(animationData, child, keyframe)
+			AnimationParser.parsePose(keyframe, pose, child)
 		end
+	elseif pose.ClassName == "KeyframeMarker" then
+		local marker = (pose :: any) :: KeyframeMarker
+		table.insert(keyframe.Marker, marker.Name)
 	end
 end
 
