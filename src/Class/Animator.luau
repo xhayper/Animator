@@ -1,6 +1,7 @@
 local AnimationEasing = require(script.Parent.Parent.Utility.AnimationEasing)
 local AnimationParser = require(script.Parent.Parent.Utility.AnimationParser)
 local AnimationTrack = require(script.Parent.AnimationTrack)
+local Types = require(script.Parent.Parent.Modules.Types)
 
 local max, min = math.max, math.min
 
@@ -14,31 +15,11 @@ local function findIndex<V>(table: { V }, predicate: (element: V, index: number)
 	return -1
 end
 
-type Transform = {
-	CFrame: CFrame,
-	Weight: number,
-	Working: {
-		CFrame: CFrame,
-		Weight: number,
-		Priority: number,
-	},
-}
-
-type AnimationProps = {
-	_loadedAnimationTrack: { AnimationTrack.AnimationTrack },
-
-	_tempCF: CFrame,
-
-	_transforms: { [string]: Transform },
-}
-
-local Animator = {}
+local Animator = {} :: Types.AnimatorProto & Types.AnimatorImpl
 Animator.ClassName = "Animator"
 Animator.__index = Animator
 
-export type Animator = typeof(setmetatable({} :: AnimationProps, Animator))
-
-function Animator.new(): Animator
+function Animator.new(): Types.Animator
 	local self = setmetatable({}, Animator)
 
 	self._loadedAnimationTrack = {}
@@ -50,7 +31,7 @@ function Animator.new(): Animator
 	return self
 end
 
-function Animator:Stop(track: AnimationTrack.AnimationTrack, fadeOut: number?)
+function Animator:Stop(track: Types.AnimationTrack, fadeOut: number?)
 	local index = table.find(self._loadedAnimationTrack, track)
 
 	if not index then
@@ -71,7 +52,7 @@ function Animator:Stop(track: AnimationTrack.AnimationTrack, fadeOut: number?)
 	end
 end
 
-function Animator:LoadAnimation(animation: KeyframeSequence): AnimationTrack.AnimationTrack
+function Animator:LoadAnimation(animation: KeyframeSequence): Types.AnimationTrack
 	local animationData = AnimationParser.parse(animation)
 
 	local track = AnimationTrack.new(self, animationData)
@@ -85,16 +66,14 @@ function Animator:LoadAnimation(animation: KeyframeSequence): AnimationTrack.Ani
 	return track
 end
 
--- function Animator:StepAnimations(deltaTime: number) end
-
-function Animator:GetPlayingAnimationTracks(): { AnimationTrack.AnimationTrack }
+function Animator:GetPlayingAnimationTracks(): { Types.AnimationTrack }
 	return self._loadedAnimationTrack
 end
 
 function Animator:Update()
 	local time = DateTime.now().UnixTimestampMillis
 
-	for _, track: AnimationTrack.AnimationTrack in ipairs(self._loadedAnimationTrack) do
+	for _, track: Types.AnimationTrack in ipairs(self._loadedAnimationTrack) do
 		if track._needToPlay then
 			continue
 		end
@@ -136,9 +115,9 @@ function Animator:Update()
 		end
 	end
 
-	local transforms = {} :: { [string]: Transform }
+	local transforms = {} :: { [string]: Types.AnimatorTransform }
 
-	for _, track: AnimationTrack.AnimationTrack in ipairs(self._loadedAnimationTrack) do
+	for _, track: Types.AnimationTrack in ipairs(self._loadedAnimationTrack) do
 		local weight = max(0, min(1, track.Weight))
 			* (track._fadeIn and (track._fadeIn.Elapsed / track._fadeIn.Duration) or 1)
 			* (track._fadeOut and (1 - track._fadeOut.Elapsed / track._fadeOut.Duration) or 1)
@@ -148,7 +127,7 @@ function Animator:Update()
 		end
 
 		for name, keyframes in pairs(track.Animation.Keyframes) do
-			local transform = transforms[name] :: Transform?
+			local transform = transforms[name] :: Types.AnimatorTransform?
 
 			if
 				transform
@@ -169,7 +148,7 @@ function Animator:Update()
 			end
 
 			if not transform then
-				transform = self._transforms[name] :: Transform?
+				transform = self._transforms[name] :: Types.AnimatorTransform?
 
 				if transform then
 					transform.CFrame = CFrame.new()
@@ -206,9 +185,9 @@ function Animator:Update()
 
 			local prev = (
 				index == -1 and keyframes.Pose[#keyframes.Pose] or keyframes.Pose[index - 1]
-			) :: AnimationParser.PoseData
+			) :: Types.PoseData
 
-			local next: AnimationParser.PoseData?
+			local next: Types.PoseData?
 
 			if index == 1 then
 				next = nil

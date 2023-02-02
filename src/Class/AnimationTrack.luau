@@ -1,34 +1,17 @@
-local AnimationParser = require(script.Parent.Parent.Utility.AnimationParser)
+local Types = require(script.Parent.Parent.Modules.Types)
 
-type AnimationTrackProps = {
-	Animation: AnimationParser.AnimationData,
-	IsPlaying: boolean,
-	Length: number,
-	Looped: boolean,
-	Priority: number,
-	Speed: number,
-	TimePosition: number,
-	Weight: number,
+--[[
+TODO: GetMarkerReachedSignal(name: string): RBXScriptSignal  
+TODO: Returns an event that fires when a specified KeyframeMarker has been hit in an animation.
 
-	_animator: any,
-	_needToPlay: boolean,
-	_previousUpdate: number,
-	_fadeOut: {
-		Duration: number,
-		Elapsed: number,
-	}?,
-	_fadeIn: {
-		Duration: number,
-		Elapsed: number,
-	}?,
-}
+TODO: GetTimeOfKeyframe(keyframeName: string): number  
+TODO: Returns the time position of the first Keyframe of the given name in an AnimationTrack.
+]]--
 
-local AnimationTrack = {}
+local AnimationTrack = {} :: Types.AnimationTrackProto & Types.AnimationTrackImpl
 AnimationTrack.__index = AnimationTrack
 
-export type AnimationTrack = typeof(setmetatable({} :: AnimationTrackProps, AnimationTrack))
-
-function AnimationTrack.new(animator, animationData: AnimationParser.AnimationData): AnimationTrack
+function AnimationTrack.new(animator, animationData: Types.AnimationData): AnimationTrack
 	local self = setmetatable({}, AnimationTrack)
 
 	self.Animation = animationData
