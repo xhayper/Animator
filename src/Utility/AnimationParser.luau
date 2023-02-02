@@ -1,25 +1,8 @@
-local AnimationParser = {}
+local Types = require(script.Parent.Parent.Modules.Types)
 
-export type PoseData = {
-	Time: number,
-    CFrame: CFrame,
-	EasingStyle: Enum.PoseEasingStyle,
-	EasingDirection: Enum.PoseEasingDirection,
-}
+local AnimationParser = {} :: Types.AnimationParser
 
-export type KeyframeData = {
-	Pose: { PoseData },
-	Marker: { string },
-}
-
-export type AnimationData = {
-	Priority: number,
-	Length: number,
-	Loop: boolean,
-	Keyframes: { [string]: KeyframeData },
-}
-
-function AnimationParser.parse(sequence: KeyframeSequence): AnimationData
+function AnimationParser.parse(sequence: KeyframeSequence): Types.AnimationData
 	assert(typeof(sequence) == "Instance", "sequence is not an Instance")
 	assert(sequence.ClassName == "KeyframeSequence", "sequence is not a KeyframeSequence")
 
@@ -31,7 +14,7 @@ function AnimationParser.parse(sequence: KeyframeSequence): AnimationData
 
 	local priority = sequence.Priority ~= nil and sequence.Priority.Value or 1000
 
-	local animationData: AnimationData = {
+	local animationData: Types.AnimationData = {
 		Priority = (priority == 1000 and -1 or priority) + 1,
 		Length = keyframes[#keyframes].Time,
 		Loop = not not sequence.Loop,
@@ -56,7 +39,7 @@ end
     THIS MUTATE `keyframeData`
 ]]
 --
-function AnimationParser.parsePose(animationData: AnimationData, pose: Pose, keyframe: Keyframe)
+function AnimationParser.parsePose(animationData: Types.AnimationData, pose: Pose, keyframe: Keyframe)
 	if pose.ClassName == "Pose" then
 		if pose.Weight > 0 then
 			local name = pose.Name
@@ -71,7 +54,7 @@ function AnimationParser.parsePose(animationData: AnimationData, pose: Pose, key
 
 			table.insert(animationData.Keyframes[name].Pose, {
 				Time = keyframe.Time,
-                CFrame = cf,
+				CFrame = cf,
 				EasingDirection = pose.EasingDirection,
 				EasingStyle = pose.EasingStyle,
 			})

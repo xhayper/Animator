@@ -3,10 +3,15 @@ local sin = math.sin
 export type EasingFunction = (t: number) -> number
 
 local function bounce(x: number): number
-	return x < 0.36363636 and 7.5625 * x ^ 2
-		or x < 0.72727272 and 7.5625 * (x - 0.54545454) ^ 2 + 0.75
-		or x < 0.90909090 and 7.5625 * (x - 0.81818181) ^ 2 + 0.9375
-		or 7.5625 * (x - 0.95454545) ^ 2 + 0.984375
+	return x < 0.36363636 and (7.5625 * x ^ 2)
+		or (
+			x < 0.72727272 and (7.5625 * (x - 0.54545454) ^ 2 + 0.75)
+			or (
+				x < 0.90909090 and (7.5625 * (x - 0.81818181) ^ 2 + 0.9375) or (
+					7.5625 * (x - 0.95454545) ^ 2 + 0.984375
+				)
+			)
+		)
 end
 
 local EasingStylesFunction: { [Enum.PoseEasingStyle]: { [Enum.PoseEasingDirection]: EasingFunction } } = {}
